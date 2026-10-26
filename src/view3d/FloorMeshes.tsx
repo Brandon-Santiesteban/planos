@@ -4,6 +4,7 @@ import { add, dist, lerp, normalize, scale, sub } from '../geometry/vec';
 import { isEndConnected, wallLength } from '../geometry/walls';
 import type { Floor, Room, Vec2, Wall } from '../model/types';
 import { usePalette } from './palette';
+import StairsMesh from './StairsMesh';
 import { edgeTouchesWall, wallPieces } from './wallPieces';
 
 const RAIL_HEIGHT = 1.0;
@@ -88,6 +89,7 @@ function RoomSlab({ room, walls, selected, floorHeight }: { room: Room; walls: W
     const shape = new THREE.Shape(room.points.map((p) => new THREE.Vector2(p.x, p.y)));
     return new THREE.ExtrudeGeometry(shape, { depth: room.kind === 'roof' ? 0.06 : 0.02, bevelEnabled: false });
   }, [room.points, room.kind]);
+  if (room.kind === 'stairs') return <StairsMesh room={room} rise={floorHeight} selected={selected} />;
   if (room.kind === 'roof') {
     // A covering only: a thin light sheet at its own height, slightly see-through.
     return (
@@ -102,7 +104,8 @@ function RoomSlab({ room, walls, selected, floorHeight }: { room: Room; walls: W
     <group>
       {/* Shape is in plan XY; +90° about X maps plan y to world z and extrudes downwards. */}
       <mesh geometry={geometry} rotation={[Math.PI / 2, 0, 0]} position={[0, 0.001, 0]} receiveShadow>
-        <meshStandardMaterial color={color} roughness={0.8} />
+        {/* Both faces: from the floor below (walking) an upper slab is the ceiling. */}
+        <meshStandardMaterial color={color} roughness={0.8} side={THREE.DoubleSide} />
       </mesh>
       {room.kind === 'balcony' &&
         edges.filter((e) => !edgeTouchesWall(e, walls)).map((e, i) => <Railing key={i} a={e[0]} b={e[1]} />)}

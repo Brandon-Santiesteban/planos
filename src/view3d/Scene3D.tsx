@@ -10,6 +10,9 @@ import { usePalette } from './palette';
 import { outdoorLights, roomLights } from './roomLights';
 import { type TimeOfDay, useSceneOptions } from './sceneOptions';
 import SegmentedSwitch from '../ui/SegmentedSwitch';
+import WalkControls from '../walk/WalkControls';
+import { WalkButton, WalkHint } from '../walk/WalkOverlay';
+import { useWalk } from '../walk/walkStore';
 import { Ground, OutdoorLights, RoomLights, SkyLights, skyColor } from './Surroundings';
 
 function bounds(p: Project) {
@@ -41,8 +44,11 @@ export default function Scene3D() {
   const activeFloorId = useEditor((s) => s.activeFloorId);
   const selection = useEditor((s) => s.selection);
   const showUpperFloors = useEditor((s) => s.showUpperFloors);
+  const walking = useWalk((s) => s.walking);
+  // Leaving the 3D view ends the walk.
+  useEffect(() => () => useWalk.getState().set({ walking: false }), []);
   const activeIndex = Math.max(0, project.floors.findIndex((f) => f.id === activeFloorId));
-  const visible = project.floors.filter((_, i) => i <= activeIndex || showUpperFloors);
+  const visible = project.floors.filter((_, i) => i <= activeIndex || showUpperFloors || walking);
   const { grass, time } = useSceneOptions();
   const visibleIds = visible.map((f) => f.id).join();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,21 +74,28 @@ export default function Scene3D() {
         {visible.map((f) => (
           <FloorMeshes key={f.id} floor={f} elevation={floorElevation(project, f.id)} selectedId={selection?.id ?? null} />
         ))}
-        {/* Left: rotate · right: pan · wheel: zoom. Middle-button dragging (dolly) is off: the user found it confusing. */}
-        <OrbitControls
-          makeDefault
-          target={target}
-          maxPolarAngle={Math.PI / 2 - 0.02}
-          enableDamping
-          mouseButtons={{ LEFT: MOUSE.ROTATE, MIDDLE: -1 as MOUSE, RIGHT: MOUSE.PAN }}
-        />
-        <CameraRig frame={frame} />
+        {walking ? <WalkControls /> : (
+          <>
+            {/* Left: rotate · right: pan · wheel: zoom. Middle-button dragging (dolly) is off: the user found it confusing. */}
+            <OrbitControls
+              makeDefault
+              target={target}
+              maxPolarAngle={Math.PI / 2 - 0.02}
+              enableDamping
+              mouseButtons={{ LEFT: MOUSE.ROTATE, MIDDLE: -1 as MOUSE, RIGHT: MOUSE.PAN }}
+            />
+            <CameraRig frame={frame} />
+          </>
+        )}
       </Canvas>
+      <WalkHint />
       <div className="scene-toggle">
-        <label>
-          <input type="checkbox" checked={showUpperFloors} onChange={(e) => useEditor.getState().setShowUpperFloors(e.target.checked)} />
-          Plantas superiores
-        </label>
+        {!walking && (
+          <label>
+            <input type="checkbox" checked={showUpperFloors} onChange={(e) => useEditor.getState().setShowUpperFloors(e.target.checked)} />
+            Plantas superiores
+          </label>
+        )}
         <label>
           <input type="checkbox" checked={grass} onChange={(e) => useSceneOptions.getState().set({ grass: e.target.checked })} />
           Césped
@@ -93,6 +106,7 @@ export default function Scene3D() {
           options={[{ value: 'manana', label: 'Mañana' }, { value: 'tarde', label: 'Tarde' }, { value: 'noche', label: 'Noche' }]}
           onChange={(t) => useSceneOptions.getState().set({ time: t })}
         />
+        <WalkButton />
       </div>
     </div>
   );

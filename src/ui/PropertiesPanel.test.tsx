@@ -16,6 +16,11 @@ beforeEach(() => {
   s().select({ kind: 'wall', id: wall().id });
 });
 
+function chooseKind(label: string) {
+  fireEvent.click(screen.getByRole('combobox', { name: 'Tipo' }));
+  fireEvent.click(screen.getByRole('option', { name: label }));
+}
+
 function typeInto(label: string, text: string) {
   const input = screen.getByLabelText(label) as HTMLInputElement;
   fireEvent.change(input, { target: { value: text } });
@@ -80,7 +85,7 @@ test('a room can be renamed and turned into a balcony', () => {
   s().select({ kind: 'room', id: room().id });
   render(<PropertiesPanel />);
   typeInto('Nombre', 'Balcón');
-  fireEvent.click(screen.getByRole('radio', { name: 'Balcón' }));
+  chooseKind('Balcón');
   expect(room().name).toBe('Balcón');
   expect(room().kind).toBe('balcony');
   expect(screen.getByText('6,00 m²')).toBeInTheDocument();
@@ -91,8 +96,43 @@ test('a room can become a roof with its own height', () => {
   const room = () => s().project.floors[0].rooms[0];
   s().select({ kind: 'room', id: room().id });
   render(<PropertiesPanel />);
-  fireEvent.click(screen.getByRole('radio', { name: 'Cubierta' }));
+  chooseKind('Cubierta');
   expect(room().kind).toBe('roof');
   typeInto('Altura de la cubierta', '3,1');
   expect(room().height).toBeCloseTo(3.1);
+});
+
+test('a room can become a U-shaped stairs going up to the right', () => {
+  s().apply((d) => void addRoom(d, d.floors[0].id, [{ x: 0, y: 0 }, { x: 2, y: 0 }, { x: 2, y: 3 }, { x: 0, y: 3 }], 'Escalera'));
+  const room = () => s().project.floors[0].rooms[0];
+  s().select({ kind: 'room', id: room().id });
+  render(<PropertiesPanel />);
+  expect(screen.queryByRole('combobox', { name: 'Sube hacia' })).toBeNull();
+  chooseKind('Escalera');
+  expect(room().kind).toBe('stairs');
+  expect(screen.getByRole('heading', { name: 'Escalera' })).toBeInTheDocument();
+  expect(screen.getByRole('combobox', { name: 'Sube hacia' })).toHaveTextContent('Arriba');
+  fireEvent.click(screen.getByRole('combobox', { name: 'Sube hacia' }));
+  fireEvent.click(screen.getByRole('option', { name: 'Derecha' }));
+  expect(room().up).toBe('e');
+  expect(screen.getByRole('radio', { name: 'Recta' })).toHaveAttribute('aria-checked', 'true');
+  fireEvent.click(screen.getByRole('radio', { name: 'En U' }));
+  expect(room().stairShape).toBe('u');
+});
+
+test('Invertir apertura flips the swing of a door', () => {
+  s().apply((d) => void addOpening(d, d.floors[0].id, wall().id, 'door', 2));
+  s().select({ kind: 'opening', id: s().project.floors[0].openings[0].id });
+  render(<PropertiesPanel />);
+  fireEvent.click(screen.getByRole('button', { name: 'Invertir apertura' }));
+  expect(s().project.floors[0].openings[0].flip).toBe(true);
+  fireEvent.click(screen.getByRole('button', { name: 'Invertir apertura' }));
+  expect(s().project.floors[0].openings[0].flip).toBe(false);
+});
+
+test('windows have no Invertir apertura', () => {
+  s().apply((d) => void addOpening(d, d.floors[0].id, wall().id, 'window', 2));
+  s().select({ kind: 'opening', id: s().project.floors[0].openings[0].id });
+  render(<PropertiesPanel />);
+  expect(screen.queryByRole('button', { name: 'Invertir apertura' })).toBeNull();
 });

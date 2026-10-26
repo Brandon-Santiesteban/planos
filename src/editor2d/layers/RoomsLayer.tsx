@@ -3,6 +3,7 @@ import { formatArea, formatMetres } from '../../model/units';
 import type { Floor } from '../../model/types';
 import type { Selection } from '../../store/editorStore';
 import { usePlanOptions } from '../planOptions';
+import StairsSymbol from './StairsSymbol';
 
 /** Area (when shown) and the inside size of rectangular rooms, e.g. «12,00 m² · 3,00 × 4,00 m». */
 function areaLabel(points: { x: number; y: number }[], showArea: boolean): string {
@@ -27,6 +28,7 @@ export default function RoomsLayer({ floor, selection, pxPerMetre }: { floor: Fl
               points={r.points.map((p) => `${p.x},${p.y}`).join(' ')}
               data-id={r.id}
             />
+            {r.kind === 'stairs' && <StairsSymbol room={r} rise={floor.height} />}
             {/* A roof is only outlined: its label would sit on top of the room underneath. */}
             {r.kind !== 'roof' && (
               <>

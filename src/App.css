@@ -305,3 +305,44 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 .scene-toggle .carril button { height: 28px; }
 .room.roof { fill: none; stroke: var(--tenue); stroke-dasharray: 2 4; stroke-width: 1.5px; }
 .room.roof.selected { stroke: var(--acento); fill: color-mix(in srgb, var(--acento) 6%, transparent); }
+
+/* ---------- Phase 2: dropdown, stairs in the plan, walk mode ---------- */
+.desplegable { position: relative; }
+.desplegable-campo {
+  width: 100%; height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 10px 0 12px;
+  border: 0; border-radius: 8px; background: var(--sup2); color: var(--tinta); font: inherit; text-align: left; cursor: pointer;
+}
+.desplegable-campo:focus-visible, .desplegable.abierta .desplegable-campo { outline: none; box-shadow: inset 0 0 0 2px var(--acento); }
+.desplegable-valor { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.desplegable-flecha { color: var(--tenue); transition: transform .15s; }
+.desplegable.abierta .desplegable-flecha { transform: rotate(180deg); }
+.desplegable-panel {
+  position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 4px); padding: 6px;
+  background: var(--sup); border-radius: 10px; box-shadow: var(--sombra-honda), 0 0 0 1px var(--contorno);
+}
+.desplegable-buscar {
+  width: 100%; height: 32px; padding: 0 10px; margin-bottom: 4px; border: 0; border-radius: 8px;
+  background: var(--sup2); color: var(--tinta); font: inherit; font-size: 13px; outline: none;
+}
+.desplegable-buscar:focus { box-shadow: inset 0 0 0 2px var(--acento); }
+.desplegable-panel ul { list-style: none; margin: 0; padding: 0; max-height: 240px; overflow-y: auto; }
+.desplegable-panel li { display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 8px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+.desplegable-panel li.activa { background: var(--fondo); }
+.desplegable-panel li[aria-selected='true'] { font-weight: 500; }
+.desplegable-check { width: 16px; display: grid; place-items: center; color: var(--acento); }
+.desplegable-vacio { margin: 6px 8px; font-size: 13px; color: var(--tenue); }
+
+.room.stairs:not(.selected) { fill: color-mix(in srgb, var(--acento) 4%, transparent); }
+.stairs-symbol { pointer-events: none; }
+.stair-step, .stair-divider { stroke: var(--tenue); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.stair-divider { stroke: var(--tinta); stroke-width: 2px; }
+.stair-arrow { fill: none; stroke: var(--acento); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.stair-arrow-head { fill: var(--acento); }
+
+.ayuda-caminar {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%); pointer-events: none; white-space: nowrap;
+  padding: 6px 14px; border-radius: 999px; background: var(--tinta); color: var(--sup); font-size: 13px;
+  box-shadow: var(--sombra); transition: opacity .2s;
+}
+.ayuda-caminar.mirando { opacity: .6; }
+.scene-toggle .btn-chico .icono { margin-left: -2px; }
