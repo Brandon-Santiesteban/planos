@@ -26,6 +26,7 @@ const room = z.object({
   stairShape: z.enum(['recta', 'u']).optional(),
   floorMaterial: z.enum(['ceramica', 'porcelanato', 'madera', 'concreto', 'piedra', 'cesped']).optional(),
   railing: z.enum(['vidrio', 'muro', 'celosia']).optional(),
+  railingColor: color.optional(),
 });
 const furniture = z.object({
   id: z.string(), type: z.string().min(1), x: z.number().finite(), y: z.number().finite(), rotation: z.number().finite(),

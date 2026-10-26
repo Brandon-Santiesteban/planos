@@ -67,6 +67,8 @@ export interface Room {
   floorMaterial?: FloorMaterial;
   /** balconies only: kind of railing on the open edges (default 'vidrio'). */
   railing?: RailingType;
+  /** balconies only: hex colour of the celosía slats / parapet / glass railing metal (default: per kind). */
+  railingColor?: string;
 }
 
 /** A piece of furniture from the catalog (src/furniture/catalog.ts), placed on a floor. */

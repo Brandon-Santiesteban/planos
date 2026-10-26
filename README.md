@@ -44,6 +44,15 @@ Abre un ejemplo directamente con su enlace (la primera vez se carga el ejemplo; 
 
 Los archivos están en `public/ejemplos/`.
 
+## Materiales y fachada
+
+- **Acabados de un muro**: selecciona un muro y, en *Acabados*, elige para cada cara (*Cara A* y *Cara B*) el acabado (pintura, ladrillo, piedra, madera o enchape) y el color, con las muestras o escribiendo el código (`#E4D9C6`). Cada cara dice a qué habitación mira, o si mira al exterior. En la pintura el color es el de la pared; en los demás acabados tiñe la textura (Blanco la deja natural).
+- **Usar en toda la fachada**: en una cara que mira al exterior, copia ese acabado a todas las caras exteriores de la planta. Se puede deshacer.
+- **Piso**: en una habitación o balcón, elige cerámica, porcelanato (60 × 60 cm, mate), madera, concreto, piedra o césped.
+- **Baranda** de un balcón: *Vidrio*, *Muro* (muro de 1 m con remate) o *Celosía* (listones horizontales), con su color. En la planta baja la celosía es un cerramiento de 2 m sobre un muro de 0,6 m, que da privacidad y deja pasar el aire.
+- En 3D las texturas tienen su tamaño real: un ladrillo mide lo mismo en cualquier muro.
+- `node scripts/ejemplo-fachada.mjs [archivo.casa.json]` aplica a la casa de ejemplo la propuesta de fachada (hueso arenilla, frente de la escalera en madera, medianeras gris claro, cerramiento negro) y de pisos. Se puede correr varias veces.
+
 ## Atajos
 
 | Tecla | Acción |
