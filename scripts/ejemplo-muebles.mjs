@@ -199,11 +199,14 @@ const RECIPES = {
     k.onWall('w', 'closet', r.y1 - 0.8);
   },
   'Terraza (pretil)'(k, r) {
-    // Rooftop. Adelante (abajo en el plano) a la izquierda de la escalera: la piscina elevada; detrás, dos
-    // asoleadoras; en el centro la pérgola con sofá y mesa; al fondo bar y parrilla; jardineras y materas en el pretil.
-    const pool = k.onWall('s', 'piscina', r.x0 + 1.45, { width: 2.9, depth: 2.4, turn: 180 });
-    const loungerY = pool.y - 1.2 - 0.05 - 0.975;
+    // Rooftop (sin piscina: el usuario la deja para el módulo 2). Adelante (abajo en el plano), a la izquierda de la
+    // escalera: zona de asoleo con jardinera en el pretil, dos asoleadoras y sombrilla; detrás, mesa de exterior;
+    // en el centro la pérgola con sofá y mesa; al fondo bar y parrilla; jardineras y materas en el pretil.
+    const front = k.onWall('s', 'jardinera', r.x0 + 1.45, { turn: 180 });
+    const loungerY = front.y - 0.2 - 0.1 - 0.975;
     for (const x of [r.x0 + 0.55, r.x0 + 1.45]) k.piece('asoleadora', x, loungerY, 0);
+    k.piece('sombrilla', r.x0 + 2.15, loungerY, 0, { width: 1.8, depth: 1.8 });
+    k.piece('mesa-exterior', r.x0 + 1.2, loungerY - 0.975 - 0.15 - 0.9, 0);
     const pg = { x: r.x0 + 2.4, y: r.y0 + 1.3 + 1.4 };
     k.piece('pergola', pg.x, pg.y, 0, { depth: 2.8 });
     k.piece('sofa-exterior', pg.x, pg.y - 1.4 + 0.15 + 0.425, 0);
@@ -214,7 +217,7 @@ const RECIPES = {
     k.onWall('e', 'jardinera', r.y0 + 0.55 + 0.9);
     k.onWall('e', 'jardinera', r.y0 + 0.55 + 1.8 + 0.1 + 0.9);
     k.onWall('w', 'jardinera', pg.y);
-    k.onWall('w', 'matera-alta', loungerY - 1.25, { gap: 0.02 });
+    k.onWall('w', 'matera-alta', loungerY - 2.6, { gap: 0.02 });
   },
 };
 
