@@ -35,6 +35,8 @@ const PATHS = {
   chevron: 'M6 9l6 6 6-6',
   walk: 'M13 5.6a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2z M11.5 8L10 14l-3 7 M10 14l3.5 3v4 M7 11.5l2.5-3.5h3.5l2 3 2.5 1',
   flip: 'M12 3v18 M8 7L4 12l4 5z M16 7l4 5-4 5z',
+  sofa: 'M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3 M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3z M5 18v2 M19 18v2',
+  search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z M20 20l-4-4',
 } as const;
 
 export type IconName = keyof typeof PATHS;

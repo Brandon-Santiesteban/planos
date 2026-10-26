@@ -5,6 +5,7 @@ import { isEditableTarget } from '../ui/keys';
 import LengthInput from '../ui/LengthInput';
 import BackgroundLayer from './layers/BackgroundLayer';
 import DimensionsLayer from './layers/DimensionsLayer';
+import FurnitureLayer from './layers/FurnitureLayer';
 import GridLayer from './layers/GridLayer';
 import OpeningsLayer from './layers/OpeningsLayer';
 import RoomsLayer from './layers/RoomsLayer';
@@ -180,6 +181,7 @@ export default function Plan2D() {
           <GridLayer view={view} size={size} />
           {below && <WallsLayer floor={below} ghost />}
           <RoomsLayer floor={floor} selection={selection} pxPerMetre={k} />
+          <FurnitureLayer floor={floor} selection={selection} pxPerMetre={k} />
           <WallsLayer floor={floor} selection={selection} />
           <OpeningsLayer floor={floor} selection={selection} />
           <DimensionsLayer floor={floor} pxPerMetre={k} />

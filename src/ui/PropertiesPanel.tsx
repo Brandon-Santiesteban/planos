@@ -8,6 +8,8 @@ import {
 import type { Floor, Project, Room, RoomKind, StairShape, StairUp } from '../model/types';
 import { formatArea } from '../model/units';
 import { useEditor } from '../store/editorStore';
+import CatalogPanel from '../furniture/CatalogPanel';
+import FurnitureProps from '../furniture/FurnitureProps';
 import BackgroundControls from './BackgroundControls';
 import Dropdown from './Dropdown';
 import { LengthField, TextField } from './fields';
@@ -157,13 +159,14 @@ export default function PropertiesPanel() {
   const floor = project.floors.find((f) => f.id === activeFloorId) ?? project.floors[0];
 
   if (tool === 'quickRoom') return <QuickRoomPanel />;
+  if (tool === 'furniture') return <CatalogPanel />;
 
   if (!selection) {
     return (
       <>
         <section className="tarjeta properties">
           <h3>Propiedades</h3>
-          <p className="hint parrafo">Selecciona un muro, una puerta, una ventana o una habitación para ver y cambiar sus medidas.</p>
+          <p className="hint parrafo">Selecciona un muro, una puerta, una ventana, una habitación o un mueble para ver y cambiar sus medidas.</p>
         </section>
         <section className="tarjeta">
           <OrientationPanel />
@@ -179,6 +182,7 @@ export default function PropertiesPanel() {
       {selection.kind === 'wall' && <WallProps key={selection.id} floor={floor} id={selection.id} />}
       {selection.kind === 'opening' && <OpeningProps key={selection.id} floor={floor} id={selection.id} />}
       {selection.kind === 'room' && <RoomProps key={selection.id} floor={floor} id={selection.id} />}
+      {selection.kind === 'furniture' && <FurnitureProps key={selection.id} floor={floor} id={selection.id} />}
     </section>
   );
 }
