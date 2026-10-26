@@ -20,6 +20,13 @@ test('round-trips a project', () => {
   expect(r).toEqual({ ok: true, project: p });
 });
 
+test('files from before the compass open with north up', () => {
+  const old = JSON.parse(serializeProject(sampleProject()));
+  delete old.north;
+  const r = parseProject(JSON.stringify(old));
+  expect(r.ok && r.project.north).toBe(0);
+});
+
 test('rejects broken JSON', () => {
   const r = parseProject('{');
   expect(r.ok).toBe(false);

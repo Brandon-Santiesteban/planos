@@ -9,6 +9,7 @@ import GridLayer from './layers/GridLayer';
 import OpeningsLayer from './layers/OpeningsLayer';
 import RoomsLayer from './layers/RoomsLayer';
 import WallsLayer from './layers/WallsLayer';
+import Compass from './Compass';
 import PreviewLayer from './PreviewLayer';
 import { getTool, type ToolContext } from './tools';
 import { type Size, type View, screenToWorld, worldToScreen, zoomAt } from './viewport';
@@ -164,6 +165,7 @@ export default function Plan2D() {
           <DimensionsLayer floor={floor} pxPerMetre={k} />
           <PreviewLayer preview={preview} pxPerMetre={k} />
         </g>
+        <Compass north={project.north} x={size.w - 46} y={size.h - 46} />
       </svg>
       {typing && typingAt && <LengthInput text={typing.typed} valid={typing.typedValid} x={typingAt.x} y={typingAt.y} label={toolName === 'calibrate' ? 'Medida real' : 'Longitud'} />}
     </div>

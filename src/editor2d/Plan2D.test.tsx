@@ -37,3 +37,10 @@ test('rectangular rooms also show their inside size', () => {
   render(<Plan2D />);
   expect(screen.getByText('12,00 m² · 3,00 × 4,00 m')).toBeInTheDocument();
 });
+
+test('the compass points to the project north', () => {
+  useEditor.getState().apply((d) => { d.north = 90; });
+  const { container } = render(<Plan2D />);
+  const needle = container.querySelector('[data-testid="brujula"] .aguja');
+  expect(needle?.getAttribute('transform')).toBe('rotate(90)');
+});

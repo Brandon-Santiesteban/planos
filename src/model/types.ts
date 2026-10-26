@@ -56,6 +56,8 @@ export interface Project {
   /** Stable id used by the saved-projects library. */
   id: string;
   name: string;
+  /** Compass: degrees clockwise from the top of the plan to geographic north. */
+  north: number;
   /** ordered bottom to top */
   floors: Floor[];
 }

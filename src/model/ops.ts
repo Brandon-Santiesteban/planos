@@ -4,6 +4,7 @@ import { polygonArea } from '../geometry/polygons';
 import { add, dist, normalize, scale, sub } from '../geometry/vec';
 import { createFloor, DEFAULTS } from './defaults';
 import { newId } from './ids';
+import { normalizeDegrees } from './orientation';
 import { quickRoomOutline, uncoveredParts } from './quickRoom';
 import type { Background, Floor, Opening, OpeningKind, Project, RoomKind, Vec2, Wall } from './types';
 
@@ -285,6 +286,10 @@ export function updateBackground(
 ): void {
   const bg = getFloor(p, floorId).background;
   if (bg) Object.assign(bg, patch);
+}
+
+export function setNorth(p: Project, degrees: number): void {
+  p.north = normalizeDegrees(degrees);
 }
 
 export function floorElevation(p: Project, floorId: string): number {

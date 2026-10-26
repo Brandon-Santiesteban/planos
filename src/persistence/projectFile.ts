@@ -30,7 +30,7 @@ const floor = z
     message: 'Hay una puerta o ventana en un muro que no existe',
   });
 // Files saved before projects had an id get one when opened.
-const project = z.object({ version: z.literal(1), id: z.string().min(1).optional(), name: z.string(), floors: z.array(floor).min(1) });
+const project = z.object({ version: z.literal(1), id: z.string().min(1).optional(), name: z.string(), north: z.number().finite().optional(), floors: z.array(floor).min(1) });
 
 const INVALID = 'El archivo no es un proyecto válido';
 
@@ -50,7 +50,7 @@ export function parseProject(text: string): { ok: true; project: Project } | { o
   }
   const r = project.safeParse(data);
   if (!r.success) return { ok: false, error: INVALID };
-  const parsed = { ...r.data, id: r.data.id ?? newId() } as Project;
+  const parsed = { ...r.data, id: r.data.id ?? newId(), north: r.data.north ?? 0 } as Project;
   const problem = geometryProblem(parsed);
   if (problem) return { ok: false, error: `${INVALID}: ${problem}` };
   return { ok: true, project: parsed };

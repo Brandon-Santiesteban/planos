@@ -8,6 +8,7 @@ import { formatArea } from '../model/units';
 import { useEditor } from '../store/editorStore';
 import BackgroundControls from './BackgroundControls';
 import { LengthField, TextField } from './fields';
+import OrientationPanel from './OrientationPanel';
 import QuickRoomPanel from './QuickRoomPanel';
 import Icon from './Icon';
 import SegmentedSwitch from './SegmentedSwitch';
@@ -113,6 +114,9 @@ export default function PropertiesPanel() {
         <section className="tarjeta properties">
           <h3>Propiedades</h3>
           <p className="hint parrafo">Selecciona un muro, una puerta, una ventana o una habitación para ver y cambiar sus medidas.</p>
+        </section>
+        <section className="tarjeta">
+          <OrientationPanel />
         </section>
         <section className="tarjeta">
           <BackgroundControls floor={floor} />
