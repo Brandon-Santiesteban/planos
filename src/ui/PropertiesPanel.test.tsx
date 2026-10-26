@@ -136,3 +136,12 @@ test('windows have no Invertir apertura', () => {
   render(<PropertiesPanel />);
   expect(screen.queryByRole('button', { name: 'Invertir apertura' })).toBeNull();
 });
+
+test('a door can be turned into a glass door', () => {
+  s().apply((d) => void addOpening(d, d.floors[0].id, wall().id, 'door', 2));
+  const door = () => s().project.floors[0].openings[0];
+  s().select({ kind: 'opening', id: door().id });
+  render(<PropertiesPanel />);
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Puerta de vidrio' }));
+  expect(door().glass).toBe(true);
+});

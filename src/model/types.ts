@@ -34,6 +34,8 @@ export interface Opening {
   sill: number;
   /** doors: swing to the other side of the wall */
   flip?: boolean;
+  /** doors: a glass door (e.g. a sliding glass door to a balcony) — drawn with a glass pane */
+  glass?: boolean;
 }
 
 /**
@@ -66,6 +68,8 @@ export interface Room {
   stairShape?: StairShape;
   /** floor finish (rooms and balconies) */
   floorMaterial?: FloorMaterial;
+  /** balconies only: edges (index i = points[i] → points[i+1]) left without railing, e.g. towards a driveway. */
+  openEdges?: number[];
   /** balconies only: kind of railing on the open edges (default 'vidrio'). */
   railing?: RailingType;
   /** balconies only: hex colour of the celosía slats / parapet / glass railing metal (default: per kind). */

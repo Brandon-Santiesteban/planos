@@ -246,6 +246,11 @@ export function setStairShape(p: Project, floorId: string, roomId: string, shape
 }
 
 /** Doors: swing to the other side of the wall. */
+export function setDoorGlass(p: Project, floorId: string, openingId: string, glass: boolean): void {
+  const o = getFloor(p, floorId).openings.find((x) => x.id === openingId);
+  if (o && o.kind === 'door') o.glass = glass;
+}
+
 export function toggleDoorFlip(p: Project, floorId: string, openingId: string): void {
   const o = getFloor(p, floorId).openings.find((x) => x.id === openingId);
   if (o && o.kind === 'door') o.flip = !o.flip;

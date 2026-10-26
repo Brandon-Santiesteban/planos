@@ -126,3 +126,10 @@ test('outdoor zones with asphalt or soil survive a save/open', () => {
   p.floors[0].rooms[0] = { ...p.floors[0].rooms[0], kind: 'exterior', floorMaterial: 'asfalto' };
   expect(parseProject(serializeProject(p))).toEqual({ ok: true, project: p });
 });
+
+test('glass doors and railing-free edges survive a save/open', () => {
+  const p = sampleProject();
+  p.floors[0].openings[0].glass = true;
+  p.floors[0].rooms[0] = { ...p.floors[0].rooms[0], kind: 'balcony', openEdges: [2] };
+  expect(parseProject(serializeProject(p))).toEqual({ ok: true, project: p });
+});

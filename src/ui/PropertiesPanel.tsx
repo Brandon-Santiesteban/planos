@@ -3,7 +3,7 @@ import { wallLength } from '../geometry/walls';
 import { RoomMaterials, WallFinishes } from '../materials/MaterialPanels';
 import {
   deleteOpening, deleteRoom, deleteWall, renameRoom, setRoofHeight, setRoomKind, setStairShape, setStairUp, setWallLength,
-  toggleDoorFlip, updateOpening, updateWall,
+  toggleDoorFlip, setDoorGlass, updateOpening, updateWall,
 } from '../model/ops';
 import type { Floor, Project, Room, RoomKind, StairShape, StairUp } from '../model/types';
 import { formatArea } from '../model/units';
@@ -79,6 +79,12 @@ function OpeningProps({ floor, id }: { floor: Floor; id: string }) {
         <div className="acciones">
           <button className="btn btn-sec" onClick={() => edit((d, f) => toggleDoorFlip(d, f, id))}><Icon name="flip" size={16} />Invertir apertura</button>
         </div>
+      )}
+      {o.kind === 'door' && (
+        <label className="toggle-linea">
+          <input type="checkbox" checked={o.glass === true} onChange={(e) => edit((d, f) => setDoorGlass(d, f, id, e.target.checked))} />
+          Puerta de vidrio
+        </label>
       )}
       <DeleteButton onClick={() => remove(o.kind === 'door' ? 'Puerta eliminada' : 'Ventana eliminada', (d, f) => deleteOpening(d, f, id))} />
     </>

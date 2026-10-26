@@ -9,7 +9,8 @@ import { applyMetricUVs, wallEndExtension } from '../materials/wallFaces';
 import type { Floor, RailingType, Room, Vec2, Wall } from '../model/types';
 import { usePalette } from './palette';
 import StairsMesh from './StairsMesh';
-import { edgeTouchesWall, wallPieces } from './wallPieces';
+import { railingEdges } from './railingEdges';
+import { wallPieces } from './wallPieces';
 
 /** Rotation about Y that aligns local +X with the plan direction d (plan y = world z). */
 const yaw = (d: Vec2) => -Math.atan2(d.y, d.x);
@@ -67,7 +68,8 @@ function WallMesh({ wall, floor, selected }: { wall: Wall; floor: Floor; selecte
         );
       })}
       {openings
-        .filter((o) => o.kind === 'window')
+        // Windows, and doors marked as glass (a sliding glass door), get a pane.
+        .filter((o) => o.kind === 'window' || o.glass)
         .map((o) => {
           const c = add(wall.a, scale(d, o.offset));
           return (
@@ -137,7 +139,6 @@ function RoomSlab({ room, walls, selected, floorHeight, ground }: { room: Room; 
   const color = selected ? pal.selected : room.kind === 'balcony' ? pal.balcony : pal.room;
   // The slab's top UVs are plan coordinates in metres, so floor textures keep their real size.
   const surface = !selected && room.floorMaterial ? floorSurfaceMaterial(room.floorMaterial) : null;
-  const edges: [Vec2, Vec2][] = room.points.map((p, i) => [p, room.points[(i + 1) % room.points.length]]);
   return (
     <group>
       {/* Shape is in plan XY; +90° about X maps plan y to world z and extrudes downwards. */}
@@ -153,8 +154,8 @@ function RoomSlab({ room, walls, selected, floorHeight, ground }: { room: Room; 
         <meshStandardMaterial color="#efebe4" roughness={0.9} side={THREE.BackSide} />
       </mesh>
       {room.kind === 'balcony' &&
-        edges.filter((e) => !edgeTouchesWall(e, walls)).map((e, i) => (
-          <Railing key={i} a={e[0]} b={e[1]} type={room.railing} color={room.railingColor} ground={ground} />
+        railingEdges(room, walls).map((e) => (
+          <Railing key={e.index} a={e.a} b={e.b} type={room.railing} color={room.railingColor} ground={ground} />
         ))}
     </group>
   );

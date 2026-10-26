@@ -484,3 +484,7 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 .aviso-progreso-pie { display: flex; justify-content: space-between; }
 .aviso-progreso-barra { height: 6px; border-radius: 3px; background: var(--sup2); overflow: hidden; }
 .aviso-progreso-barra > div { height: 100%; background: var(--acento); border-radius: 3px; transition: width .2s linear; }
+
+/* ---- Interruptor en una línea (p. ej. «Puerta de vidrio») ---- */
+.toggle-linea { display: flex; align-items: center; gap: 8px; margin: 10px 0 4px; cursor: pointer; }
+.toggle-linea input { accent-color: var(--acento); }

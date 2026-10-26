@@ -19,6 +19,7 @@ const opening = z.object({
   id: z.string(), wallId: z.string(), kind: z.enum(['door', 'window']),
   offset: z.number().finite(), width: positive, height: positive, sill: z.number().finite().min(0),
   flip: z.boolean().optional(),
+  glass: z.boolean().optional(),
 });
 const room = z.object({
   id: z.string(), name: z.string(), kind: z.enum(['room', 'balcony', 'roof', 'stairs', 'exterior']), points: z.array(vec).min(3),
@@ -26,6 +27,7 @@ const room = z.object({
   stairShape: z.enum(['recta', 'u']).optional(),
   floorMaterial: z.enum(['ceramica', 'porcelanato', 'madera', 'concreto', 'piedra', 'cesped', 'asfalto', 'tierra']).optional(),
   railing: z.enum(['vidrio', 'muro', 'celosia']).optional(),
+  openEdges: z.array(z.number().int().min(0)).optional(),
   railingColor: color.optional(),
 });
 const furniture = z.object({
