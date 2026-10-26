@@ -6,14 +6,14 @@ import OrientationPanel from './OrientationPanel';
 
 beforeEach(() => useEditor.getState().loadProject(createEmptyProject()));
 
-test('turning the compass says where the front faces', () => {
+test('turning the compass says which way each side of the plan faces', () => {
   render(<OrientationPanel />);
-  expect(screen.getByText(/mira al Norte/)).toBeInTheDocument();
+  expect(screen.getByText('Arriba del plano: Norte · Abajo: Sur')).toBeInTheDocument();
   fireEvent.click(screen.getByLabelText('Girar el norte 15° a la derecha'));
   expect(useEditor.getState().project.north).toBe(15);
   const input = screen.getByLabelText('Norte (grados)');
   fireEvent.change(input, { target: { value: '180' } });
   fireEvent.keyDown(input, { key: 'Enter' });
   expect(useEditor.getState().project.north).toBe(180);
-  expect(screen.getByText(/mira al Sur/)).toBeInTheDocument();
+  expect(screen.getByText('Arriba del plano: Sur · Abajo: Norte')).toBeInTheDocument();
 });

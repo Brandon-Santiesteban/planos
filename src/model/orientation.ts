@@ -9,7 +9,7 @@ export function cardinal(bearing: number): string {
   return NAMES[Math.round(normalizeDegrees(bearing) / 45) % 8];
 }
 
-/** Which way the top of the plan (the front of the house) faces. */
+/** Which way the top of the plan faces. */
 export function frontFacing(north: number): string {
   return cardinal(-north);
 }

@@ -28,7 +28,7 @@ export default function OrientationPanel() {
   return (
     <div className="orientacion">
       <h3>Orientación</h3>
-      <p className="hint">{`El frente (arriba del plano) mira al ${frontFacing(north)}.`}</p>
+      <p className="hint">{`Arriba del plano: ${frontFacing(north)} · Abajo: ${frontFacing(north + 180)}`}</p>
       <div className="field">
         <label htmlFor="norte">Norte (grados)</label>
         <div className="with-unit">

@@ -12,9 +12,22 @@ import WallsLayer from './layers/WallsLayer';
 import Compass from './Compass';
 import PreviewLayer from './PreviewLayer';
 import { getTool, type ToolContext } from './tools';
-import { type Size, type View, screenToWorld, worldToScreen, zoomAt } from './viewport';
+import { type Bounds, fitView, type Size, type View, screenToWorld, worldToScreen, zoomAt } from './viewport';
+import type { Project } from '../model/types';
 
 const DEFAULT_SIZE: Size = { w: 800, h: 600 };
+
+/** Walls of every floor plus balconies (a lot or garden zone shouldn't shrink the house on screen). */
+function houseBounds(p: Project): Bounds | null {
+  const pts = p.floors.flatMap((f) => [
+    ...f.walls.flatMap((w) => [w.a, w.b]),
+    ...f.rooms.filter((r) => r.kind === 'balcony').flatMap((r) => r.points),
+  ]);
+  if (!pts.length) return null;
+  const xs = pts.map((q) => q.x);
+  const ys = pts.map((q) => q.y);
+  return { minX: Math.min(...xs), minY: Math.min(...ys), maxX: Math.max(...xs), maxY: Math.max(...ys) };
+}
 
 export default function Plan2D() {
   const project = useEditor((s) => s.project);
@@ -37,6 +50,13 @@ export default function Plan2D() {
   viewRef.current = view;
   const sizeRef = useRef(size);
   sizeRef.current = size;
+  const loadCount = useEditor((s) => s.loadCount);
+  const measured = size !== DEFAULT_SIZE;
+
+  // Frame the house whenever a project is opened (and once the real size of the view is known).
+  useEffect(() => {
+    setView(fitView(houseBounds(useEditor.getState().project), sizeRef.current));
+  }, [loadCount, measured]);
 
   const ctx = (): ToolContext => ({ state: useEditor.getState(), view: viewRef.current, ...mods.current });
 

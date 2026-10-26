@@ -12,7 +12,7 @@ test('cardinal names in Spanish', () => {
   expect(cardinal(359)).toBe('Norte');
 });
 
-test('the top of the plan (the front) faces where north is not', () => {
+test('which way the top of the plan faces', () => {
   expect(frontFacing(0)).toBe('Norte'); // north points up
   expect(frontFacing(180)).toBe('Sur'); // north points down
   expect(frontFacing(90)).toBe('Oeste'); // north points right → up is west
