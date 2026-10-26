@@ -17,6 +17,7 @@ Haz doble clic en **`iniciar.bat`**. La primera vez instala lo necesario (tarda 
 - **Calcar un plano**: sin nada seleccionado, *Cargar plano de fondo* (imagen o PDF), luego *Calibrar escala*: clic en dos puntos de distancia conocida, escribe la medida real y Enter.
 - **3D**: arrastra para girar, rueda para acercar, botón derecho para desplazar. *Mostrar plantas superiores* enseña las plantas por encima de la actual.
 - **Cuadrícula**: abajo a la izquierda del plano puedes mostrarla u ocultarla y elegir 10 cm, 50 cm o 1 m. Oculta, los puntos solo se pegan a las esquinas de los muros.
+- **Metros cuadrados**: el botón **m²** (abajo a la izquierda del plano) muestra u oculta el área de cada habitación. Viene apagado; las medidas de las habitaciones rectangulares se ven siempre.
 - **Mis proyectos**: todo se guarda solo, cada proyecto por separado, y arriba ves la hora del último guardado. *Nuevo* no borra el anterior: lo encuentras en *Mis proyectos*.
 - **Guardar**: crea un archivo `.casa.json` en tu PC. Después de guardarlo (o abrirlo) una vez, ese archivo se actualiza solo con cada cambio.
 - **Modo oscuro**: botón de la luna arriba a la derecha.

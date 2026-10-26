@@ -4,8 +4,12 @@ import { createEmptyProject } from '../model/defaults';
 import { addRoom, addWall } from '../model/ops';
 import { useEditor } from '../store/editorStore';
 import Plan2D from './Plan2D';
+import { usePlanOptions } from './planOptions';
 
-beforeEach(() => useEditor.getState().loadProject(createEmptyProject()));
+beforeEach(() => {
+  useEditor.getState().loadProject(createEmptyProject());
+  usePlanOptions.setState({ showArea: true });
+});
 
 test('renders a wall with its length label', () => {
   const { apply, activeFloorId } = useEditor.getState();
@@ -43,4 +47,14 @@ test('the compass points to the project north', () => {
   const { container } = render(<Plan2D />);
   const needle = container.querySelector('[data-testid="brujula"] .aguja');
   expect(needle?.getAttribute('transform')).toBe('rotate(90)');
+});
+
+test('square metres are hidden when the option is off, sizes stay', () => {
+  usePlanOptions.setState({ showArea: false });
+  const { apply, activeFloorId } = useEditor.getState();
+  apply((d) => void addRoom(d, activeFloorId, [{ x: 0, y: 0 }, { x: 3, y: 0 }, { x: 3, y: 4 }, { x: 0, y: 4 }], 'Dormitorio'));
+  apply((d) => void addRoom(d, activeFloorId, [{ x: 5, y: 0 }, { x: 8, y: 0 }, { x: 6, y: 3 }], 'Rincón'));
+  render(<Plan2D />);
+  expect(screen.getByText('3,00 × 4,00 m')).toBeInTheDocument();
+  expect(screen.queryByText(/m²/)).toBeNull();
 });
