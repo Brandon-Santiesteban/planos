@@ -595,19 +595,25 @@ function SelectionBox({ f, color }: { f: Furniture; color: string }) {
 
 type Controls = { enabled: boolean } | null;
 
-/** Every piece of a floor, at the floor's elevation. Click selects; dragging moves it on its floor (one undo step). */
+/** Every piece of a floor, at the floor's elevation. A click selects; dragging a selected piece moves it on its floor (one undo step). */
 export default function FurnitureMeshes({ floor, elevation, selectedId }: { floor: Floor; elevation: number; selectedId: string | null }) {
   const pal = usePalette();
   const { camera, gl } = useThree();
   const controls = useThree((s) => s.controls) as unknown as Controls;
   const dragRef = useRef<{ drag: FurnitureDrag; plane: THREE.Plane; offset: { x: number; y: number }; started: boolean; downX: number; downY: number } | null>(null);
 
-  const onPointerDown = (e: ThreeEvent<PointerEvent>, f: Furniture) => {
-    if (e.button !== 0) return;
+  const onClick = (e: ThreeEvent<MouseEvent>, f: Furniture) => {
+    if (e.delta > 4) return; // that was a camera drag, not a click
     e.stopPropagation();
     const store = useEditor.getState();
     if (store.activeFloorId !== floor.id) store.setActiveFloor(floor.id);
     useEditor.getState().select({ kind: 'furniture', id: f.id });
+  };
+
+  // Only an already selected piece is dragged: dragging anything else orbits the camera.
+  const onPointerDown = (e: ThreeEvent<PointerEvent>, f: Furniture) => {
+    if (e.button !== 0 || f.id !== selectedId) return;
+    e.stopPropagation();
     const drag = beginFurnitureDrag(f.id, floor.id);
     if (!drag) return;
     if (controls) controls.enabled = false;
@@ -654,6 +660,7 @@ export default function FurnitureMeshes({ floor, elevation, selectedId }: { floo
           position={[f.x, f.elevation, f.y]}
           rotation={[0, (-f.rotation * Math.PI) / 180, 0]}
           onPointerDown={(e) => onPointerDown(e, f)}
+          onClick={(e) => onClick(e, f)}
         >
           <FurnitureModel3D f={f} />
           {f.id === selectedId && <SelectionBox f={f} color={pal.selected} />}
