@@ -86,3 +86,21 @@ test('a roof keeps its own height', () => {
   const r = parseProject(serializeProject(p));
   expect(r.ok && r.project.floors[0].rooms[0]).toMatchObject({ kind: 'roof', height: 3.1 });
 });
+
+test('furniture, finishes, stairs and railings survive a save/open', () => {
+  const p = sampleProject();
+  const f = p.floors[0];
+  f.furniture = [{ id: 'm1', type: 'cama-doble', x: 1, y: 2, rotation: 90, width: 1.6, depth: 2, height: 0.5, elevation: 0 }];
+  f.walls[0].sides = { left: { color: '#FFFFFF', finish: 'pintura' }, right: { finish: 'ladrillo' } };
+  f.rooms[0] = { ...f.rooms[0], kind: 'stairs', up: 'e', floorMaterial: 'madera' };
+  f.openings[0].flip = true;
+  const r = parseProject(serializeProject(p));
+  expect(r).toEqual({ ok: true, project: p });
+});
+
+test('files from before furniture existed open with no furniture', () => {
+  const old = JSON.parse(serializeProject(sampleProject()));
+  delete old.floors[0].furniture;
+  const r = parseProject(JSON.stringify(old));
+  expect(r.ok && r.project.floors[0].furniture).toEqual([]);
+});

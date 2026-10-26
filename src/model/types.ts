@@ -1,6 +1,15 @@
 // All lengths are in metres. Plan coordinates: x right, y down; 3D world maps (x, y) -> (x, elevation, y).
 export type Vec2 = { x: number; y: number };
 
+/** Finish of one face of a wall. */
+export type WallFinish = 'pintura' | 'ladrillo' | 'piedra' | 'madera' | 'enchape';
+
+export interface WallSide {
+  /** hex colour, e.g. "#F4F1EA" (used by 'pintura'; tints the other finishes) */
+  color?: string;
+  finish?: WallFinish;
+}
+
 export interface Wall {
   id: string;
   a: Vec2;
@@ -8,6 +17,8 @@ export interface Wall {
   thickness: number;
   /** null = use the floor height */
   height: number | null;
+  /** Faces of the wall: `left` is on the left when walking from a to b (the +perp side), `right` the other. */
+  sides?: { left?: WallSide; right?: WallSide };
 }
 
 export type OpeningKind = 'door' | 'window';
@@ -21,10 +32,22 @@ export interface Opening {
   width: number;
   height: number;
   sill: number;
+  /** doors: swing to the other side of the wall */
+  flip?: boolean;
 }
 
-/** room = interior; balcony = exterior with railing; roof = a covering slab only (e.g. a patio roof). */
-export type RoomKind = 'room' | 'balcony' | 'roof';
+/**
+ * room = interior; balcony = exterior with railing; roof = a covering slab only (e.g. a patio roof);
+ * stairs = a flight going up to the next floor (no slab: the 3D view draws steps).
+ */
+export type RoomKind = 'room' | 'balcony' | 'roof' | 'stairs';
+
+/** Direction a stairs room goes up, in plan terms: n = towards the top of the plan (−y), s = +y, e = +x, w = −x. */
+export type StairUp = 'n' | 's' | 'e' | 'w';
+
+export type FloorMaterial = 'ceramica' | 'porcelanato' | 'madera' | 'concreto' | 'piedra' | 'cesped';
+
+export type RailingType = 'vidrio' | 'muro' | 'celosia';
 
 export interface Room {
   id: string;
@@ -33,6 +56,30 @@ export interface Room {
   points: Vec2[];
   /** roof only: height of the slab above this floor (default: the floor height). */
   height?: number;
+  /** stairs only: which way it goes up (default 'n'). */
+  up?: StairUp;
+  /** floor finish (rooms and balconies) */
+  floorMaterial?: FloorMaterial;
+  /** balconies only: kind of railing on the open edges (default 'vidrio'). */
+  railing?: RailingType;
+}
+
+/** A piece of furniture from the catalog (src/furniture/catalog.ts), placed on a floor. */
+export interface Furniture {
+  id: string;
+  /** catalog id, e.g. "cama-doble" */
+  type: string;
+  /** centre in plan coordinates */
+  x: number;
+  y: number;
+  /** degrees, clockwise in plan */
+  rotation: number;
+  width: number;
+  depth: number;
+  height: number;
+  /** height of its base above the floor (stacking: a monitor on a desk) */
+  elevation: number;
+  color?: string;
 }
 
 export interface Background {
@@ -51,6 +98,7 @@ export interface Floor {
   walls: Wall[];
   openings: Opening[];
   rooms: Room[];
+  furniture: Furniture[];
   background: Background | null;
 }
 

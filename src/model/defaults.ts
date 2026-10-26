@@ -18,6 +18,7 @@ export function createFloor(name: string): Floor {
     name,
     height: DEFAULTS.floorHeight,
     walls: [],
+    furniture: [],
     openings: [],
     rooms: [],
     background: null,

@@ -7,15 +7,28 @@ import type { Opening, Project } from '../model/types';
 const vec = z.object({ x: z.number().finite(), y: z.number().finite() });
 const positive = z.number().finite().positive();
 
+const color = z.string().regex(/^#[0-9a-fA-F]{6}$/);
+const wallSide = z.object({
+  color: color.optional(), finish: z.enum(['pintura', 'ladrillo', 'piedra', 'madera', 'enchape']).optional(),
+});
 const wall = z.object({
   id: z.string(), a: vec, b: vec, thickness: positive, height: positive.nullable(),
+  sides: z.object({ left: wallSide.optional(), right: wallSide.optional() }).optional(),
 });
 const opening = z.object({
   id: z.string(), wallId: z.string(), kind: z.enum(['door', 'window']),
   offset: z.number().finite(), width: positive, height: positive, sill: z.number().finite().min(0),
+  flip: z.boolean().optional(),
 });
 const room = z.object({
-  id: z.string(), name: z.string(), kind: z.enum(['room', 'balcony', 'roof']), points: z.array(vec).min(3), height: positive.optional(),
+  id: z.string(), name: z.string(), kind: z.enum(['room', 'balcony', 'roof', 'stairs']), points: z.array(vec).min(3),
+  height: positive.optional(), up: z.enum(['n', 's', 'e', 'w']).optional(),
+  floorMaterial: z.enum(['ceramica', 'porcelanato', 'madera', 'concreto', 'piedra', 'cesped']).optional(),
+  railing: z.enum(['vidrio', 'muro', 'celosia']).optional(),
+});
+const furniture = z.object({
+  id: z.string(), type: z.string().min(1), x: z.number().finite(), y: z.number().finite(), rotation: z.number().finite(),
+  width: positive, depth: positive, height: positive, elevation: z.number().finite().min(0), color: color.optional(),
 });
 const background = z.object({
   dataUrl: z.string().startsWith('data:'), origin: vec, metresPerPixel: positive,
@@ -24,7 +37,10 @@ const background = z.object({
 const floor = z
   .object({
     id: z.string(), name: z.string(), height: positive,
-    walls: z.array(wall), openings: z.array(opening), rooms: z.array(room), background: background.nullable(),
+    walls: z.array(wall), openings: z.array(opening), rooms: z.array(room),
+    // Files saved before furniture existed have none.
+    furniture: z.array(furniture).optional().transform((v) => v ?? []),
+    background: background.nullable(),
   })
   .refine((f) => f.openings.every((o) => f.walls.some((w) => w.id === o.wallId)), {
     message: 'Hay una puerta o ventana en un muro que no existe',

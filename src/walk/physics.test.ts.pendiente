@@ -1,0 +1,96 @@
+import { createEmptyProject } from '../model/defaults';
+import { addFloor, addOpening, addRoom, addWall, setRoomKind, setStairUp } from '../model/ops';
+import type { Project } from '../model/types';
+import { blockingSegments, levelAt, moveWithCollisions, EYE_HEIGHT } from './physics';
+
+let p: Project;
+let g: string;
+beforeEach(() => {
+  p = createEmptyProject();
+  g = p.floors[0].id;
+});
+const rect = (x0: number, y0: number, x1: number, y1: number) => [
+  { x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: y1 }, { x: x0, y: y1 },
+];
+
+test('a plain wall blocks along its whole length', () => {
+  addWall(p, g, { x: 0, y: 0 }, { x: 4, y: 0 });
+  const segs = blockingSegments(p.floors[0]);
+  expect(segs).toHaveLength(1);
+  expect(segs[0].a.x).toBeCloseTo(0);
+  expect(segs[0].b.x).toBeCloseTo(4);
+});
+
+test('a door leaves a gap you can walk through, a window does not', () => {
+  const w = addWall(p, g, { x: 0, y: 0 }, { x: 4, y: 0 })!;
+  addOpening(p, g, w, 'door', 1);
+  addOpening(p, g, w, 'window', 3);
+  const segs = blockingSegments(p.floors[0]);
+  // pieces: 0…0.6 | door gap 0.6…1.4 | 1.4…4 (the window has wall under its sill)
+  expect(segs).toHaveLength(2);
+  expect(segs[0].b.x).toBeCloseTo(0.6);
+  expect(segs[1].a.x).toBeCloseTo(1.4);
+});
+
+test('walking into a wall stops at the wall and slides along it', () => {
+  addWall(p, g, { x: 0, y: 0 }, { x: 4, y: 0 });
+  const segs = blockingSegments(p.floors[0]);
+  // standing 0.5 m south of the wall, walking north-east into it
+  const next = moveWithCollisions({ x: 2, y: 0.5 }, { x: 0.5, y: -1 }, segs, 0.25);
+  expect(next.y).toBeGreaterThanOrEqual(0.25 + 0.075 - 1e-6); // radius + half thickness
+  expect(next.x).toBeCloseTo(2.5); // kept the sideways part of the step
+});
+
+test('a free step goes all the way', () => {
+  expect(moveWithCollisions({ x: 1, y: 1 }, { x: 0.3, y: 0.1 }, [], 0.25)).toEqual({ x: 1.3, y: 1.1 });
+});
+
+/** Walks in 10 cm steps from a to b, carrying the feet height along. */
+function walk(from: { x: number; y: number }, to: { x: number; y: number }, feet: number) {
+  let level = { floorIndex: 0, feet };
+  const n = Math.ceil(Math.hypot(to.x - from.x, to.y - from.y) / 0.1);
+  for (let i = 1; i <= n; i++) {
+    const t = i / n;
+    level = levelAt(p, { x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t }, level.feet);
+  }
+  return level;
+}
+
+function stairs(floorId: string) {
+  const s = addRoom(p, floorId, rect(0, 0, 1, 3), 'Escalera')!;
+  setRoomKind(p, floorId, s, 'stairs');
+  setStairUp(p, floorId, s, 'n'); // goes up towards −y
+}
+
+test('walking up a stairs room takes you from one floor to the next', () => {
+  addFloor(p);
+  stairs(g);
+  expect(walk({ x: 0.5, y: 3.5 }, { x: 0.5, y: 1.5 }, 0).feet).toBeCloseTo(1.3, 1);
+  const top = walk({ x: 0.5, y: 3.5 }, { x: 0.5, y: 0.02 }, 0);
+  expect(top.floorIndex).toBe(1);
+  expect(top.feet).toBeCloseTo(2.6, 1);
+});
+
+test('off the stairs your feet stay on your floor', () => {
+  addFloor(p);
+  expect(levelAt(p, { x: 5, y: 5 }, 2.6)).toEqual({ floorIndex: 1, feet: 2.6 });
+  expect(EYE_HEIGHT).toBe(1.65);
+});
+
+test('coming down from the upper floor uses the same ramp', () => {
+  addFloor(p);
+  stairs(g);
+  const down = walk({ x: 0.5, y: -0.5 }, { x: 0.5, y: 3.5 }, 2.6);
+  expect(down).toEqual({ floorIndex: 0, feet: 0 });
+});
+
+test('with stairs stacked on every floor you keep climbing the one you are on', () => {
+  addFloor(p);
+  addFloor(p);
+  stairs(g);
+  stairs(p.floors[1].id);
+  // halfway up the first flight
+  expect(walk({ x: 0.5, y: 3.5 }, { x: 0.5, y: 1.5 }, 0).feet).toBeCloseTo(1.3, 1);
+  // standing on the first floor, entering the second flight from its bottom
+  expect(walk({ x: 0.5, y: 3.5 }, { x: 0.5, y: 1.5 }, 2.6).feet).toBeCloseTo(3.9, 1);
+});

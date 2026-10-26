@@ -6,7 +6,7 @@ import { createFloor, DEFAULTS } from './defaults';
 import { newId } from './ids';
 import { normalizeDegrees } from './orientation';
 import { quickRoomOutline, uncoveredParts } from './quickRoom';
-import type { Background, Floor, Opening, OpeningKind, Project, RoomKind, Vec2, Wall } from './types';
+import type { Background, Floor, Opening, OpeningKind, Project, RoomKind, StairUp, Vec2, Wall } from './types';
 
 function getFloor(p: Project, floorId: string): Floor {
   const f = p.floors.find((fl) => fl.id === floorId);
@@ -233,6 +233,11 @@ export function renameRoom(p: Project, floorId: string, roomId: string, name: st
 export function setRoomKind(p: Project, floorId: string, roomId: string, kind: RoomKind): void {
   const r = getFloor(p, floorId).rooms.find((x) => x.id === roomId);
   if (r) r.kind = kind;
+}
+
+export function setStairUp(p: Project, floorId: string, roomId: string, up: StairUp): void {
+  const r = getFloor(p, floorId).rooms.find((x) => x.id === roomId);
+  if (r) r.up = up;
 }
 
 export function setRoofHeight(p: Project, floorId: string, roomId: string, height: number): void {
