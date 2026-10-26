@@ -57,14 +57,20 @@ function probes(w, side) {
 }
 
 /**
- * A face is outside when it looks at no room of its floor (roof coverings, balconies and the patio don't count),
+ * A face is outside when it looks at no room of its floor (balconies, outdoor zones, the patio and raised roofs
+ * don't count; a roof at wall height does),
  * or when the wall lies on the module and the face looks out of the module's box.
  */
 export function isOutside(floor, w, side) {
   const ps = probes(w, side);
   const onModule = inModule(w.a) && inModule(w.b);
   if (onModule && !strictlyInModule(ps[0])) return true;
-  const enclosed = floor.rooms.filter((r) => r.kind !== 'roof' && r.kind !== 'balcony' && !/patio/i.test(r.name));
+  // A roof at wall height closes the space under it (e.g. the stair head on the terrace); a roof raised above
+  // the walls (the patio's, with air all around) does not.
+  const closedRoof = (r) => r.kind === 'roof' && (r.height ?? floor.height) <= floor.height + TOL;
+  const enclosed = floor.rooms.filter(
+    (r) => (closedRoof(r) || (r.kind !== 'roof' && r.kind !== 'balcony' && r.kind !== 'exterior')) && !/patio/i.test(r.name),
+  );
   return !ps.some((p) => enclosed.some((r) => pointInPolygon(p, r.points)));
 }
 

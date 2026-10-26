@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "id": "935e1ad0-c683-42d2-96bc-d81b9104cb4a",
+  "id": "a2cf7a60-0c8f-418e-93a3-62a98ab91878",
   "name": "Casa etapa 1",
   "north": 0,
   "floors": [
@@ -1550,7 +1550,7 @@
               "y": 11.7
             }
           ],
-          "floorMaterial": "concreto"
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "003296d2-0a6f-4fce-bd5b-eef69d01f916",
@@ -1574,7 +1574,7 @@
               "y": 18.7
             }
           ],
-          "floorMaterial": "asfalto"
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "e98fcd0f-345f-47ea-9327-f60d76e38ed2",
@@ -1598,7 +1598,7 @@
               "y": 19.3
             }
           ],
-          "floorMaterial": "concreto"
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "6c001a9e-82ca-40dd-ad8f-1464b998dd46",
@@ -1622,7 +1622,7 @@
               "y": 22.3
             }
           ],
-          "floorMaterial": "cesped"
+          "floorMaterial": "porcelanato"
         }
       ],
       "background": null
@@ -2574,7 +2574,7 @@
             },
             "right": {
               "finish": "pintura",
-              "color": "#E4D9C6"
+              "color": "#EDE4D3"
             }
           }
         },
@@ -2597,7 +2597,7 @@
             },
             "right": {
               "finish": "pintura",
-              "color": "#E4D9C6"
+              "color": "#EDE4D3"
             }
           }
         },
@@ -2615,7 +2615,8 @@
           "height": null,
           "sides": {
             "left": {
-              "finish": "madera"
+              "finish": "pintura",
+              "color": "#EDE4D3"
             },
             "right": {
               "finish": "madera"
@@ -2637,7 +2638,7 @@
           "sides": {
             "left": {
               "finish": "pintura",
-              "color": "#C8CBCE"
+              "color": "#EDE4D3"
             },
             "right": {
               "finish": "pintura",
