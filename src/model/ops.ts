@@ -16,13 +16,69 @@ function getWall(f: Floor, wallId: string): Wall | undefined {
   return f.walls.find((w) => w.id === wallId);
 }
 
-/** Moves every wall endpoint on the floor that sits at `from` to `to`. */
-function moveEndpointsAt(f: Floor, from: Vec2, to: Vec2): void {
+/** A wall end; joints sharing a point move together. */
+export type Joint = { wallId: string; end: 'a' | 'b' };
+
+/** Every wall end on the floor sitting at `pt`. Record these at the start of a drag. */
+export function jointsAt(f: Floor, pt: Vec2): Joint[] {
+  const out: Joint[] = [];
   for (const w of f.walls) {
-    if (dist(w.a, from) <= DEFAULTS.joinTolerance) w.a = { ...to };
-    if (dist(w.b, from) <= DEFAULTS.joinTolerance) w.b = { ...to };
+    if (dist(w.a, pt) <= DEFAULTS.joinTolerance) out.push({ wallId: w.id, end: 'a' });
+    if (dist(w.b, pt) <= DEFAULTS.joinTolerance) out.push({ wallId: w.id, end: 'b' });
   }
+  return out;
 }
+
+/** Moves exactly the given joints; refuses (returns false) if any wall would become too short. */
+function moveJoints(f: Floor, moves: { joint: Joint; to: Vec2 }[]): boolean {
+  const next = new Map<string, { a: Vec2; b: Vec2 }>();
+  for (const { joint, to } of moves) {
+    const w = getWall(f, joint.wallId);
+    if (!w) continue;
+    const cur = next.get(w.id) ?? { a: w.a, b: w.b };
+    next.set(w.id, { ...cur, [joint.end]: to });
+  }
+  for (const ends of next.values()) if (dist(ends.a, ends.b) < DEFAULTS.minWallLength) return false;
+  for (const [id, ends] of next) {
+    const w = getWall(f, id)!;
+    w.a = { ...ends.a };
+    w.b = { ...ends.b };
+  }
+  refitOpenings(f);
+  return true;
+}
+
+export function setJoints(p: Project, floorId: string, joints: Joint[], to: Vec2): boolean {
+  return moveJoints(getFloor(p, floorId), joints.map((joint) => ({ joint, to })));
+}
+
+export function translateJoints(p: Project, floorId: string, joints: Joint[], delta: Vec2): boolean {
+  const f = getFloor(p, floorId);
+  return moveJoints(
+    f,
+    joints.flatMap((joint) => {
+      const w = getWall(f, joint.wallId);
+      return w ? [{ joint, to: add(w[joint.end], delta) }] : [];
+    }),
+  );
+}
+
+/** Both ends of a wall plus every end joined to them. */
+export function wallJoints(f: Floor, wallId: string): Joint[] {
+  const w = getWall(f, wallId);
+  return w ? [...jointsAt(f, w.a), ...jointsAt(f, w.b)] : [];
+}
+
+function wallHeight(f: Floor, w: Wall): number {
+  return w.height ?? f.height;
+}
+
+/** Top of the tallest opening on a wall (0 if none). */
+function openingsTop(f: Floor, wallId: string): number {
+  return Math.max(0, ...f.openings.filter((o) => o.wallId === wallId).map((o) => o.sill + o.height));
+}
+
+const MIN_OPENING_HEIGHT = 0.3;
 
 /** Re-fits the openings of walls whose length changed; drops those that no longer fit. */
 function refitOpenings(f: Floor): void {
@@ -57,39 +113,35 @@ export function updateWall(
   floorId: string,
   wallId: string,
   patch: Partial<Pick<Wall, 'thickness' | 'height'>>,
-): void {
-  const w = getWall(getFloor(p, floorId), wallId);
-  if (w) Object.assign(w, patch);
-}
-
-export function setWallLength(p: Project, floorId: string, wallId: string, length: number): void {
+): boolean {
   const f = getFloor(p, floorId);
   const w = getWall(f, wallId);
-  if (!w || length < DEFAULTS.minWallLength) return;
+  if (!w) return false;
+  if (patch.thickness !== undefined && !(patch.thickness > 0)) return false;
+  if (patch.height !== undefined) {
+    const h = patch.height ?? f.height;
+    if (!(h > 0) || h + 1e-9 < openingsTop(f, wallId)) return false;
+  }
+  Object.assign(w, patch);
+  return true;
+}
+
+export function setWallLength(p: Project, floorId: string, wallId: string, length: number): boolean {
+  const f = getFloor(p, floorId);
+  const w = getWall(f, wallId);
+  if (!w) return false;
   const to = add(w.a, scale(normalize(sub(w.b, w.a)), length));
-  moveEndpointsAt(f, w.b, to);
-  refitOpenings(f);
+  return moveJoints(f, jointsAt(f, w.b).map((joint) => ({ joint, to })));
 }
 
-export function moveWallEndpoint(p: Project, floorId: string, wallId: string, end: 'a' | 'b', to: Vec2): void {
+export function moveWallEndpoint(p: Project, floorId: string, wallId: string, end: 'a' | 'b', to: Vec2): boolean {
   const f = getFloor(p, floorId);
   const w = getWall(f, wallId);
-  if (!w) return;
-  const other = end === 'a' ? w.b : w.a;
-  if (dist(other, to) < DEFAULTS.minWallLength) return;
-  moveEndpointsAt(f, w[end], to);
-  refitOpenings(f);
+  return w ? setJoints(p, floorId, jointsAt(f, w[end]), to) : false;
 }
 
-export function moveWall(p: Project, floorId: string, wallId: string, delta: Vec2): void {
-  const f = getFloor(p, floorId);
-  const w = getWall(f, wallId);
-  if (!w) return;
-  const a = { ...w.a };
-  const b = { ...w.b };
-  moveEndpointsAt(f, a, add(a, delta));
-  moveEndpointsAt(f, b, add(b, delta));
-  refitOpenings(f);
+export function moveWall(p: Project, floorId: string, wallId: string, delta: Vec2): boolean {
+  return translateJoints(p, floorId, wallJoints(getFloor(p, floorId), wallId), delta);
 }
 
 export function deleteWall(p: Project, floorId: string, wallId: string): void {
@@ -103,11 +155,13 @@ export function addOpening(p: Project, floorId: string, wallId: string, kind: Op
   const w = getWall(f, wallId);
   if (!w) return null;
   const d = DEFAULTS[kind];
+  const height = Math.min(d.height, wallHeight(f, w) - d.sill);
+  if (height < MIN_OPENING_HEIGHT) return null;
   const others = f.openings.filter((o) => o.wallId === wallId);
   const c = fitOpening(wallLength(w), offset, d.width, others);
   if (c === null) return null;
   const id = newId();
-  f.openings.push({ id, wallId, kind, offset: c, width: d.width, height: d.height, sill: d.sill });
+  f.openings.push({ id, wallId, kind, offset: c, width: d.width, height, sill: d.sill });
   return id;
 }
 
@@ -123,7 +177,7 @@ export function updateOpening(
   const w = getWall(f, o.wallId);
   if (!w) return false;
   const next = { ...o, ...patch };
-  const wallH = w.height ?? f.height;
+  const wallH = wallHeight(f, w);
   if (next.width <= 0 || next.height <= 0 || next.sill < 0 || next.sill + next.height > wallH + 1e-9) return false;
   const others = f.openings.filter((x) => x.wallId === o.wallId && x.id !== o.id);
   const c = fitOpening(wallLength(w), next.offset, next.width, others);
@@ -172,8 +226,12 @@ export function renameFloor(p: Project, floorId: string, name: string): void {
   getFloor(p, floorId).name = name;
 }
 
-export function setFloorHeight(p: Project, floorId: string, h: number): void {
-  if (h > 0) getFloor(p, floorId).height = h;
+export function setFloorHeight(p: Project, floorId: string, h: number): boolean {
+  const f = getFloor(p, floorId);
+  if (!(h > 0)) return false;
+  if (f.walls.some((w) => w.height === null && h + 1e-9 < openingsTop(f, w.id))) return false;
+  f.height = h;
+  return true;
 }
 
 export function moveFloor(p: Project, floorId: string, dir: -1 | 1): void {

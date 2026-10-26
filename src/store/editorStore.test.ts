@@ -35,6 +35,11 @@ test('loadProject clears history', () => {
   expect(s().dirty).toBe(false);
 });
 
+test('a project restored from autosave can be marked as unsaved', () => {
+  s().loadProject(createEmptyProject(), { dirty: true });
+  expect(s().dirty).toBe(true);
+});
+
 test('undo clears a selection whose target vanished', () => {
   s().apply((d) => void addWall(d, floorId(), { x: 0, y: 0 }, { x: 4, y: 0 }));
   s().select({ kind: 'wall', id: walls()[0].id });

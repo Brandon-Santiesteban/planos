@@ -1,15 +1,13 @@
 import { useCallback } from 'react';
+import { getCurrentHandle, setCurrentHandle } from '../persistence/currentFile';
 import { openProject, saveProject } from '../persistence/projectFile';
 import { useEditor } from '../store/editorStore';
-
-// The handle of the file last opened/saved, so "Guardar" overwrites it without asking again.
-let currentHandle: FileSystemFileHandle | undefined;
 
 export function useProjectFile() {
   const save = useCallback(async () => {
     try {
-      const h = await saveProject(useEditor.getState().project, currentHandle);
-      if (h) currentHandle = h;
+      const h = await saveProject(useEditor.getState().project, getCurrentHandle());
+      if (h) setCurrentHandle(h);
       if (h || !('showSaveFilePicker' in window)) useEditor.getState().markSaved();
     } catch (e) {
       alert(`No se pudo guardar: ${(e as Error).message}`);
@@ -25,8 +23,8 @@ export function useProjectFile() {
         alert(r.error);
         return;
       }
-      currentHandle = r.handle ?? undefined;
       useEditor.getState().loadProject(r.project);
+      setCurrentHandle(r.handle ?? undefined); // after loadProject, which clears it
     } catch (e) {
       alert(`No se pudo abrir: ${(e as Error).message}`);
     }

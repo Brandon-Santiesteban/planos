@@ -27,7 +27,7 @@ export interface EditorState {
   setActiveFloor(id: string): void;
   setSnapping(on: boolean): void;
   setShowUpperFloors(on: boolean): void;
-  loadProject(p: Project): void;
+  loadProject(p: Project, opts?: { dirty?: boolean }): void;
   markSaved(): void;
 }
 
@@ -67,7 +67,10 @@ export const useEditor = create<EditorState>()((set, get) => ({
 
   apply(recipe, opts) {
     const state = get();
-    const next = produce(state.project, recipe);
+    // Recipes may return an op result (e.g. boolean); immer must only see draft mutations.
+    const next = produce(state.project, (d) => {
+      recipe(d);
+    });
     if (next === state.project) return;
     const record = opts?.record ?? true;
     set({
@@ -113,9 +116,15 @@ export const useEditor = create<EditorState>()((set, get) => ({
   },
   setSnapping: (snapping) => set({ snapping }),
   setShowUpperFloors: (showUpperFloors) => set({ showUpperFloors }),
-  loadProject: (p) =>
+  loadProject: (p, opts) =>
     set((s) => ({
-      project: p, activeFloorId: p.floors[0].id, selection: null, past: [], future: [], dirty: false, loadCount: s.loadCount + 1,
+      project: p,
+      activeFloorId: p.floors[0].id,
+      selection: null,
+      past: [],
+      future: [],
+      dirty: opts?.dirty ?? false,
+      loadCount: s.loadCount + 1,
     })),
   markSaved: () => set({ dirty: false }),
 }));

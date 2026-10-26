@@ -52,8 +52,9 @@ export function createCalibrateTool(): ToolHandler {
     },
     onKey(key) {
       if (key === 'Escape') {
+        const busy = a !== null;
         reset();
-        return true;
+        return busy;
       }
       if (!b) return false;
       if (key === 'Enter') {

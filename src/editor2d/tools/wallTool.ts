@@ -51,8 +51,9 @@ export function createWallTool(): ToolHandler {
     },
     onKey(key) {
       if (key === 'Escape') {
+        const busy = start !== null;
         this.reset();
-        return true;
+        return busy;
       }
       if (!start) return false;
       if (key === 'Enter') {

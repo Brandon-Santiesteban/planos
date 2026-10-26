@@ -2,7 +2,9 @@ import { snapToGrid } from '../../geometry/snap';
 import { dist, sub } from '../../geometry/vec';
 import { projectOntoWall } from '../../geometry/walls';
 import { DEFAULTS } from '../../model/defaults';
-import { deleteOpening, deleteRoom, deleteWall, moveWall, moveWallEndpoint, updateOpening } from '../../model/ops';
+import {
+  deleteOpening, deleteRoom, deleteWall, type Joint, jointsAt, setJoints, translateJoints, updateOpening, wallJoints,
+} from '../../model/ops';
 import type { Vec2 } from '../../model/types';
 import { useEditor } from '../../store/editorStore';
 import { hitTest } from '../hitTest';
@@ -13,8 +15,8 @@ const HIT_PX = 8;
 const DRAG_START_PX = 3;
 
 type Drag =
-  | { kind: 'endpoint'; wallId: string; end: 'a' | 'b' }
-  | { kind: 'wall'; wallId: string; applied: Vec2 }
+  | { kind: 'endpoint'; wallId: string; end: 'a' | 'b'; joints: Joint[] }
+  | { kind: 'wall'; wallId: string; applied: Vec2; joints: Joint[] }
   | { kind: 'opening'; openingId: string; wallId: string };
 
 export function createSelectTool(): ToolHandler {
@@ -33,10 +35,11 @@ export function createSelectTool(): ToolHandler {
       if (!hit) return select(null);
       if (hit.kind === 'endpoint') {
         select({ kind: 'wall', id: hit.wallId });
-        drag = { kind: 'endpoint', wallId: hit.wallId, end: hit.end };
+        const w = floor.walls.find((x) => x.id === hit.wallId)!;
+        drag = { kind: 'endpoint', wallId: hit.wallId, end: hit.end, joints: jointsAt(floor, w[hit.end]) };
       } else if (hit.kind === 'wall') {
         select({ kind: 'wall', id: hit.id });
-        drag = { kind: 'wall', wallId: hit.id, applied: { x: 0, y: 0 } };
+        drag = { kind: 'wall', wallId: hit.id, applied: { x: 0, y: 0 }, joints: wallJoints(floor, hit.id) };
       } else if (hit.kind === 'opening') {
         select({ kind: 'opening', id: hit.id });
         const o = floor.openings.find((x) => x.id === hit.id)!;
@@ -61,14 +64,17 @@ export function createSelectTool(): ToolHandler {
         const wall = floor.walls.find((w) => w.id === d.wallId);
         if (!wall) return;
         const to = snapForTool(p, ctx, [], wall[d.end]).point;
-        store.apply((draft) => moveWallEndpoint(draft, floorId, d.wallId, d.end, to), { record: false });
+        store.apply((draft) => void setJoints(draft, floorId, d.joints, to), { record: false });
       } else if (d.kind === 'wall') {
         let total = sub(p, downAt);
         if (ctx.state.snapping && !ctx.altKey) total = snapToGrid(total, DEFAULTS.gridStep);
         const step = sub(total, d.applied);
         if (step.x === 0 && step.y === 0) return;
-        store.apply((draft) => moveWall(draft, floorId, d.wallId, step), { record: false });
-        d.applied = total;
+        let moved = false;
+        store.apply((draft) => {
+          moved = translateJoints(draft, floorId, d.joints, step);
+        }, { record: false });
+        if (moved) d.applied = total;
       } else {
         const wall = floor.walls.find((w) => w.id === d.wallId);
         if (!wall) return;

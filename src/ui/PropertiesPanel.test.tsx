@@ -2,7 +2,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { wallLength } from '../geometry/walls';
 import { createEmptyProject } from '../model/defaults';
-import { addRoom, addWall } from '../model/ops';
+import { addOpening, addRoom, addWall } from '../model/ops';
 import { useEditor } from '../store/editorStore';
 import PropertiesPanel from './PropertiesPanel';
 
@@ -39,6 +39,28 @@ test('Grosor accepts comma decimals', () => {
   render(<PropertiesPanel />);
   typeInto('Grosor', '0,2');
   expect(wall().thickness).toBeCloseTo(0.2);
+});
+
+test('focusing and leaving a field without editing changes nothing', () => {
+  s().loadProject(createEmptyProject());
+  s().apply((d) => void addWall(d, d.floors[0].id, { x: 0, y: 0 }, { x: 1, y: 1 })); // 1.41421… m
+  s().select({ kind: 'wall', id: wall().id });
+  const pastBefore = s().past.length;
+  render(<PropertiesPanel />);
+  const input = screen.getByLabelText('Longitud');
+  fireEvent.focus(input);
+  fireEvent.blur(input);
+  expect(wallLength(wall())).toBeCloseTo(Math.SQRT2, 6);
+  expect(s().past.length).toBe(pastBefore);
+});
+
+test('a refused edit puts the real value back in the field', () => {
+  s().apply((d) => void addOpening(d, d.floors[0].id, wall().id, 'door', 2));
+  s().select({ kind: 'opening', id: s().project.floors[0].openings[0].id });
+  render(<PropertiesPanel />);
+  const input = typeInto('Ancho', '9');
+  expect(s().project.floors[0].openings[0].width).toBe(0.8);
+  expect(input.value).toBe('0,80');
 });
 
 test('Eliminar deletes the wall', () => {

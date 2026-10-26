@@ -47,8 +47,9 @@ export function createOpeningTool(kind: OpeningKind): ToolHandler {
     },
     onKey(key) {
       if (key !== 'Escape') return false;
+      // Never consume Escape: the global shortcut returns to the select tool.
       hover = null;
-      return true;
+      return false;
     },
     preview(): ToolPreview | null {
       if (!hover) return null;

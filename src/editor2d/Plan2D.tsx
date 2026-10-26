@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
 import type { Vec2 } from '../model/types';
 import { useEditor } from '../store/editorStore';
+import { isEditableTarget } from '../ui/keys';
 import LengthInput from '../ui/LengthInput';
 import BackgroundLayer from './layers/BackgroundLayer';
 import DimensionsLayer from './layers/DimensionsLayer';
@@ -68,8 +69,7 @@ export default function Plan2D() {
     const down = (e: KeyboardEvent) => {
       mods.current = { altKey: e.altKey, shiftKey: e.shiftKey };
       if (e.code === 'Space') spaceDown.current = true;
-      const t = e.target as HTMLElement | null;
-      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+      if (isEditableTarget(e.target)) return;
       if (e.ctrlKey || e.metaKey) return;
       if (tool.onKey?.(e.key, ctx())) {
         e.preventDefault();

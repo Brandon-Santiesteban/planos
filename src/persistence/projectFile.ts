@@ -1,5 +1,7 @@
 import { z } from 'zod';
-import type { Project } from '../model/types';
+import { fitOpening, wallLength } from '../geometry/walls';
+import { DEFAULTS } from '../model/defaults';
+import type { Opening, Project } from '../model/types';
 
 const vec = z.object({ x: z.number().finite(), y: z.number().finite() });
 const positive = z.number().finite().positive();
@@ -45,8 +47,34 @@ export function parseProject(text: string): { ok: true; project: Project } | { o
     return { ok: false, error: 'Versión de proyecto no compatible' };
   }
   const r = project.safeParse(data);
-  if (!r.success) return { ok: false, error: `${INVALID}: ${r.error.issues[0]?.message ?? ''}` };
+  if (!r.success) return { ok: false, error: INVALID };
+  const problem = geometryProblem(r.data as Project);
+  if (problem) return { ok: false, error: `${INVALID}: ${problem}` };
   return { ok: true, project: r.data as Project };
+}
+
+/** Rejects geometry the editor itself would never produce. Returns a Spanish message or null. */
+function geometryProblem(p: Project): string | null {
+  for (const f of p.floors) {
+    const ids = new Set<string>();
+    for (const x of [...f.walls, ...f.openings, ...f.rooms]) {
+      if (ids.has(x.id)) return `hay elementos repetidos en «${f.name}»`;
+      ids.add(x.id);
+    }
+    for (const w of f.walls) {
+      if (wallLength(w) < DEFAULTS.minWallLength) return `hay un muro demasiado corto en «${f.name}»`;
+    }
+    const placed: Opening[] = [];
+    for (const o of f.openings) {
+      const w = f.walls.find((x) => x.id === o.wallId)!;
+      const others = placed.filter((q) => q.wallId === o.wallId);
+      const fitted = fitOpening(wallLength(w), o.offset, o.width, others);
+      if (fitted === null || Math.abs(fitted - o.offset) > 1e-6) return `hay una puerta o ventana fuera de su muro en «${f.name}»`;
+      if (o.sill + o.height > (w.height ?? f.height) + 1e-6) return `hay una puerta o ventana más alta que su muro en «${f.name}»`;
+      placed.push(o);
+    }
+  }
+  return null;
 }
 
 // Minimal File System Access API typings (Chrome/Edge).

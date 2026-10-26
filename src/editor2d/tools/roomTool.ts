@@ -42,8 +42,9 @@ export function createRoomTool(): ToolHandler {
     },
     onKey(key, ctx) {
       if (key === 'Escape') {
+        const busy = points.length > 0;
         this.reset();
-        return true;
+        return busy;
       }
       if (key === 'Enter' && points.length) {
         close(ctx);

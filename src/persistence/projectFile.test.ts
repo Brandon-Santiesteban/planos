@@ -38,6 +38,36 @@ test('rejects an opening pointing to a missing wall', () => {
   expect(parseProject(serializeProject(p)).ok).toBe(false);
 });
 
+test('rejects an opening outside its wall', () => {
+  const p = sampleProject();
+  p.floors[0].openings[0].offset = 50;
+  expect(parseProject(serializeProject(p)).ok).toBe(false);
+});
+
+test('rejects overlapping openings', () => {
+  const p = sampleProject();
+  p.floors[0].openings.push({ ...p.floors[0].openings[0], id: 'other' });
+  expect(parseProject(serializeProject(p)).ok).toBe(false);
+});
+
+test('rejects a zero-length wall', () => {
+  const p = sampleProject();
+  p.floors[0].walls.push({ id: 'z', a: { x: 1, y: 1 }, b: { x: 1, y: 1 }, thickness: 0.15, height: null });
+  expect(parseProject(serializeProject(p)).ok).toBe(false);
+});
+
+test('rejects an opening taller than its wall', () => {
+  const p = sampleProject();
+  p.floors[0].openings[0].height = 3;
+  expect(parseProject(serializeProject(p)).ok).toBe(false);
+});
+
+test('error messages are fully in Spanish', () => {
+  const r = parseProject('null');
+  expect(r.ok).toBe(false);
+  if (!r.ok) expect(r.error).not.toMatch(/invalid|expected|received/i);
+});
+
 test('rejects a project without floors', () => {
   const p = { ...sampleProject(), floors: [] };
   expect(parseProject(JSON.stringify(p)).ok).toBe(false);

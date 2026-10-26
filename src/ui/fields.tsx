@@ -19,6 +19,10 @@ export function LengthField({ label, value, onCommit, allowEmpty = false, placeh
   }, [shown]);
 
   const commit = () => {
+    if (text === shown) {
+      setInvalid(false); // untouched: never round the real value to the 2 decimals shown
+      return;
+    }
     if (text.trim() === '' && allowEmpty) {
       setInvalid(false);
       onCommit(null);
@@ -30,7 +34,9 @@ export function LengthField({ label, value, onCommit, allowEmpty = false, placeh
       return;
     }
     setInvalid(false);
-    if (v !== value) onCommit(v);
+    onCommit(v);
+    // If the edit was refused the value doesn't change; show the real value again.
+    setText(shown);
   };
 
   return (
