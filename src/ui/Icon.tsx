@@ -37,6 +37,11 @@ const PATHS = {
   flip: 'M12 3v18 M8 7L4 12l4 5z M16 7l4 5-4 5z',
   sofa: 'M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3 M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3z M5 18v2 M19 18v2',
   search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z M20 20l-4-4',
+  // Photos and render (src/render)
+  camera: 'M4 8h3l2-3h6l2 3h3v11H4z M12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z',
+  sparkle: 'M11 3l1.8 5.2L18 10l-5.2 1.8L11 17l-1.8-5.2L4 10l5.2-1.8z M18.5 15l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z',
+  stop: 'M7 7h10v10H7z',
+  play: 'M8 5.5l10.5 6.5L8 18.5z',
 } as const;
 
 export type IconName = keyof typeof PATHS;

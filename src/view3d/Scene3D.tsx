@@ -15,6 +15,8 @@ import WalkControls from '../walk/WalkControls';
 import { WalkButton, WalkHint } from '../walk/WalkOverlay';
 import { useWalk } from '../walk/walkStore';
 import { Ground, OutdoorLights, RoomLights, SkyLights, skyColor } from './Surroundings';
+import RenderBridge from '../render/RenderBridge';
+import RenderButtons from '../render/RenderButtons';
 
 function bounds(p: Project) {
   const pts = p.floors.flatMap((f) => [...f.walls.flatMap((w) => [w.a, w.b]), ...f.rooms.flatMap((r) => r.points)]);
@@ -89,6 +91,7 @@ export default function Scene3D() {
             <CameraRig frame={frame} />
           </>
         )}
+        <RenderBridge />
       </Canvas>
       <WalkHint />
       <div className="scene-toggle">
@@ -109,6 +112,7 @@ export default function Scene3D() {
           onChange={(t) => useSceneOptions.getState().set({ time: t })}
         />
         <WalkButton />
+        <RenderButtons />
       </div>
     </div>
   );

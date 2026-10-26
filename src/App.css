@@ -454,3 +454,33 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 
 /* ---- Zonas exteriores (andén, calle, zona verde) ---- */
 .room.exterior { fill: color-mix(in srgb, var(--tenue) 8%, transparent); stroke: var(--linea); stroke-dasharray: 6 4; }
+/* ---------- Fotos y render (src/render) ---------- */
+.render-botones { display: flex; gap: 6px; align-items: center; }
+.render-botones .btn-chico { height: 28px; }
+.render-ventana { max-width: 720px; }
+/* Leave the bottom-right corner to the progress card on mid-size screens. */
+@media (min-width: 1000px) and (max-width: 1440px) { .render-ventana { margin-right: 300px; } }
+.render-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
+.render-cabecera h2 { margin: 0; }
+.render-cabecera .carril { min-width: 230px; }
+.render-cabecera .carril button { height: 30px; }
+.render-ventana .parrafo { margin: 6px 0 14px; text-align: justify; text-align-last: left; hyphens: auto; max-width: 68ch; }
+/* The frame keeps the image's aspect (set inline); max-height shrinks the width with it. */
+.render-marco { width: auto; max-width: 100%; max-height: 60vh; margin: 0 auto; border-radius: 10px; overflow: hidden; background: var(--sup2); }
+.render-lienzo { display: block; width: 100%; height: 100%; object-fit: contain; }
+.render-datos { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font-size: 12px; color: var(--tenue); font-variant-numeric: tabular-nums; }
+.render-error { color: var(--peligro); flex-basis: 100%; }
+
+/* Avisos de progreso: floating card bottom-right, above the window veil. */
+.aviso-progreso {
+  position: fixed; right: 20px; bottom: 20px; z-index: 55; width: 300px;
+  background: var(--sup); border-radius: 10px; box-shadow: var(--sombra-honda), 0 0 0 1px var(--contorno);
+  padding: 12px 14px; font-size: 13px; display: flex; flex-direction: column; gap: 8px;
+}
+.aviso-progreso-linea { display: flex; align-items: center; gap: 8px; }
+.aviso-progreso-linea .icono { color: var(--acento); }
+.aviso-progreso-titulo { font-weight: 500; flex: 1; }
+.aviso-progreso-cifra, .aviso-progreso-pie { color: var(--tenue); font-size: 12px; font-variant-numeric: tabular-nums; }
+.aviso-progreso-pie { display: flex; justify-content: space-between; }
+.aviso-progreso-barra { height: 6px; border-radius: 3px; background: var(--sup2); overflow: hidden; }
+.aviso-progreso-barra > div { height: 100%; background: var(--acento); border-radius: 3px; transition: width .2s linear; }

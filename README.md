@@ -42,6 +42,14 @@ Botón **Exportar** en la barra de arriba. Eliges la planta (la actual o todas) 
 - **En 3D**: clic en un mueble para seleccionarlo; arrástralo para moverlo por su planta. Si lo sueltas encima de otro, queda apoyado sobre él (por ejemplo un monitor sobre el escritorio). Todo se deshace con Ctrl+Z, igual que en el plano.
 - **Amueblar el ejemplo**: `node scripts/ejemplo-muebles.mjs public/ejemplos/casa-etapa-1.casa.json` pone muebles según el nombre de cada habitación (cambia los que hubiera) y muestra un resumen.
 - Para añadir un mueble al catálogo basta una línea en `src/furniture/catalog.ts` si usa una forma que ya existe.
+## Fotos y render
+
+En la barra de abajo de la vista 3D:
+
+- **Tomar foto**: guarda un PNG de lo que ves, al doble de resolución de la pantalla, con el nombre `<proyecto> - dd-mm-aaaa hh.mm.png`. Es inmediata.
+- **Render**: abre *Render realista*, que calcula la misma vista con trazado de rayos (luz que rebota, sombras suaves, reflejos y vidrio). La imagen se va limpiando poco a poco; abajo a la derecha ves las muestras, el tiempo y cuánto falta. Elige la calidad (*Rápido*, *Bueno*, *Alto*), pulsa *Detener* cuando te guste y *Guardar imagen*. Necesita una tarjeta gráfica decente: en un portátil sencillo *Bueno* puede tardar varios minutos.
+
+Detalles y límites: `docs/render.md`.
 
 ## Ejemplos
 
