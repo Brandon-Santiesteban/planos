@@ -98,6 +98,13 @@ test('furniture, finishes, stairs and railings survive a save/open', () => {
   expect(r).toEqual({ ok: true, project: p });
 });
 
+test('a balcony railing colour survives a save/open', () => {
+  const p = sampleProject();
+  p.floors[0].rooms[0] = { ...p.floors[0].rooms[0], kind: 'balcony', railing: 'celosia', railingColor: '#1E1E1E' };
+  const r = parseProject(serializeProject(p));
+  expect(r).toEqual({ ok: true, project: p });
+});
+
 test('files from before furniture existed open with no furniture', () => {
   const old = JSON.parse(serializeProject(sampleProject()));
   delete old.floors[0].furniture;

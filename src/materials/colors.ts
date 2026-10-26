@@ -10,11 +10,13 @@ export function normalizeHex(text: string): string | null {
 export const SWATCHES: { label: string; hex: string }[] = [
   { label: 'Blanco', hex: '#F7F5F0' },
   { label: 'Hueso', hex: '#EDE4D3' },
+  { label: 'Hueso arenilla', hex: '#E4D9C6' },
   { label: 'Arena', hex: '#D9C7A5' },
   { label: 'Gris claro', hex: '#C8CBCE' },
   { label: 'Gris grafito', hex: '#4A4F55' },
   { label: 'Terracota', hex: '#B4613D' },
   { label: 'Verde salvia', hex: '#9DAE8A' },
   { label: 'Azul petróleo', hex: '#1F4E5F' },
-  { label: 'Negro', hex: '#1E1F21' },
+  { label: 'Madera', hex: '#8A5A3B' },
+  { label: 'Negro', hex: '#1E1E1E' },
 ];

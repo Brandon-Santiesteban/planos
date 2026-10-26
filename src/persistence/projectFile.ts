@@ -25,6 +25,7 @@ const room = z.object({
   height: positive.optional(), up: z.enum(['n', 's', 'e', 'w']).optional(),
   floorMaterial: z.enum(['ceramica', 'porcelanato', 'madera', 'concreto', 'piedra', 'cesped']).optional(),
   railing: z.enum(['vidrio', 'muro', 'celosia']).optional(),
+  railingColor: color.optional(),
 });
 const furniture = z.object({
   id: z.string(), type: z.string().min(1), x: z.number().finite(), y: z.number().finite(), rotation: z.number().finite(),

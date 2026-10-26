@@ -12,9 +12,10 @@ test('normalizeHex rejects anything else', () => {
   for (const bad of ['', '#', '#12345', '#1234567', 'gggggg', 'rojo', '#12 456']) expect(normalizeHex(bad)).toBeNull();
 });
 
-test('the nine swatches are valid colours with Spanish names', () => {
+test('the swatches (house palette included) are valid colours with Spanish names', () => {
   expect(SWATCHES.map((s) => s.label)).toEqual([
-    'Blanco', 'Hueso', 'Arena', 'Gris claro', 'Gris grafito', 'Terracota', 'Verde salvia', 'Azul petróleo', 'Negro',
+    'Blanco', 'Hueso', 'Hueso arenilla', 'Arena', 'Gris claro', 'Gris grafito', 'Terracota', 'Verde salvia', 'Azul petróleo',
+    'Madera', 'Negro',
   ]);
   for (const s of SWATCHES) expect(normalizeHex(s.hex)).toBe(s.hex);
 });
@@ -32,6 +33,9 @@ test('catalog lists the 5 wall finishes and 6 floor materials with real-world ti
   const courses = WALL_FINISHES.ladrillo.tile[1] / 0.08;
   expect(courses).toBeCloseTo(Math.round(courses));
   expect(FLOOR_MATERIALS.porcelanato.label).toBe('Porcelanato');
+  // Matte porcelanato in 60 × 60 cm tiles: 2 × 2 per 1,2 m repeat, no gloss.
+  expect(FLOOR_MATERIALS.porcelanato.tile).toEqual([1.2, 1.2]);
+  expect(FLOOR_MATERIALS.porcelanato.roughness).toBeGreaterThanOrEqual(0.8);
   expect(FLOOR_MATERIALS.cesped.label).toBe('Césped');
   expect(WALL_FINISHES.enchape.label).toBe('Enchape');
 });

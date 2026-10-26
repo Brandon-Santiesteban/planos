@@ -30,8 +30,8 @@ export const FLOOR_MATERIAL_ORDER: FloorMaterial[] = ['ceramica', 'porcelanato',
 export const FLOOR_MATERIALS: Record<FloorMaterial, MaterialDef> = {
   // 45 × 45 cm tiles.
   ceramica: { label: 'Cerámica', tile: [0.9, 0.9], chip: '#D9CFC1', roughness: 0.45 },
-  // Large 60 × 60 cm light tiles.
-  porcelanato: { label: 'Porcelanato', tile: [1.2, 1.2], chip: '#ECEAE5', roughness: 0.25 },
+  // Matte 60 × 60 cm light tiles with thin joints.
+  porcelanato: { label: 'Porcelanato', tile: [1.2, 1.2], chip: '#E2DDD4', roughness: 0.85 },
   // Planks 15 cm × 1,2 m, staggered.
   madera: { label: 'Madera', tile: [1.2, 0.9], chip: '#A87A4F', roughness: 0.6 },
   concreto: { label: 'Concreto', tile: [2, 2], chip: '#A9A8A3', roughness: 0.9 },
