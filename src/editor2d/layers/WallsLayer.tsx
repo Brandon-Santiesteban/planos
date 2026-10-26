@@ -1,0 +1,24 @@
+import { isEndConnected, wallFootprint } from '../../geometry/walls';
+import type { Floor } from '../../model/types';
+import type { Selection } from '../../store/editorStore';
+
+const pts = (ps: { x: number; y: number }[]) => ps.map((p) => `${p.x},${p.y}`).join(' ');
+
+export default function WallsLayer({ floor, selection, ghost = false }: { floor: Floor; selection?: Selection; ghost?: boolean }) {
+  return (
+    <g className={ghost ? 'walls ghost' : 'walls'}>
+      {floor.walls.map((w) => {
+        const fp = wallFootprint(w, isEndConnected(floor.walls, w.id, 'a'), isEndConnected(floor.walls, w.id, 'b'));
+        const selected = !ghost && selection?.kind === 'wall' && selection.id === w.id;
+        return (
+          <polygon
+            key={w.id}
+            className={`wall${ghost ? ' ghost' : ''}${selected ? ' selected' : ''}`}
+            points={pts(fp)}
+            data-id={w.id}
+          />
+        );
+      })}
+    </g>
+  );
+}
