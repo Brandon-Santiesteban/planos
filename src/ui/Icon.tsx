@@ -31,6 +31,12 @@ const PATHS = {
   rotate: 'M20 12a8 8 0 1 1-2.34-5.66 M20 4v4h-4',
   grid: 'M4 4h16v16H4z M4 9.33h16 M4 14.67h16 M9.33 4v16 M14.67 4v16',
   copy: 'M9 9h11v11H9z M5 15V4h11',
+  // Photos and render (src/render)
+  camera: 'M4 8h3l2-3h6l2 3h3v11H4z M12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z',
+  sparkle: 'M11 3l1.8 5.2L18 10l-5.2 1.8L11 17l-1.8-5.2L4 10l5.2-1.8z M18.5 15l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z',
+  stop: 'M7 7h10v10H7z',
+  play: 'M8 5.5l10.5 6.5L8 18.5z',
+  download: 'M12 4v11 M7 10l5 5 5-5 M5 20h14',
 } as const;
 
 export type IconName = keyof typeof PATHS;

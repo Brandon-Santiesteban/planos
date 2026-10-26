@@ -11,6 +11,8 @@ import { outdoorLights, roomLights } from './roomLights';
 import { type TimeOfDay, useSceneOptions } from './sceneOptions';
 import SegmentedSwitch from '../ui/SegmentedSwitch';
 import { Ground, OutdoorLights, RoomLights, SkyLights, skyColor } from './Surroundings';
+import RenderBridge from '../render/RenderBridge';
+import RenderButtons from '../render/RenderButtons';
 
 function bounds(p: Project) {
   const pts = p.floors.flatMap((f) => [...f.walls.flatMap((w) => [w.a, w.b]), ...f.rooms.flatMap((r) => r.points)]);
@@ -77,6 +79,7 @@ export default function Scene3D() {
           mouseButtons={{ LEFT: MOUSE.ROTATE, MIDDLE: -1 as MOUSE, RIGHT: MOUSE.PAN }}
         />
         <CameraRig frame={frame} />
+        <RenderBridge />
       </Canvas>
       <div className="scene-toggle">
         <label>
@@ -93,6 +96,7 @@ export default function Scene3D() {
           options={[{ value: 'manana', label: 'Mañana' }, { value: 'tarde', label: 'Tarde' }, { value: 'noche', label: 'Noche' }]}
           onChange={(t) => useSceneOptions.getState().set({ time: t })}
         />
+        <RenderButtons />
       </div>
     </div>
   );

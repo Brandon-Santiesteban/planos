@@ -22,6 +22,15 @@ Haz doble clic en **`iniciar.bat`**. La primera vez instala lo necesario (tarda 
 - **Guardar**: crea un archivo `.casa.json` en tu PC. Después de guardarlo (o abrirlo) una vez, ese archivo se actualiza solo con cada cambio.
 - **Modo oscuro**: botón de la luna arriba a la derecha.
 
+## Fotos y render
+
+En la barra de abajo de la vista 3D:
+
+- **Tomar foto**: guarda un PNG de lo que ves, al doble de resolución de la pantalla, con el nombre `<proyecto> - dd-mm-aaaa hh.mm.png`. Es inmediata.
+- **Render**: abre *Render realista*, que calcula la misma vista con trazado de rayos (luz que rebota, sombras suaves, reflejos y vidrio). La imagen se va limpiando poco a poco; abajo a la derecha ves las muestras, el tiempo y cuánto falta. Elige la calidad (*Rápido*, *Bueno*, *Alto*), pulsa *Detener* cuando te guste y *Guardar imagen*. Necesita una tarjeta gráfica decente: en un portátil sencillo *Bueno* puede tardar varios minutos.
+
+Detalles y límites: `docs/render.md`.
+
 ## Ejemplos
 
 Abre un ejemplo directamente con su enlace (la primera vez se carga el ejemplo; después, tu copia con tus cambios):
