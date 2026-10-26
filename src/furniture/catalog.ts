@@ -4,7 +4,7 @@
 // rotation 0), so a desk at rotation 0 has its back at −y and you sit at +y.
 
 export const CATEGORIES = [
-  'Dormitorio', 'Sala', 'Comedor', 'Cocina', 'Baño', 'Oficina y setup', 'Lavandería', 'Exterior', 'Parqueadero',
+  'Dormitorio', 'Sala', 'Comedor', 'Cocina', 'Baño', 'Oficina y setup', 'Lavandería', 'Exterior', 'Rooftop', 'Parqueadero',
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
 
@@ -14,7 +14,8 @@ export type FurnitureModel =
   | 'monitor' | 'torre' | 'tablero' | 'estanteria' | 'lampara' | 'sofa' | 'sofaL' | 'sillon' | 'mesaCentro'
   | 'muebleTV' | 'televisor' | 'alfombra' | 'mesa' | 'silla' | 'meson' | 'estufa' | 'nevera' | 'lavaplatos'
   | 'alacena' | 'sanitario' | 'lavamanos' | 'ducha' | 'banera' | 'espejo' | 'lavadero' | 'lavadora' | 'matera'
-  | 'banca' | 'carro' | 'moto';
+  | 'banca' | 'carro' | 'moto' | 'piscina' | 'asoleadora' | 'sombrilla' | 'pergola' | 'bar' | 'parrilla'
+  | 'jardinera';
 
 export interface CatalogItem {
   id: string;
@@ -33,6 +34,8 @@ export interface CatalogItem {
   double?: boolean;
   /** placed over another piece, it sits on top of it (a monitor on a desk) */
   onTop?: boolean;
+  /** tables: the chairs come with it (drawn around it in 2D and 3D) */
+  withChairs?: boolean;
 }
 
 const item = (
@@ -99,6 +102,18 @@ export const CATALOG: CatalogItem[] = [
   // Exterior
   item('matera', 'Matera con planta', 'Exterior', 'matera', [0.45, 0.45, 1.0], '#a0522d'),
   item('banca', 'Banca de exterior', 'Exterior', 'banca', [1.2, 0.45, 0.45], '#9a7650'),
+  // Rooftop
+  item('piscina', 'Piscina elevada', 'Rooftop', 'piscina', [3.0, 2.4, 1.1], '#eae6df'),
+  item('asoleadora', 'Asoleadora', 'Rooftop', 'asoleadora', [0.7, 1.95, 0.85], '#e8e2d6'),
+  item('sombrilla', 'Sombrilla', 'Rooftop', 'sombrilla', [2.5, 2.5, 2.4], '#e6dccb'),
+  item('pergola', 'Pérgola', 'Rooftop', 'pergola', [3.0, 3.0, 2.4], '#8a6a4b'),
+  item('sofa-exterior', 'Sofá de exterior', 'Rooftop', 'sofa', [2.0, 0.85, 0.75], '#cfc6b6'),
+  item('mesa-exterior', 'Mesa de exterior con sillas', 'Rooftop', 'mesa', [1.2, 0.8, 0.74], '#9a7650', { seats: 4, withChairs: true }),
+  item('silla-exterior', 'Silla de exterior', 'Rooftop', 'silla', [0.5, 0.55, 0.85], '#9a7650'),
+  item('bar', 'Barra con taburetes', 'Rooftop', 'bar', [2.0, 0.6, 1.05], '#7a5a3f', { seats: 3 }),
+  item('parrilla', 'Parrilla (BBQ)', 'Rooftop', 'parrilla', [1.2, 0.6, 1.0], '#3b3f45'),
+  item('jardinera', 'Jardinera larga', 'Rooftop', 'jardinera', [1.8, 0.4, 0.6], '#9b9188'),
+  item('matera-alta', 'Matera alta', 'Rooftop', 'matera', [0.45, 0.45, 1.6], '#6b625b'),
   // Parqueadero (length along the width: the nose of a vehicle points to +x)
   item('carro', 'Carro (sedán)', 'Parqueadero', 'carro', [4.5, 1.8, 1.45], '#5d6d7e'),
   item('moto', 'Moto', 'Parqueadero', 'moto', [2.0, 0.75, 1.1], '#7b2d26'),

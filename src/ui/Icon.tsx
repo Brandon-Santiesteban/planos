@@ -31,6 +31,8 @@ const PATHS = {
   rotate: 'M20 12a8 8 0 1 1-2.34-5.66 M20 4v4h-4',
   grid: 'M4 4h16v16H4z M4 9.33h16 M4 14.67h16 M9.33 4v16 M14.67 4v16',
   copy: 'M9 9h11v11H9z M5 15V4h11',
+  sofa: 'M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3 M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3z M5 18v2 M19 18v2',
+  search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z M20 20l-4-4',
 } as const;
 
 export type IconName = keyof typeof PATHS;

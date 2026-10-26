@@ -25,6 +25,8 @@ test('includes the pieces the house needs', () => {
     'sofa-l', 'sillon', 'mesa-centro', 'mueble-tv', 'televisor', 'alfombra', 'mesa-comedor-4', 'mesa-comedor-6',
     'silla-comedor', 'meson', 'estufa', 'nevera', 'lavaplatos', 'alacena', 'sanitario', 'lavamanos', 'lavamanos-doble',
     'ducha', 'banera', 'espejo', 'lavadero', 'lavadora', 'matera', 'banca', 'carro', 'moto',
+    'piscina', 'asoleadora', 'sombrilla', 'pergola', 'sofa-exterior', 'mesa-exterior', 'bar', 'parrilla', 'jardinera',
+    'matera-alta',
   ];
   for (const id of required) expect(catalogItem(id), id).toBeDefined();
 });
@@ -34,6 +36,10 @@ test('a monitor sits on a desk and a car is a sedan', () => {
   const car = catalogItem('carro')!;
   expect(car.width).toBeCloseTo(4.5, 1);
   expect(car.depth).toBeCloseTo(1.8, 1);
+});
+
+test('the raised pool sits on the floor and is about 3 × 2,4 × 1,1 m', () => {
+  expect(catalogItem('piscina')).toMatchObject({ category: 'Rooftop', width: 3, depth: 2.4, height: 1.1, elevation: 0 });
 });
 
 test('search ignores accents and case, and can be limited to a category', () => {

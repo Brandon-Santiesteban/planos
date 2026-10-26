@@ -305,3 +305,50 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 .scene-toggle .carril button { height: 28px; }
 .room.roof { fill: none; stroke: var(--tenue); stroke-dasharray: 2 4; stroke-width: 1.5px; }
 .room.roof.selected { stroke: var(--acento); fill: color-mix(in srgb, var(--acento) 6%, transparent); }
+
+/* ---------- Muebles (fase 3: catálogo, plano y panel) ---------- */
+.mueble-contorno { fill: color-mix(in srgb, var(--sup) 82%, transparent); stroke: color-mix(in srgb, var(--tinta) 70%, transparent); stroke-width: 1.2px; vector-effect: non-scaling-stroke; }
+.mueble-detalle { fill: none; stroke: color-mix(in srgb, var(--tinta) 45%, transparent); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.mueble-detalle.lleno { fill: color-mix(in srgb, var(--tinta) 45%, transparent); }
+.mueble-detalle.tenue { stroke: color-mix(in srgb, var(--tinta) 25%, transparent); }
+.mueble-detalle.punteado { stroke-dasharray: 3 3; }
+.mueble-detalle.agua { fill: color-mix(in srgb, var(--acento) 14%, transparent); }
+.mueble.elevado .mueble-contorno { fill: color-mix(in srgb, var(--sup) 92%, transparent); }
+.mueble.selected .mueble-contorno { fill: color-mix(in srgb, var(--acento) 14%, var(--sup)); stroke: var(--acento); stroke-width: 2px; }
+.mueble.selected .mueble-detalle { stroke: color-mix(in srgb, var(--acento) 70%, transparent); }
+.mueble.fantasma { opacity: .6; pointer-events: none; }
+.mueble.fantasma .mueble-contorno { fill: color-mix(in srgb, var(--acento) 12%, transparent); stroke: var(--acento); stroke-dasharray: 5 3; }
+.mueble-nombre { fill: var(--tenue); font-weight: 500; pointer-events: none; }
+.mueble.selected .mueble-nombre { fill: var(--acento); }
+.plan2d-wrap.tool-furniture .plan2d { cursor: copy; }
+
+.catalogo .buscador { display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 12px; border-radius: 8px; background: var(--sup2); color: var(--tenue); }
+.catalogo .buscador:focus-within { box-shadow: inset 0 0 0 2px var(--acento); }
+.catalogo .field .buscador input { height: 36px; padding: 0; background: transparent; box-shadow: none; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 0; border-radius: 999px;
+  background: var(--sup2); color: var(--tinta); font: inherit; font-size: 12.5px; font-weight: 500; cursor: pointer;
+}
+.chip:hover { background: color-mix(in srgb, var(--acento) 10%, var(--sup2)); }
+.chip.activa { background: var(--acento); color: var(--acento-tinta); }
+.chip .conteo { font-size: 11.5px; opacity: .75; font-variant-numeric: tabular-nums; }
+.chip:focus-visible, .tarjeta-mueble:focus-visible, .muestra:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+.muebles-lista { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.tarjeta-mueble {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px 8px; border: 0; border-radius: 10px;
+  background: var(--sup); box-shadow: inset 0 0 0 1px var(--linea); color: var(--tinta); font: inherit; cursor: pointer; text-align: center;
+}
+.tarjeta-mueble:hover { background: var(--fondo); }
+.tarjeta-mueble.activa { background: color-mix(in srgb, var(--acento) 12%, var(--sup)); box-shadow: inset 0 0 0 1.5px var(--acento); }
+.tarjeta-mueble .nombre { font-size: 12.5px; font-weight: 500; line-height: 1.25; }
+.tarjeta-mueble .medida { font-size: 12px; color: var(--tenue); font-variant-numeric: tabular-nums; }
+.mueble-miniatura { display: block; }
+.mueble-encabezado { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.mueble-encabezado h2 { margin: 0 0 2px; }
+.fila-rotacion { display: flex; align-items: flex-end; gap: 6px; }
+.fila-rotacion .field { flex: 1; min-width: 0; }
+.fila-rotacion .btn { margin-bottom: 14px; height: 38px; }
+.muestras { display: flex; flex-wrap: wrap; gap: 6px; }
+.muestra { width: 24px; height: 24px; border: 0; border-radius: 6px; cursor: pointer; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tinta) 20%, transparent); }
+.muestra.activa { box-shadow: 0 0 0 2px var(--sup), 0 0 0 4px var(--acento); }
