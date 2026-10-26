@@ -7,11 +7,13 @@ import { useEditor, type Selection } from '../../store/editorStore';
 
 /** Names are shown only where they fit: pieces at least this many pixels across. */
 const LABEL_MIN_PX = 34;
+/** …and only when zoomed in enough that they don't crowd the room names. */
+const LABEL_MIN_ZOOM = 90;
 
 function Piece({ f, selected, pxPerMetre, ghost = false }: { f: Furniture; selected: boolean; pxPerMetre: number; ghost?: boolean }) {
   const item = catalogItem(f.type);
   const font = 10 / pxPerMetre;
-  const showName = ghost || selected || Math.min(f.width, f.depth) * pxPerMetre >= LABEL_MIN_PX;
+  const showName = ghost || selected || (pxPerMetre >= LABEL_MIN_ZOOM && Math.min(f.width, f.depth) * pxPerMetre >= LABEL_MIN_PX);
   return (
     <g className={`mueble${selected ? ' selected' : ''}${ghost ? ' fantasma' : ''}${f.elevation > 0.05 ? ' elevado' : ''}`} data-id={ghost ? undefined : f.id}>
       <g transform={`translate(${f.x} ${f.y}) rotate(${f.rotation})`}>

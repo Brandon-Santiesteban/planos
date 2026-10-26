@@ -22,6 +22,14 @@ Haz doble clic en **`iniciar.bat`**. La primera vez instala lo necesario (tarda 
 - **Guardar**: crea un archivo `.casa.json` en tu PC. Después de guardarlo (o abrirlo) una vez, ese archivo se actualiza solo con cada cambio.
 - **Modo oscuro**: botón de la luna arriba a la derecha.
 
+## Muebles
+
+- **Catálogo**: herramienta *Muebles* (U). En el panel derecho busca por nombre o elige una categoría (Dormitorio, Sala, Comedor, Cocina, Baño, Oficina y setup, Lavandería, Exterior, Rooftop, Parqueadero). Toca un mueble: su silueta sigue al ratón y un clic lo coloca (puedes poner varios seguidos). **R** lo gira (Shift+R al otro lado). Cerca de un muro (a menos de 15 cm) se pega a él de espaldas y paralelo. **Esc** termina.
+- **Mover y editar**: con *Seleccionar* (V) arrastra un mueble (se ajusta cada 5 cm; con **Alt**, libre). Lo que está encima (un monitor sobre el escritorio) se mueve con él. **R** / **Shift+R** lo giran 90°, **Supr** lo elimina y **Ctrl+D** lo duplica. En el panel cambias ancho, fondo, alto, elevación, rotación y color, y tienes *Duplicar* y *Eliminar* (con *Deshacer*).
+- **En 3D**: clic en un mueble para seleccionarlo; arrástralo para moverlo por su planta. Si lo sueltas encima de otro, queda apoyado sobre él (por ejemplo un monitor sobre el escritorio). Todo se deshace con Ctrl+Z, igual que en el plano.
+- **Amueblar el ejemplo**: `node scripts/ejemplo-muebles.mjs public/ejemplos/casa-etapa-1.casa.json` pone muebles según el nombre de cada habitación (cambia los que hubiera) y muestra un resumen.
+- Para añadir un mueble al catálogo basta una línea en `src/furniture/catalog.ts` si usa una forma que ya existe.
+
 ## Ejemplos
 
 Abre un ejemplo directamente con su enlace (la primera vez se carga el ejemplo; después, tu copia con tus cambios):
@@ -36,7 +44,8 @@ Los archivos están en `public/ejemplos/`.
 |---|---|
 | Ctrl+Z / Ctrl+Y | Deshacer / Rehacer |
 | Ctrl+S / Ctrl+O | Guardar / Mis proyectos |
-| V, M, P, N, H, R | Herramientas |
+| V, M, P, N, H, R, U | Herramientas |
+| R / Shift+R, Supr, Ctrl+D | Girar, eliminar y duplicar el mueble seleccionado |
 | Rueda | Zoom en el plano |
 | Botón central/derecho o Espacio + arrastrar | Mover el plano |
 

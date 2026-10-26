@@ -307,7 +307,7 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 .room.roof.selected { stroke: var(--acento); fill: color-mix(in srgb, var(--acento) 6%, transparent); }
 
 /* ---------- Muebles (fase 3: catálogo, plano y panel) ---------- */
-.mueble-contorno { fill: color-mix(in srgb, var(--sup) 82%, transparent); stroke: color-mix(in srgb, var(--tinta) 70%, transparent); stroke-width: 1.2px; vector-effect: non-scaling-stroke; }
+.mueble-contorno { fill: color-mix(in srgb, var(--sup) 60%, transparent); stroke: color-mix(in srgb, var(--tinta) 70%, transparent); stroke-width: 1.2px; vector-effect: non-scaling-stroke; }
 .mueble-detalle { fill: none; stroke: color-mix(in srgb, var(--tinta) 45%, transparent); stroke-width: 1px; vector-effect: non-scaling-stroke; }
 .mueble-detalle.lleno { fill: color-mix(in srgb, var(--tinta) 45%, transparent); }
 .mueble-detalle.tenue { stroke: color-mix(in srgb, var(--tinta) 25%, transparent); }
@@ -318,7 +318,7 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 .mueble.selected .mueble-detalle { stroke: color-mix(in srgb, var(--acento) 70%, transparent); }
 .mueble.fantasma { opacity: .6; pointer-events: none; }
 .mueble.fantasma .mueble-contorno { fill: color-mix(in srgb, var(--acento) 12%, transparent); stroke: var(--acento); stroke-dasharray: 5 3; }
-.mueble-nombre { fill: var(--tenue); font-weight: 500; pointer-events: none; }
+.mueble-nombre { fill: var(--tenue); font-weight: 500; pointer-events: none; paint-order: stroke; stroke: var(--sup); stroke-width: 3px; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .mueble.selected .mueble-nombre { fill: var(--acento); }
 .plan2d-wrap.tool-furniture .plan2d { cursor: copy; }
 
