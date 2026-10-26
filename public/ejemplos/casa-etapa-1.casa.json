@@ -346,7 +346,7 @@
         {
           "id": "6a4e92a8-bd9e-43cf-aeda-923f83d6f493",
           "name": "Escalera",
-          "kind": "room",
+          "kind": "stairs",
           "points": [
             {
               "x": 3.3,
@@ -364,7 +364,9 @@
               "x": 3.3,
               "y": 6
             }
-          ]
+          ],
+          "stairShape": "u",
+          "up": "s"
         },
         {
           "id": "13a84433-55c2-4682-90cf-0c06b3ffce37",
@@ -1091,7 +1093,7 @@
         {
           "id": "02bae7c3-705d-486d-8203-1065ba811239",
           "name": "Escalera",
-          "kind": "room",
+          "kind": "stairs",
           "points": [
             {
               "x": 3.3,
@@ -1109,7 +1111,9 @@
               "x": 3.3,
               "y": 6
             }
-          ]
+          ],
+          "stairShape": "u",
+          "up": "s"
         },
         {
           "id": "ad08524d-472d-49ab-96b5-105f065c5911",
@@ -1395,7 +1399,7 @@
         {
           "id": "73182538-0415-40b0-aa5e-df4bf027f64b",
           "name": "Escalera",
-          "kind": "room",
+          "kind": "stairs",
           "points": [
             {
               "x": 3.3,
@@ -1413,7 +1417,9 @@
               "x": 3.3,
               "y": 6
             }
-          ]
+          ],
+          "stairShape": "u",
+          "up": "s"
         }
       ],
       "background": null
