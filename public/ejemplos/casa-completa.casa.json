@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "id": "3d1f7589-e1f5-45e3-95c4-ce0e2ad630ee",
+  "id": "93f0b0cd-5bf0-4cfd-9354-d434c86f9779",
   "name": "Casa completa (3 pisos)",
   "north": 0,
   "floors": [
@@ -1048,7 +1048,7 @@
           "elevation": 0
         },
         {
-          "id": "entorno-27932165-e63e-459b-b64a-376e5073ca60",
+          "id": "entorno-b40d9d24-b5cd-4e26-9808-d58f3fe598b8",
           "type": "arbol-guayacan",
           "x": -5.5,
           "y": 20.8,
@@ -1057,10 +1057,10 @@
           "depth": 3,
           "height": 6,
           "elevation": 0,
-          "color": "#e3b42b"
+          "color": "#6a8c42"
         },
         {
-          "id": "entorno-ee3393ac-a914-44ed-b09a-124f3ca8aae5",
+          "id": "entorno-d55cf2f4-1ed1-4e57-99db-fce94161672b",
           "type": "arbol-guayacan",
           "x": 2.75,
           "y": 20.8,
@@ -1069,10 +1069,10 @@
           "depth": 3,
           "height": 6,
           "elevation": 0,
-          "color": "#e3b42b"
+          "color": "#6a8c42"
         },
         {
-          "id": "entorno-a88050e1-57f3-4eed-989e-ba869111496c",
+          "id": "entorno-dd699d9f-d6d4-4b86-9afc-e2a38331206e",
           "type": "arbol-guayacan",
           "x": 11,
           "y": 20.8,
@@ -1081,10 +1081,10 @@
           "depth": 3,
           "height": 6,
           "elevation": 0,
-          "color": "#e3b42b"
+          "color": "#6a8c42"
         },
         {
-          "id": "entorno-083f714f-e176-4640-a5ed-5b8cda229fb1",
+          "id": "entorno-929ff8e4-32e4-4099-88c8-8f432ddfb7b9",
           "type": "arbol-pequeno",
           "x": -1.4,
           "y": 21.1,
@@ -1093,10 +1093,10 @@
           "depth": 2,
           "height": 3.5,
           "elevation": 0,
-          "color": "#5f8a3e"
+          "color": "#5d8642"
         },
         {
-          "id": "entorno-d43febd1-d6d0-48c7-b03d-7eeca610705b",
+          "id": "entorno-abc52df0-31ab-4731-be9c-6760ff1a16af",
           "type": "arbol-pequeno",
           "x": 6.9,
           "y": 21.1,
@@ -1105,10 +1105,10 @@
           "depth": 2,
           "height": 3.5,
           "elevation": 0,
-          "color": "#5f8a3e"
+          "color": "#5d8642"
         },
         {
-          "id": "entorno-8b7d5943-4d1c-4712-80a1-3a99ffaa2f0e",
+          "id": "entorno-1322166d-75a9-4a61-aa86-7e94188bc956",
           "type": "arbusto",
           "x": -3.5,
           "y": 20,
@@ -1117,10 +1117,10 @@
           "depth": 1,
           "height": 1,
           "elevation": 0,
-          "color": "#557a38"
+          "color": "#557e3c"
         },
         {
-          "id": "entorno-8952d13b-a0ea-4c54-bfab-f776d18ba847",
+          "id": "entorno-00fe006d-c2b0-4009-826f-f808afb5f387",
           "type": "arbusto",
           "x": 0.6,
           "y": 20,
@@ -1129,10 +1129,10 @@
           "depth": 1,
           "height": 1,
           "elevation": 0,
-          "color": "#557a38"
+          "color": "#557e3c"
         },
         {
-          "id": "entorno-551c0e8f-fff0-4094-9975-5baa7729724f",
+          "id": "entorno-c501341c-615c-40db-9d1a-9c2f959bbd4c",
           "type": "arbusto",
           "x": 4.9,
           "y": 20,
@@ -1141,10 +1141,10 @@
           "depth": 1,
           "height": 1,
           "elevation": 0,
-          "color": "#557a38"
+          "color": "#557e3c"
         },
         {
-          "id": "entorno-d7a3efd5-adbe-41a5-b070-9a49ec5eef7d",
+          "id": "entorno-d792335c-35e0-4b06-b5e0-3d9ac825a3b0",
           "type": "arbusto",
           "x": 9,
           "y": 20,
@@ -1153,10 +1153,10 @@
           "depth": 1,
           "height": 1,
           "elevation": 0,
-          "color": "#557a38"
+          "color": "#557e3c"
         },
         {
-          "id": "entorno-460b3d87-8a92-45bd-ae96-f5cb52e6447c",
+          "id": "entorno-f0f43fe3-7555-45c4-a40c-11a796d28131",
           "type": "poste-alumbrado",
           "x": 6.1,
           "y": 10.6,
@@ -1166,6 +1166,18 @@
           "height": 6,
           "elevation": 0,
           "color": "#3b3f45"
+        },
+        {
+          "id": "entorno-09a7394d-3845-41c5-8510-b43a3f5c2bff",
+          "type": "porton-telescopico",
+          "x": 1.65,
+          "y": 10.139999999999999,
+          "rotation": 0,
+          "width": 3.3,
+          "depth": 0.12,
+          "height": 2,
+          "elevation": 0,
+          "color": "#1e1e1e"
         }
       ],
       "openings": [
@@ -1696,7 +1708,7 @@
           "up": "n"
         },
         {
-          "id": "649c9f26-193a-4740-887e-97c8fdd90ddc",
+          "id": "4a8c9278-2595-448d-a779-0aa594e00be8",
           "kind": "exterior",
           "name": "Andén",
           "points": [
@@ -1720,7 +1732,7 @@
           "floorMaterial": "concreto"
         },
         {
-          "id": "6105f3fa-1e77-4efc-972b-003a031c5fe7",
+          "id": "9345170f-14f0-4fef-91c1-d75491cc22de",
           "kind": "exterior",
           "name": "Calle (doble sentido)",
           "points": [
@@ -1744,7 +1756,7 @@
           "floorMaterial": "asfalto"
         },
         {
-          "id": "d4fc10b5-a4dd-4c15-8bf5-d9e520c5bed0",
+          "id": "7200ac21-88d7-44cb-83f5-23e32c1459b4",
           "kind": "exterior",
           "name": "Sardinel",
           "points": [
@@ -1768,7 +1780,7 @@
           "floorMaterial": "concreto"
         },
         {
-          "id": "f96defa2-c237-4c9b-a629-54eebd1f263e",
+          "id": "50ddf3a2-d02b-4b2c-81ba-43bfdf96946a",
           "kind": "exterior",
           "name": "Zona verde (propuesta)",
           "points": [
