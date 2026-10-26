@@ -5,6 +5,7 @@ import { createEmptyProject } from '../model/defaults';
 import { addOpening, addRoom, addWall } from '../model/ops';
 import { useEditor } from '../store/editorStore';
 import PropertiesPanel from './PropertiesPanel';
+import { useToasts } from './toasts';
 
 const s = () => useEditor.getState();
 const wall = () => s().project.floors[0].walls[0];
@@ -63,10 +64,14 @@ test('a refused edit puts the real value back in the field', () => {
   expect(input.value).toBe('0,80');
 });
 
-test('Eliminar deletes the wall', () => {
+test('Eliminar deletes the wall and offers Deshacer', () => {
   render(<PropertiesPanel />);
   fireEvent.click(screen.getByText('Eliminar'));
   expect(s().project.floors[0].walls).toHaveLength(0);
+  const toast = useToasts.getState().toasts.at(-1)!;
+  expect(toast.text).toBe('Muro eliminado');
+  toast.action!.run();
+  expect(s().project.floors[0].walls).toHaveLength(1);
 });
 
 test('a room can be renamed and turned into a balcony', () => {
@@ -75,7 +80,7 @@ test('a room can be renamed and turned into a balcony', () => {
   s().select({ kind: 'room', id: room().id });
   render(<PropertiesPanel />);
   typeInto('Nombre', 'Balcón');
-  fireEvent.change(screen.getByLabelText('Tipo'), { target: { value: 'balcony' } });
+  fireEvent.click(screen.getByRole('radio', { name: 'Balcón' }));
   expect(room().name).toBe('Balcón');
   expect(room().kind).toBe('balcony');
   expect(screen.getByText('6,00 m²')).toBeInTheDocument();

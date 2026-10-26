@@ -5,6 +5,7 @@ import { floorElevation } from '../model/ops';
 import type { Project } from '../model/types';
 import { useEditor } from '../store/editorStore';
 import FloorMeshes from './FloorMeshes';
+import { usePalette } from './palette';
 
 function bounds(p: Project) {
   const pts = p.floors.flatMap((f) => [...f.walls.flatMap((w) => [w.a, w.b]), ...f.rooms.flatMap((r) => r.points)]);
@@ -30,6 +31,7 @@ function CameraRig({ frame }: { frame: Frame }) {
 }
 
 export default function Scene3D() {
+  const pal = usePalette();
   const project = useEditor((s) => s.project);
   const activeFloorId = useEditor((s) => s.activeFloorId);
   const selection = useEditor((s) => s.selection);
@@ -46,7 +48,7 @@ export default function Scene3D() {
   return (
     <div className="scene3d" data-testid="scene3d">
       <Canvas shadows camera={{ fov: 60, near: 0.05, far: 500, position: [frame.cx + frame.size, frame.size, frame.cy + frame.size * 1.2] }}>
-        <color attach="background" args={['#eef2f6']} />
+        <color attach="background" args={[pal.sky]} />
         <hemisphereLight args={['#ffffff', '#b9a98f', 0.9]} />
         <directionalLight
           position={[frame.cx + 8, 15, frame.cy + 6]}
@@ -60,9 +62,9 @@ export default function Scene3D() {
         />
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[frame.cx, -0.03, frame.cy]} receiveShadow>
           <planeGeometry args={[200, 200]} />
-          <meshStandardMaterial color="#dfe5dc" />
+          <meshStandardMaterial color={pal.floor} />
         </mesh>
-        <gridHelper args={[60, 60, '#c3cbc0', '#d3dad0']} position={[frame.cx, -0.025, frame.cy]} />
+        <gridHelper key={pal.line} args={[60, 60, pal.line, pal.line]} position={[frame.cx, -0.025, frame.cy]} />
         {visible.map((f) => (
           <FloorMeshes key={f.id} floor={f} elevation={floorElevation(project, f.id)} selectedId={selection?.id ?? null} />
         ))}

@@ -1,13 +1,14 @@
 import { useEffect, useId, useState } from 'react';
 import { formatMetres, parseLength } from '../model/units';
 
-/** Length input in metres: commits on Enter or blur, shows red and ignores invalid text. */
-export function LengthField({ label, value, onCommit, allowEmpty = false, placeholder }: {
+/** Filled length input in metres: commits on Enter or blur; invalid text is flagged with how to fix it. */
+export function LengthField({ label, value, onCommit, allowEmpty = false, placeholder, help }: {
   label: string;
   value: number | null;
   onCommit: (v: number | null) => void;
   allowEmpty?: boolean;
   placeholder?: string;
+  help?: string;
 }) {
   const id = useId();
   const shown = value === null ? '' : formatMetres(value).replace(' m', '');
@@ -48,12 +49,17 @@ export function LengthField({ label, value, onCommit, allowEmpty = false, placeh
           className={invalid ? 'invalid' : ''}
           value={text}
           placeholder={placeholder}
+          inputMode="decimal"
+          aria-invalid={invalid}
           onChange={(e) => setText(e.target.value)}
           onBlur={commit}
           onKeyDown={(e) => { if (e.key === 'Enter') commit(); }}
         />
         <span className="unit">m</span>
       </div>
+      {invalid
+        ? <span className="error">Escribe una medida mayor que 0, por ejemplo 3,5 o 350 cm.</span>
+        : help && <span className="ayuda">{help}</span>}
     </div>
   );
 }

@@ -3,10 +3,14 @@ import Plan2D from './editor2d/Plan2D';
 import { loadAutosave, startAutosave } from './persistence/autosave';
 import { trackProjectLoads } from './persistence/currentFile';
 import { useEditor } from './store/editorStore';
+import { DialogHost } from './ui/Dialog';
 import FloorsPanel from './ui/FloorsPanel';
+import Icon from './ui/Icon';
 import PropertiesPanel from './ui/PropertiesPanel';
 import Toolbar, { TOOLS } from './ui/Toolbar';
 import { isEditableTarget } from './ui/keys';
+import { applyTheme, useTheme } from './ui/theme';
+import ToastHost from './ui/ToastHost';
 import TopBar from './ui/TopBar';
 import { useProjectFile } from './ui/useProjectFile';
 
@@ -17,6 +21,8 @@ type Layout = 'split' | '2d' | '3d';
 export default function App() {
   const [layout, setLayout] = useState<Layout>('split');
   const { save, open } = useProjectFile();
+  const theme = useTheme((s) => s.theme);
+  useEffect(() => applyTheme(theme), [theme]);
 
   // Restore the last autosaved project, then keep autosaving.
   useEffect(() => trackProjectLoads(), []);
@@ -66,18 +72,20 @@ export default function App() {
         {layout !== '3d' && (
           <section className="view view-2d">
             <Plan2D />
-            <button className="maximise" onClick={() => setLayout(layout === '2d' ? 'split' : '2d')}>
-              {layout === '2d' ? 'Dividir' : 'Ampliar 2D'}
+            <span className="etiqueta-vista">Plano 2D</span>
+            <button className="maximise btn btn-chico" onClick={() => setLayout(layout === '2d' ? 'split' : '2d')}>
+              <Icon name={layout === '2d' ? 'split' : 'maximize'} size={16} />{layout === '2d' ? 'Dividir' : 'Ampliar'}
             </button>
           </section>
         )}
         {layout !== '2d' && (
           <section className="view view-3d">
-            <Suspense fallback={<div className="placeholder">Cargando 3D…</div>}>
+            <Suspense fallback={<div className="cargando"><div className="barra" /></div>}>
               <Scene3D />
             </Suspense>
-            <button className="maximise" onClick={() => setLayout(layout === '3d' ? 'split' : '3d')}>
-              {layout === '3d' ? 'Dividir' : 'Ampliar 3D'}
+            <span className="etiqueta-vista">Vista 3D</span>
+            <button className="maximise btn btn-chico" onClick={() => setLayout(layout === '3d' ? 'split' : '3d')}>
+              <Icon name={layout === '3d' ? 'split' : 'maximize'} size={16} />{layout === '3d' ? 'Dividir' : 'Ampliar'}
             </button>
           </section>
         )}
@@ -86,6 +94,8 @@ export default function App() {
         <FloorsPanel />
         <PropertiesPanel />
       </div>
+      <ToastHost />
+      <DialogHost />
     </div>
   );
 }

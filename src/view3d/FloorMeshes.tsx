@@ -3,18 +3,16 @@ import * as THREE from 'three';
 import { add, dist, lerp, normalize, scale, sub } from '../geometry/vec';
 import { isEndConnected, wallLength } from '../geometry/walls';
 import type { Floor, Room, Vec2, Wall } from '../model/types';
+import { usePalette } from './palette';
 import { edgeTouchesWall, wallPieces } from './wallPieces';
 
-const WALL_COLOR = '#e9e6df';
-const SELECTED_COLOR = '#60a5fa';
-const ROOM_COLOR = '#d9c7a6';
-const BALCONY_COLOR = '#b8bcc0';
 const RAIL_HEIGHT = 1.0;
 
 /** Rotation about Y that aligns local +X with the plan direction d (plan y = world z). */
 const yaw = (d: Vec2) => -Math.atan2(d.y, d.x);
 
 function WallMesh({ wall, floor, selected }: { wall: Wall; floor: Floor; selected: boolean }) {
+  const pal = usePalette();
   const length = wallLength(wall);
   const d = normalize(sub(wall.b, wall.a));
   const height = wall.height ?? floor.height;
@@ -35,7 +33,7 @@ function WallMesh({ wall, floor, selected }: { wall: Wall; floor: Floor; selecte
         return (
           <mesh key={i} position={[c.x, (p.z0 + p.z1) / 2, c.y]} rotation={[0, rot, 0]} castShadow receiveShadow>
             <boxGeometry args={[p.u1 - p.u0, p.z1 - p.z0, wall.thickness]} />
-            <meshStandardMaterial color={selected ? SELECTED_COLOR : WALL_COLOR} roughness={0.9} />
+            <meshStandardMaterial color={selected ? pal.selected : pal.wall} roughness={0.9} />
           </mesh>
         );
       })}
@@ -55,6 +53,7 @@ function WallMesh({ wall, floor, selected }: { wall: Wall; floor: Floor; selecte
 }
 
 function Railing({ a, b }: { a: Vec2; b: Vec2 }) {
+  const pal = usePalette();
   const length = dist(a, b);
   const d = normalize(sub(b, a));
   const mid = lerp(a, b, 0.5);
@@ -64,7 +63,7 @@ function Railing({ a, b }: { a: Vec2; b: Vec2 }) {
     <group>
       <mesh position={[mid.x, RAIL_HEIGHT, mid.y]} rotation={[0, rot, 0]} castShadow>
         <boxGeometry args={[length, 0.05, 0.06]} />
-        <meshStandardMaterial color="#4b5563" metalness={0.6} roughness={0.4} />
+        <meshStandardMaterial color={pal.rail} metalness={0.6} roughness={0.4} />
       </mesh>
       <mesh position={[mid.x, RAIL_HEIGHT / 2, mid.y]} rotation={[0, rot, 0]}>
         <boxGeometry args={[length, RAIL_HEIGHT - 0.05, 0.015]} />
@@ -75,7 +74,7 @@ function Railing({ a, b }: { a: Vec2; b: Vec2 }) {
         return (
           <mesh key={i} position={[p.x, RAIL_HEIGHT / 2, p.y]} castShadow>
             <boxGeometry args={[0.04, RAIL_HEIGHT, 0.04]} />
-            <meshStandardMaterial color="#4b5563" metalness={0.6} roughness={0.4} />
+            <meshStandardMaterial color={pal.rail} metalness={0.6} roughness={0.4} />
           </mesh>
         );
       })}
@@ -84,11 +83,12 @@ function Railing({ a, b }: { a: Vec2; b: Vec2 }) {
 }
 
 function RoomSlab({ room, walls, selected }: { room: Room; walls: Wall[]; selected: boolean }) {
+  const pal = usePalette();
   const geometry = useMemo(() => {
     const shape = new THREE.Shape(room.points.map((p) => new THREE.Vector2(p.x, p.y)));
     return new THREE.ExtrudeGeometry(shape, { depth: 0.02, bevelEnabled: false });
   }, [room.points]);
-  const color = selected ? SELECTED_COLOR : room.kind === 'balcony' ? BALCONY_COLOR : ROOM_COLOR;
+  const color = selected ? pal.selected : room.kind === 'balcony' ? pal.balcony : pal.room;
   const edges: [Vec2, Vec2][] = room.points.map((p, i) => [p, room.points[(i + 1) % room.points.length]]);
   return (
     <group>

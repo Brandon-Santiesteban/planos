@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import Plan2D from '../editor2d/Plan2D';
 import { createEmptyProject } from '../model/defaults';
 import { addWall } from '../model/ops';
 import { useEditor } from '../store/editorStore';
+import { DialogHost } from './Dialog';
 import FloorsPanel from './FloorsPanel';
 
 const s = () => useEditor.getState();
@@ -21,12 +22,14 @@ test('Eliminar is disabled with a single floor', () => {
   expect(screen.getByText('Eliminar')).toBeDisabled();
 });
 
-test('deleting the active floor activates the one below', () => {
-  vi.spyOn(window, 'confirm').mockReturnValue(true);
-  render(<FloorsPanel />);
+test('deleting the active floor asks first, then activates the one below', async () => {
+  render(<><FloorsPanel /><DialogHost /></>);
   fireEvent.click(screen.getByText('Añadir planta'));
   fireEvent.click(screen.getByText('Eliminar'));
-  expect(s().project.floors).toHaveLength(1);
+  const dialog = screen.getByRole('dialog');
+  expect(dialog).toHaveTextContent('Planta 1');
+  fireEvent.click(within(dialog).getByText('Eliminar planta'));
+  await waitFor(() => expect(s().project.floors).toHaveLength(1));
   expect(s().activeFloorId).toBe(s().project.floors[0].id);
 });
 
