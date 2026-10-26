@@ -85,3 +85,20 @@ input.invalid { border-color: var(--danger); background: #fef2f2; }
 .opening.selected .door-leaf, .opening.selected .window-frame { stroke: var(--accent); }
 .dimension { fill: #374151; pointer-events: none; }
 .background { pointer-events: none; }
+.plan2d-wrap { position: relative; width: 100%; height: 100%; }
+.plan2d-wrap.tool-wall .plan2d, .plan2d-wrap.tool-room .plan2d,
+.plan2d-wrap.tool-door .plan2d, .plan2d-wrap.tool-window .plan2d,
+.plan2d-wrap.tool-calibrate .plan2d { cursor: crosshair; }
+.preview-wall { fill: rgba(37, 99, 235, 0.35); stroke: var(--accent); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.preview-polygon { fill: rgba(37, 99, 235, 0.12); stroke: var(--accent); stroke-width: 1.5px; stroke-dasharray: 5 3; vector-effect: non-scaling-stroke; }
+.preview-length { fill: var(--accent); font-weight: 600; pointer-events: none; }
+.snap-marker { fill: #fff; stroke: var(--accent); stroke-width: 2px; vector-effect: non-scaling-stroke; }
+.snap-marker.invalid { stroke: var(--danger); }
+.length-input {
+  position: absolute; pointer-events: none; display: flex; gap: 6px; align-items: baseline;
+  background: var(--panel); border: 1px solid var(--accent); border-radius: 6px; padding: 4px 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12); font-size: 13px;
+}
+.length-input .label, .length-input .unit { color: var(--muted); font-size: 11px; }
+.length-input .value { font-weight: 700; min-width: 2ch; }
+.length-input.invalid { border-color: var(--danger); background: #fef2f2; }

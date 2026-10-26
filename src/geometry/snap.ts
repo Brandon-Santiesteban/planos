@@ -1,8 +1,11 @@
 import type { Vec2 } from '../model/types';
 import { dist } from './vec';
 
+// Rounds to micrometres to drop floating-point noise such as 3.4000000000000004.
+const clean = (n: number) => Math.round(n * 1e6) / 1e6;
+
 export function snapToGrid(p: Vec2, step: number): Vec2 {
-  return { x: Math.round(p.x / step) * step, y: Math.round(p.y / step) * step };
+  return { x: clean(Math.round(p.x / step) * step), y: clean(Math.round(p.y / step) * step) };
 }
 
 /** Rotates `to` around `from` to the nearest multiple of stepDeg, keeping the length. */

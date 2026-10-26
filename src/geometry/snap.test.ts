@@ -5,6 +5,9 @@ test('snapToGrid rounds to step', () => {
   expect(p.x).toBeCloseTo(1.25);
   expect(p.y).toBeCloseTo(0.05);
 });
+test('snapToGrid returns clean decimals', () => {
+  expect(snapToGrid({ x: 3.41, y: 0.29 }, 0.05)).toEqual({ x: 3.4, y: 0.3 });
+});
 test('snapAngle flattens near-horizontal line and keeps length', () => {
   const p = snapAngle({ x: 0, y: 0 }, { x: 3, y: 0.2 }, 45);
   expect(p.y).toBeCloseTo(0);
