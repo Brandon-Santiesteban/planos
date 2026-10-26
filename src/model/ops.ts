@@ -6,7 +6,7 @@ import { createFloor, DEFAULTS } from './defaults';
 import { newId } from './ids';
 import { normalizeDegrees } from './orientation';
 import { quickRoomOutline, uncoveredParts } from './quickRoom';
-import type { Background, Floor, Opening, OpeningKind, Project, RoomKind, StairUp, Vec2, Wall } from './types';
+import type { Background, Floor, Opening, OpeningKind, Project, RoomKind, StairShape, StairUp, Vec2, Wall } from './types';
 
 function getFloor(p: Project, floorId: string): Floor {
   const f = p.floors.find((fl) => fl.id === floorId);
@@ -238,6 +238,17 @@ export function setRoomKind(p: Project, floorId: string, roomId: string, kind: R
 export function setStairUp(p: Project, floorId: string, roomId: string, up: StairUp): void {
   const r = getFloor(p, floorId).rooms.find((x) => x.id === roomId);
   if (r) r.up = up;
+}
+
+export function setStairShape(p: Project, floorId: string, roomId: string, shape: StairShape): void {
+  const r = getFloor(p, floorId).rooms.find((x) => x.id === roomId);
+  if (r) r.stairShape = shape;
+}
+
+/** Doors: swing to the other side of the wall. */
+export function toggleDoorFlip(p: Project, floorId: string, openingId: string): void {
+  const o = getFloor(p, floorId).openings.find((x) => x.id === openingId);
+  if (o && o.kind === 'door') o.flip = !o.flip;
 }
 
 export function setRoofHeight(p: Project, floorId: string, roomId: string, height: number): void {

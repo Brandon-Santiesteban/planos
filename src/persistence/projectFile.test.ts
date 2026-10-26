@@ -104,3 +104,12 @@ test('files from before furniture existed open with no furniture', () => {
   const r = parseProject(JSON.stringify(old));
   expect(r.ok && r.project.floors[0].furniture).toEqual([]);
 });
+
+test('a U-shaped stairs keeps its shape', () => {
+  const p = sampleProject();
+  p.floors[0].rooms[0] = { ...p.floors[0].rooms[0], kind: 'stairs', up: 's', stairShape: 'u' };
+  expect(parseProject(serializeProject(p))).toEqual({ ok: true, project: p });
+  const bad = JSON.parse(serializeProject(p));
+  bad.floors[0].rooms[0].stairShape = 'caracol';
+  expect(parseProject(JSON.stringify(bad)).ok).toBe(false);
+});
