@@ -1,16 +1,16 @@
 {
   "version": 1,
-  "id": "2407491a-8c50-4972-a44f-3432f73c2237",
+  "id": "fce4f4a7-b8bf-4680-8512-f367a6309d5a",
   "name": "Casa etapa 1",
   "north": 0,
   "floors": [
     {
-      "id": "ff7301bc-7537-41f4-a6bf-ed3bcdfed42e",
+      "id": "906b9711-40b9-4cb1-ad52-4626825163b6",
       "name": "Primer piso",
       "height": 2.6,
       "walls": [
         {
-          "id": "10ad6bb7-555d-4a75-b85a-f6d3a2a4e354",
+          "id": "3fe9e8d0-3ca0-413a-854f-eaf3c4ebf510",
           "a": {
             "x": 5.5,
             "y": 9
@@ -23,7 +23,7 @@
           "height": null
         },
         {
-          "id": "c224c1a4-2f40-4a52-9972-164eebec967f",
+          "id": "a9958910-dd8d-4e04-bede-84f1ac71115a",
           "a": {
             "x": 5.5,
             "y": 0
@@ -36,7 +36,7 @@
           "height": null
         },
         {
-          "id": "70ccb782-331f-4954-a1ef-4a1d2a26fe94",
+          "id": "3fa74056-83b9-4197-8d18-ba8431fffac8",
           "a": {
             "x": 0,
             "y": 0
@@ -49,7 +49,7 @@
           "height": null
         },
         {
-          "id": "19290301-9df9-40ee-ac21-433e99a1fc27",
+          "id": "9da1811c-c421-4e90-9287-674489ff980a",
           "a": {
             "x": 0,
             "y": 9
@@ -62,7 +62,7 @@
           "height": null
         },
         {
-          "id": "ab16d1a1-8d12-4c14-8d9e-d9af5ca5620f",
+          "id": "367e1945-2754-419a-8f08-57e4a426ee58",
           "a": {
             "x": 3.3,
             "y": 4
@@ -75,7 +75,7 @@
           "height": null
         },
         {
-          "id": "874c4313-a939-4121-99eb-4dfc4b5b9512",
+          "id": "07cbdb5a-b7ad-43f1-852e-9b55f8dbceac",
           "a": {
             "x": 3.3,
             "y": 4
@@ -83,6 +83,97 @@
           "b": {
             "x": 0,
             "y": 4
+          },
+          "thickness": 0.15,
+          "height": null
+        },
+        {
+          "id": "42799f88-f9c9-4c53-be31-c743112c9b9b",
+          "a": {
+            "x": 0,
+            "y": -6
+          },
+          "b": {
+            "x": 0,
+            "y": 0
+          },
+          "thickness": 0.15,
+          "height": null
+        },
+        {
+          "id": "c8f28318-00cb-4d15-84c3-c708e5033936",
+          "a": {
+            "x": 5.5,
+            "y": -6
+          },
+          "b": {
+            "x": 5.5,
+            "y": 0
+          },
+          "thickness": 0.15,
+          "height": null
+        },
+        {
+          "id": "e6549bc0-64ba-4c96-9879-a0c81b3b32ad",
+          "a": {
+            "x": 3,
+            "y": -3
+          },
+          "b": {
+            "x": 3,
+            "y": 0
+          },
+          "thickness": 0.15,
+          "height": null
+        },
+        {
+          "id": "4dd78d66-9bcd-49df-9dd3-a6e7cd4ebf2f",
+          "a": {
+            "x": 3,
+            "y": -3
+          },
+          "b": {
+            "x": 0,
+            "y": -3
+          },
+          "thickness": 0.15,
+          "height": null
+        },
+        {
+          "id": "93ddeb4d-ed2f-4286-9bb7-808138055ce4",
+          "a": {
+            "x": 4,
+            "y": -3
+          },
+          "b": {
+            "x": 3,
+            "y": -3
+          },
+          "thickness": 0.15,
+          "height": null
+        },
+        {
+          "id": "cc3db281-6d64-4d6a-bcee-ae9397756dbd",
+          "a": {
+            "x": 4,
+            "y": -6
+          },
+          "b": {
+            "x": 4,
+            "y": -3
+          },
+          "thickness": 0.15,
+          "height": null
+        },
+        {
+          "id": "c247d1ff-17df-44bf-a354-96cade3fbc5e",
+          "a": {
+            "x": 5.5,
+            "y": -6
+          },
+          "b": {
+            "x": 0,
+            "y": -6
           },
           "thickness": 0.15,
           "height": null
@@ -90,8 +181,8 @@
       ],
       "openings": [
         {
-          "id": "383c10c0-5221-4624-8b76-4b969ca2ac88",
-          "wallId": "10ad6bb7-555d-4a75-b85a-f6d3a2a4e354",
+          "id": "7d31bc12-12ee-4d5e-9250-1af99d0aa60c",
+          "wallId": "3fe9e8d0-3ca0-413a-854f-eaf3c4ebf510",
           "kind": "door",
           "offset": 3.85,
           "width": 2.6,
@@ -99,17 +190,17 @@
           "sill": 0
         },
         {
-          "id": "8c9d175b-a63b-4374-af59-85a7c4e1a958",
-          "wallId": "10ad6bb7-555d-4a75-b85a-f6d3a2a4e354",
+          "id": "af373862-fa24-497e-bc5b-7e3d13c49455",
+          "wallId": "3fe9e8d0-3ca0-413a-854f-eaf3c4ebf510",
           "kind": "window",
           "offset": 1.0999999999999996,
-          "width": 0.8,
-          "height": 1.2,
+          "width": 1.2,
+          "height": 1.7,
           "sill": 0.9
         },
         {
-          "id": "dd684b07-139c-47ea-8fc1-ab34c1d607db",
-          "wallId": "ab16d1a1-8d12-4c14-8d9e-d9af5ca5620f",
+          "id": "52188ffa-6bb5-4d45-af20-139d5cafdd35",
+          "wallId": "367e1945-2754-419a-8f08-57e4a426ee58",
           "kind": "door",
           "offset": 1,
           "width": 0.8,
@@ -117,27 +208,45 @@
           "sill": 0
         },
         {
-          "id": "541ee2c0-312b-484f-8464-fb87f4c7a8a2",
-          "wallId": "70ccb782-331f-4954-a1ef-4a1d2a26fe94",
-          "kind": "window",
-          "offset": 1,
-          "width": 1,
-          "height": 1.2,
-          "sill": 0.9
+          "id": "312bd5dc-7682-43dc-bff1-bf1559ce60dd",
+          "wallId": "3fa74056-83b9-4197-8d18-ba8431fffac8",
+          "kind": "door",
+          "offset": 4.25,
+          "width": 1.6,
+          "height": 2.1,
+          "sill": 0
         },
         {
-          "id": "7985ccb3-9ad8-4d92-91eb-88e082713b22",
-          "wallId": "70ccb782-331f-4954-a1ef-4a1d2a26fe94",
-          "kind": "window",
-          "offset": 3.75,
-          "width": 1.5,
-          "height": 1.2,
-          "sill": 0.9
+          "id": "fd70db42-0e2c-47aa-93cf-f1f7026aef4f",
+          "wallId": "e6549bc0-64ba-4c96-9879-a0c81b3b32ad",
+          "kind": "door",
+          "offset": 1.5,
+          "width": 0.8,
+          "height": 2.1,
+          "sill": 0
+        },
+        {
+          "id": "d94c31a7-4a16-4f78-b2c1-8ab320a045d1",
+          "wallId": "93ddeb4d-ed2f-4286-9bb7-808138055ce4",
+          "kind": "door",
+          "offset": 0.5,
+          "width": 0.8,
+          "height": 2.1,
+          "sill": 0
+        },
+        {
+          "id": "9e3a3ca9-3d86-49cd-97bf-feab16f245e1",
+          "wallId": "c247d1ff-17df-44bf-a354-96cade3fbc5e",
+          "kind": "door",
+          "offset": 4.75,
+          "width": 0.8,
+          "height": 2.1,
+          "sill": 0
         }
       ],
       "rooms": [
         {
-          "id": "eb1e62f7-16ec-4dfa-a562-99f749edcf85",
+          "id": "297cbc24-b43e-44ec-87d0-4c4c0ed330fb",
           "name": "Parqueadero",
           "kind": "room",
           "points": [
@@ -160,7 +269,7 @@
           ]
         },
         {
-          "id": "987f613e-dcea-4839-9a21-6727f6decd9d",
+          "id": "3cd30ce0-4e1d-44a1-9761-fa70a9a49c60",
           "name": "Escalera",
           "kind": "room",
           "points": [
@@ -183,7 +292,7 @@
           ]
         },
         {
-          "id": "3d5c1f89-a4d1-4362-8bc2-634d6b1478e1",
+          "id": "6f0e57e9-69b7-4309-9079-bb247e5c6668",
           "name": "Entrada",
           "kind": "room",
           "points": [
@@ -206,7 +315,7 @@
           ]
         },
         {
-          "id": "2f78ad81-6fff-43f2-b11b-30beb73101f6",
+          "id": "eb382c82-8dcc-4479-998b-11c0a479ab22",
           "name": "Cocina",
           "kind": "room",
           "points": [
@@ -229,7 +338,7 @@
           ]
         },
         {
-          "id": "66e32b0a-26ee-4733-a0f5-bf9a2a3f2152",
+          "id": "66cc11e9-7754-4f89-a9cd-7c1e0510fe0a",
           "name": "Sala",
           "kind": "room",
           "points": [
@@ -252,7 +361,7 @@
           ]
         },
         {
-          "id": "4e86a1e6-ad97-482c-8dd5-dcf70abf9aae",
+          "id": "454c8047-46bf-4f56-9275-ff792aca518f",
           "name": "Comedor",
           "kind": "room",
           "points": [
@@ -275,8 +384,8 @@
           ]
         },
         {
-          "id": "ae03b664-eb18-483d-a50c-31b65ae789f7",
-          "name": "Lote etapa 2 (futuro)",
+          "id": "85c8b55b-0925-469d-aa32-6fad5d8e3e82",
+          "name": "Habitación 1 (existente)",
           "kind": "room",
           "points": [
             {
@@ -284,8 +393,108 @@
               "y": 0
             },
             {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 3,
+              "y": -3
+            },
+            {
+              "x": 0,
+              "y": -3
+            }
+          ]
+        },
+        {
+          "id": "b386dcc4-9247-486c-a722-373ebfa53621",
+          "name": "Habitación 2 (existente)",
+          "kind": "room",
+          "points": [
+            {
+              "x": 0,
+              "y": -3
+            },
+            {
+              "x": 4,
+              "y": -3
+            },
+            {
+              "x": 4,
+              "y": -6
+            },
+            {
+              "x": 0,
+              "y": -6
+            }
+          ]
+        },
+        {
+          "id": "ccc0ab99-e456-4493-8f96-cbb82e2de268",
+          "name": "Patio",
+          "kind": "room",
+          "points": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
               "x": 5.5,
               "y": 0
+            },
+            {
+              "x": 5.5,
+              "y": -6
+            },
+            {
+              "x": 4,
+              "y": -6
+            },
+            {
+              "x": 4,
+              "y": -3
+            },
+            {
+              "x": 3,
+              "y": -3
+            }
+          ]
+        },
+        {
+          "id": "826c9f4f-1eba-4f0e-8500-26ed31be656c",
+          "name": "Pasillo (existente)",
+          "kind": "room",
+          "points": [
+            {
+              "x": 0,
+              "y": -6
+            },
+            {
+              "x": 5.5,
+              "y": -6
+            },
+            {
+              "x": 5.5,
+              "y": -7
+            },
+            {
+              "x": 0,
+              "y": -7
+            }
+          ]
+        },
+        {
+          "id": "ec3d0871-de31-4493-973d-c5bc25415ff3",
+          "name": "Lavadero, baño, aseo y escalera (por definir)",
+          "kind": "room",
+          "points": [
+            {
+              "x": 0,
+              "y": -7
+            },
+            {
+              "x": 5.5,
+              "y": -7
             },
             {
               "x": 5.5,
@@ -301,12 +510,12 @@
       "background": null
     },
     {
-      "id": "83549151-cae3-451f-958d-005fadd0779d",
+      "id": "d7da9893-9262-46a4-9117-c46e6261263f",
       "name": "Segundo piso",
       "height": 2.6,
       "walls": [
         {
-          "id": "2698e233-6249-4f87-a796-db391ee6a8c9",
+          "id": "b21ce05d-e9ee-462e-b390-aae6f399f23a",
           "a": {
             "x": 5.5,
             "y": 9
@@ -319,7 +528,7 @@
           "height": null
         },
         {
-          "id": "b82848d7-d599-440b-ae8b-37e3dca1f7ac",
+          "id": "9fef2b71-6786-4ed7-83bf-9d4c62bb0421",
           "a": {
             "x": 5.5,
             "y": 0
@@ -332,7 +541,7 @@
           "height": null
         },
         {
-          "id": "4dec20dd-4183-4e8d-b1af-d2b9f2b1b61b",
+          "id": "7a36c037-3f63-45cc-9ed6-6a7a0119cc85",
           "a": {
             "x": 0,
             "y": 0
@@ -345,7 +554,7 @@
           "height": null
         },
         {
-          "id": "0845ec74-59d4-4ada-9092-f6f800268ad9",
+          "id": "2b1ea2bd-237f-4160-9864-c992eabc6958",
           "a": {
             "x": 0,
             "y": 9
@@ -358,7 +567,7 @@
           "height": null
         },
         {
-          "id": "dc5ad3aa-6d07-4bbe-9806-2bd0c402b0b4",
+          "id": "5b901276-6de5-47c4-80fe-9b62a2ef37a2",
           "a": {
             "x": 3.3,
             "y": 4.8
@@ -371,7 +580,7 @@
           "height": null
         },
         {
-          "id": "42267151-a21c-4485-8be9-30d687d48bac",
+          "id": "32dcd8b3-1b75-45fd-8b32-9d4a3411e52e",
           "a": {
             "x": 3.3,
             "y": 4.8
@@ -384,7 +593,7 @@
           "height": null
         },
         {
-          "id": "0bfdf039-68e6-4b03-81ce-e5a9dd2427b1",
+          "id": "6b3aadf9-3b67-429e-9beb-5ac24f2602df",
           "a": {
             "x": 2.2,
             "y": 2.6
@@ -397,7 +606,7 @@
           "height": null
         },
         {
-          "id": "5df85b2f-9636-4f6e-9711-a4e4db06a9f5",
+          "id": "d42256f7-3be1-4fdb-bbfe-e6fa83bc7ed2",
           "a": {
             "x": 5.5,
             "y": 2.6
@@ -412,8 +621,8 @@
       ],
       "openings": [
         {
-          "id": "fac1f6b2-b83e-435e-be0c-3b70d5626ed5",
-          "wallId": "2698e233-6249-4f87-a796-db391ee6a8c9",
+          "id": "25c078e9-e720-41a1-ac66-d645be847ad3",
+          "wallId": "b21ce05d-e9ee-462e-b390-aae6f399f23a",
           "kind": "door",
           "offset": 3.85,
           "width": 1.6,
@@ -421,17 +630,17 @@
           "sill": 0
         },
         {
-          "id": "ec726513-90bf-4845-af81-046ec2a4f613",
-          "wallId": "2698e233-6249-4f87-a796-db391ee6a8c9",
+          "id": "d4f1a69c-6d55-4182-ad3e-d55949d2f17e",
+          "wallId": "b21ce05d-e9ee-462e-b390-aae6f399f23a",
           "kind": "window",
           "offset": 1.0999999999999996,
-          "width": 0.8,
-          "height": 1.2,
-          "sill": 0.9
+          "width": 1.2,
+          "height": 2.6,
+          "sill": 0
         },
         {
-          "id": "f3755b9f-d29b-4b36-8532-2f180f9d4986",
-          "wallId": "dc5ad3aa-6d07-4bbe-9806-2bd0c402b0b4",
+          "id": "adb99af3-6685-44e7-b038-c233183dc29d",
+          "wallId": "5b901276-6de5-47c4-80fe-9b62a2ef37a2",
           "kind": "door",
           "offset": 0.6000000000000001,
           "width": 0.8,
@@ -439,8 +648,8 @@
           "sill": 0
         },
         {
-          "id": "f74248fc-ffda-4894-a529-8680e7ce8aba",
-          "wallId": "42267151-a21c-4485-8be9-30d687d48bac",
+          "id": "e7270297-d2d6-49d4-86ed-213530d30373",
+          "wallId": "32dcd8b3-1b75-45fd-8b32-9d4a3411e52e",
           "kind": "door",
           "offset": 2.1999999999999997,
           "width": 0.7,
@@ -448,8 +657,8 @@
           "sill": 0
         },
         {
-          "id": "8e234498-0dc9-4b6f-afb8-8fa1e345aacc",
-          "wallId": "5df85b2f-9636-4f6e-9711-a4e4db06a9f5",
+          "id": "420d601e-cfb3-458a-a301-68e6e3e7cbf3",
+          "wallId": "d42256f7-3be1-4fdb-bbfe-e6fa83bc7ed2",
           "kind": "door",
           "offset": 1.6,
           "width": 0.8,
@@ -457,8 +666,8 @@
           "sill": 0
         },
         {
-          "id": "604d2740-d88f-416e-b6df-a58583c8befb",
-          "wallId": "4dec20dd-4183-4e8d-b1af-d2b9f2b1b61b",
+          "id": "424eda3e-08ca-4862-95f0-7a50cb22e06e",
+          "wallId": "7a36c037-3f63-45cc-9ed6-6a7a0119cc85",
           "kind": "window",
           "offset": 2.75,
           "width": 2,
@@ -468,7 +677,7 @@
       ],
       "rooms": [
         {
-          "id": "89f95028-00f5-44c4-a578-f3d8ca88db37",
+          "id": "4a75f79c-4347-4409-aeee-58df820cd8ad",
           "name": "Habitación principal",
           "kind": "room",
           "points": [
@@ -491,7 +700,7 @@
           ]
         },
         {
-          "id": "7594de24-4ec6-4be1-9d49-9ee1d41cc638",
+          "id": "23cfd41d-7748-4e97-a5d4-b3f231a8ebc9",
           "name": "Escalera",
           "kind": "room",
           "points": [
@@ -514,7 +723,7 @@
           ]
         },
         {
-          "id": "a5923410-b152-45d0-a627-a787c3991d4e",
+          "id": "f573cd58-3766-445a-869d-34956ae67606",
           "name": "Pasillo",
           "kind": "room",
           "points": [
@@ -537,7 +746,7 @@
           ]
         },
         {
-          "id": "01d795f6-ced6-403d-9c8a-d87204f6b291",
+          "id": "5f5e9649-4cfb-4eae-b87a-5b2209d53d67",
           "name": "Baño",
           "kind": "room",
           "points": [
@@ -560,7 +769,7 @@
           ]
         },
         {
-          "id": "04e2fefd-ddeb-4788-a06d-f2c4877a8701",
+          "id": "684c92eb-c28b-46fb-9b9e-ace6d242d1d6",
           "name": "Salita",
           "kind": "room",
           "points": [
@@ -583,7 +792,7 @@
           ]
         },
         {
-          "id": "9795c543-1549-4fac-9e64-29ad2a3f9952",
+          "id": "178ff5f9-3a29-46f6-b3f4-c64d7f03a069",
           "name": "Oficina",
           "kind": "room",
           "points": [
@@ -606,7 +815,7 @@
           ]
         },
         {
-          "id": "21963d73-edda-4aa5-86f8-cbf7efe78441",
+          "id": "a327c57c-82af-4e5b-9ad0-a38005be8a03",
           "name": "Balcón",
           "kind": "balcony",
           "points": [

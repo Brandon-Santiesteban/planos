@@ -1,6 +1,7 @@
 import { OrbitControls } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { useEffect, useMemo } from 'react';
+import { MOUSE } from 'three';
 import { floorElevation } from '../model/ops';
 import type { Project } from '../model/types';
 import { useEditor } from '../store/editorStore';
@@ -68,7 +69,14 @@ export default function Scene3D() {
         {visible.map((f) => (
           <FloorMeshes key={f.id} floor={f} elevation={floorElevation(project, f.id)} selectedId={selection?.id ?? null} />
         ))}
-        <OrbitControls makeDefault target={target} maxPolarAngle={Math.PI / 2 - 0.02} enableDamping />
+        {/* Left: rotate · right: pan · wheel: zoom. Middle-button dragging (dolly) is off: the user found it confusing. */}
+        <OrbitControls
+          makeDefault
+          target={target}
+          maxPolarAngle={Math.PI / 2 - 0.02}
+          enableDamping
+          mouseButtons={{ LEFT: MOUSE.ROTATE, MIDDLE: -1 as MOUSE, RIGHT: MOUSE.PAN }}
+        />
         <CameraRig frame={frame} />
       </Canvas>
       <label className="scene-toggle">
