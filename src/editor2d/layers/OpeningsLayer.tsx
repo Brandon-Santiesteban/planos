@@ -22,15 +22,16 @@ function OpeningSymbol({ wall, o, selected }: { wall: Wall; o: Opening; selected
       </g>
     );
   }
-  // Door: leaf hinged at the start, opening towards +normal, with a 90° swing arc.
-  const tip = add(add(start, scale(n, half)), scale(n, o.width));
-  const hinge = add(start, scale(n, half));
-  const closed = add(end, scale(n, half));
+  // Door: leaf hinged at the start, opening towards +normal (−normal when flipped), with a 90° swing arc.
+  const side = o.flip ? scale(n, -1) : n;
+  const tip = add(add(start, scale(side, half)), scale(side, o.width));
+  const hinge = add(start, scale(side, half));
+  const closed = add(end, scale(side, half));
   return (
     <g className={cls} data-id={o.id}>
       <polygon className="opening-gap" points={pts(gap)} />
       <line className="door-leaf" x1={hinge.x} y1={hinge.y} x2={tip.x} y2={tip.y} />
-      <path className="door-swing" d={`M ${closed.x} ${closed.y} A ${o.width} ${o.width} 0 0 1 ${tip.x} ${tip.y}`} />
+      <path className="door-swing" d={`M ${closed.x} ${closed.y} A ${o.width} ${o.width} 0 0 ${o.flip ? 0 : 1} ${tip.x} ${tip.y}`} />
     </g>
   );
 }

@@ -29,6 +29,12 @@ Botón **Exportar** en la barra de arriba. Eliges la planta (la actual o todas) 
 - **PDF a escala**: una hoja A3 por planta, a 1:50; si la planta no cabe, a 1:100 (o 1:200). La hoja se pone horizontal o vertical según lo que quepa mejor. Lleva muros rellenos, puertas con su barrido, ventanas, habitaciones con su nombre y área, muebles, la cota de cada muro, la flecha del norte, una escala gráfica en metros y un cajetín con proyecto, planta, escala y fecha. Imprime en A3 al 100 % (sin «ajustar a la página») para que la escala sea real.
 - **DXF para arquitecto**: un archivo DXF (R12, se abre en AutoCAD, BricsCAD, LibreCAD…) en metros, con una capa por tipo: MUROS, HUECOS, HABITACIONES, MUEBLES, COTAS y TEXTOS. Con *Todas*, las plantas van una al lado de otra con su nombre encima, en un solo archivo.
 - Las plantas vacías no se exportan.
+## Caminar por dentro
+
+- En la vista 3D toca **Caminar** (barra de abajo). Entras a la altura de los ojos en la habitación seleccionada o, si no hay ninguna, en la primera de la planta activa. Se ven todas las plantas.
+- Haz clic en la vista para mirar con el ratón. Muévete con **W A S D** o las flechas; **Shift** para correr. **Esc** suelta el ratón y **Salir de caminar** vuelve a la vista normal.
+- Los muros no se atraviesan; las puertas sí. Para subir o bajar de planta, camina por una **Escalera**: elige *Tipo: Escalera* en las propiedades de la habitación, hacia dónde **sube** y su **forma** (recta o en U, con descanso al fondo y llegada del mismo lado por donde empiezas).
+- En el plano la escalera se dibuja con sus escalones y una flecha que va hacia arriba. En las puertas, **Invertir apertura** cambia hacia qué lado abren.
 
 ## Ejemplos
 

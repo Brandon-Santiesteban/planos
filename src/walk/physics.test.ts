@@ -1,7 +1,7 @@
 import { createEmptyProject } from '../model/defaults';
-import { addFloor, addOpening, addRoom, addWall, setRoomKind, setStairUp } from '../model/ops';
+import { addFloor, addOpening, addRoom, addWall, setRoomKind, setStairShape, setStairUp } from '../model/ops';
 import type { Project } from '../model/types';
-import { blockingSegments, levelAt, moveWithCollisions, EYE_HEIGHT } from './physics';
+import { blockingSegments, levelAt, moveWithCollisions, segmentsAt, EYE_HEIGHT } from './physics';
 
 let p: Project;
 let g: string;
@@ -93,4 +93,65 @@ test('with stairs stacked on every floor you keep climbing the one you are on', 
   expect(walk({ x: 0.5, y: 3.5 }, { x: 0.5, y: 1.5 }, 0).feet).toBeCloseTo(1.3, 1);
   // standing on the first floor, entering the second flight from its bottom
   expect(walk({ x: 0.5, y: 3.5 }, { x: 0.5, y: 1.5 }, 2.6).feet).toBeCloseTo(3.9, 1);
+});
+
+/** A 2 × 3 m U stairs going up towards +y: first flight on x 0…1, landing y 2…3, second flight back on x 1…2. */
+function uStairs(floorId: string) {
+  const s = addRoom(p, floorId, rect(0, 0, 2, 3), 'Escalera')!;
+  setRoomKind(p, floorId, s, 'stairs');
+  setStairUp(p, floorId, s, 's');
+  setStairShape(p, floorId, s, 'u');
+}
+
+test('a U stairs takes you up one flight, across the landing and up the other back to the start side', () => {
+  addFloor(p);
+  uStairs(g);
+  let level = walk({ x: 0.5, y: -0.5 }, { x: 0.5, y: 1 }, 0);
+  expect(level.feet).toBeCloseTo(0.65, 1);
+  level = walk({ x: 0.5, y: 1 }, { x: 0.5, y: 2.5 }, level.feet);
+  expect(level.feet).toBeCloseTo(1.3, 1);
+  level = walk({ x: 0.5, y: 2.5 }, { x: 1.5, y: 2.5 }, level.feet);
+  expect(level.feet).toBeCloseTo(1.3, 1);
+  level = walk({ x: 1.5, y: 2.5 }, { x: 1.5, y: -0.5 }, level.feet);
+  expect(level).toEqual({ floorIndex: 1, feet: 2.6 });
+});
+
+test('stacked U stairs: from the upper floor you go down the arrival flight or up the next one', () => {
+  addFloor(p);
+  addFloor(p);
+  uStairs(g);
+  uStairs(p.floors[1].id);
+  expect(walk({ x: 1.5, y: -0.5 }, { x: 1.5, y: 1 }, 2.6).feet).toBeCloseTo(1.95, 1);
+  expect(walk({ x: 0.5, y: -0.5 }, { x: 0.5, y: 1 }, 2.6).feet).toBeCloseTo(3.25, 1);
+});
+
+test('the two flights of a U stairs are separated by a thin divider', () => {
+  uStairs(g);
+  const segs = blockingSegments(p.floors[0]);
+  expect(segs).toHaveLength(1);
+  expect(segs[0].a).toEqual({ x: 1, y: 0 });
+  expect(segs[0].b.y).toBeCloseTo(2);
+  const next = moveWithCollisions({ x: 0.5, y: 1 }, { x: 1, y: 0 }, segs, 0.25);
+  expect(next.x).toBeLessThan(1);
+});
+
+test('a long step never tunnels through a wall', () => {
+  addWall(p, g, { x: 0, y: 0 }, { x: 4, y: 0 });
+  const next = moveWithCollisions({ x: 2, y: 0.5 }, { x: 0, y: -3 }, blockingSegments(p.floors[0]), 0.25);
+  expect(next.y).toBeGreaterThan(0);
+});
+
+test('only the walls of floors your body is in block you', () => {
+  addFloor(p);
+  addWall(p, g, { x: 0, y: 0 }, { x: 4, y: 0 });
+  addWall(p, p.floors[1].id, { x: 0, y: 2 }, { x: 4, y: 2 });
+  const perFloor = p.floors.map(blockingSegments);
+  expect(segmentsAt(p, perFloor, 0).map((s) => s.a.y)).toEqual([0]);
+  expect(segmentsAt(p, perFloor, 2.6).map((s) => s.a.y)).toEqual([2]);
+  expect(segmentsAt(p, perFloor, 1.3)).toHaveLength(2); // halfway up the stairs
+});
+
+test('stairs on the top floor climb its own height, as drawn', () => {
+  stairs(g);
+  expect(walk({ x: 0.5, y: 3.5 }, { x: 0.5, y: 1.5 }, 0)).toEqual({ floorIndex: 0, feet: expect.closeTo(1.3, 1) });
 });

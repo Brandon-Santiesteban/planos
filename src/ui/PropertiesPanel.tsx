@@ -1,12 +1,14 @@
 import { polygonArea } from '../geometry/polygons';
 import { wallLength } from '../geometry/walls';
 import {
-  deleteOpening, deleteRoom, deleteWall, renameRoom, setRoofHeight, setRoomKind, setWallLength, updateOpening, updateWall,
+  deleteOpening, deleteRoom, deleteWall, renameRoom, setRoofHeight, setRoomKind, setStairShape, setStairUp, setWallLength,
+  toggleDoorFlip, updateOpening, updateWall,
 } from '../model/ops';
-import type { Floor, Project, RoomKind } from '../model/types';
+import type { Floor, Project, Room, RoomKind, StairShape, StairUp } from '../model/types';
 import { formatArea } from '../model/units';
 import { useEditor } from '../store/editorStore';
 import BackgroundControls from './BackgroundControls';
+import Dropdown from './Dropdown';
 import { LengthField, TextField } from './fields';
 import OrientationPanel from './OrientationPanel';
 import QuickRoomPanel from './QuickRoomPanel';
@@ -69,7 +71,43 @@ function OpeningProps({ floor, id }: { floor: Floor; id: string }) {
       {o.kind === 'window' && <LengthField label="Antepecho" value={o.sill} help="Altura desde el suelo hasta la ventana." onCommit={(v) => set({ sill: v! })} />}
       <LengthField label="Posición desde el inicio" value={o.offset} onCommit={(v) => set({ offset: v! })} />
       <p className="hint parrafo">Si una medida no cabe en el muro, se deja la que tenía.</p>
+      {o.kind === 'door' && (
+        <div className="acciones">
+          <button className="btn btn-sec" onClick={() => edit((d, f) => toggleDoorFlip(d, f, id))}><Icon name="flip" size={16} />Invertir apertura</button>
+        </div>
+      )}
       <DeleteButton onClick={() => remove(o.kind === 'door' ? 'Puerta eliminada' : 'Ventana eliminada', (d, f) => deleteOpening(d, f, id))} />
+    </>
+  );
+}
+
+const KIND_NAMES: Record<RoomKind, string> = { room: 'Habitación', balcony: 'Balcón', roof: 'Cubierta', stairs: 'Escalera' };
+const KIND_REMOVED: Record<RoomKind, string> = {
+  room: 'Habitación eliminada', balcony: 'Balcón eliminado', roof: 'Cubierta eliminada', stairs: 'Escalera eliminada',
+};
+
+function StairsFields({ r, id }: { r: Room; id: string }) {
+  return (
+    <>
+      <div className="field">
+        <span className="label">Sube hacia</span>
+        <Dropdown<StairUp>
+          label="Sube hacia"
+          value={r.up ?? 'n'}
+          options={[{ value: 'n', label: 'Arriba' }, { value: 's', label: 'Abajo' }, { value: 'w', label: 'Izquierda' }, { value: 'e', label: 'Derecha' }]}
+          onChange={(u) => edit((d, f) => setStairUp(d, f, id, u))}
+        />
+        <span className="ayuda">Arriba, abajo, izquierda o derecha del plano.</span>
+      </div>
+      <div className="field">
+        <span className="label">Forma</span>
+        <SegmentedSwitch<StairShape>
+          label="Forma"
+          value={r.stairShape ?? 'recta'}
+          options={[{ value: 'recta', label: 'Recta' }, { value: 'u', label: 'En U' }]}
+          onChange={(sh) => edit((d, f) => setStairShape(d, f, id, sh))}
+        />
+      </div>
     </>
   );
 }
@@ -79,17 +117,18 @@ function RoomProps({ floor, id }: { floor: Floor; id: string }) {
   if (!r) return null;
   return (
     <>
-      <h2>{r.kind === 'balcony' ? 'Balcón' : r.kind === 'roof' ? 'Cubierta' : 'Habitación'}</h2>
+      <h2>{KIND_NAMES[r.kind]}</h2>
       <TextField label="Nombre" value={r.name} onCommit={(v) => edit((d, f) => renameRoom(d, f, id, v))} />
       <div className="field">
         <span className="label">Tipo</span>
-        <SegmentedSwitch<RoomKind>
+        <Dropdown<RoomKind>
           label="Tipo"
           value={r.kind}
-          options={[{ value: 'room', label: 'Habitación' }, { value: 'balcony', label: 'Balcón' }, { value: 'roof', label: 'Cubierta' }]}
+          options={(Object.keys(KIND_NAMES) as RoomKind[]).map((k) => ({ value: k, label: KIND_NAMES[k] }))}
           onChange={(k) => edit((d, f) => setRoomKind(d, f, id, k))}
         />
       </div>
+      {r.kind === 'stairs' && <StairsFields r={r} id={id} />}
       {r.kind === 'roof' && (
         <LengthField
           label="Altura de la cubierta"
@@ -102,7 +141,7 @@ function RoomProps({ floor, id }: { floor: Floor; id: string }) {
         <span className="etiqueta-tarjeta" style={{ margin: 0 }}>Área</span>
         <span className="valor-fijo">{formatArea(polygonArea(r.points))}</span>
       </div>
-      <DeleteButton onClick={() => remove(r.kind === 'balcony' ? 'Balcón eliminado' : r.kind === 'roof' ? 'Cubierta eliminada' : 'Habitación eliminada', (d, f) => deleteRoom(d, f, id))} />
+      <DeleteButton onClick={() => remove(KIND_REMOVED[r.kind], (d, f) => deleteRoom(d, f, id))} />
     </>
   );
 }

@@ -32,6 +32,9 @@ const PATHS = {
   grid: 'M4 4h16v16H4z M4 9.33h16 M4 14.67h16 M9.33 4v16 M14.67 4v16',
   copy: 'M9 9h11v11H9z M5 15V4h11',
   download: 'M12 4v11 M7 10l5 5 5-5 M5 20h14',
+  chevron: 'M6 9l6 6 6-6',
+  walk: 'M13 5.6a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2z M11.5 8L10 14l-3 7 M10 14l3.5 3v4 M7 11.5l2.5-3.5h3.5l2 3 2.5 1',
+  flip: 'M12 3v18 M8 7L4 12l4 5z M16 7l4 5-4 5z',
 } as const;
 
 export type IconName = keyof typeof PATHS;

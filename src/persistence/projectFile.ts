@@ -23,6 +23,7 @@ const opening = z.object({
 const room = z.object({
   id: z.string(), name: z.string(), kind: z.enum(['room', 'balcony', 'roof', 'stairs']), points: z.array(vec).min(3),
   height: positive.optional(), up: z.enum(['n', 's', 'e', 'w']).optional(),
+  stairShape: z.enum(['recta', 'u']).optional(),
   floorMaterial: z.enum(['ceramica', 'porcelanato', 'madera', 'concreto', 'piedra', 'cesped']).optional(),
   railing: z.enum(['vidrio', 'muro', 'celosia']).optional(),
 });

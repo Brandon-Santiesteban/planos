@@ -45,6 +45,9 @@ export type RoomKind = 'room' | 'balcony' | 'roof' | 'stairs';
 /** Direction a stairs room goes up, in plan terms: n = towards the top of the plan (−y), s = +y, e = +x, w = −x. */
 export type StairUp = 'n' | 's' | 'e' | 'w';
 
+/** recta = one straight flight; u = two flights side by side with a landing at the far end, arriving back on the start side. */
+export type StairShape = 'recta' | 'u';
+
 export type FloorMaterial = 'ceramica' | 'porcelanato' | 'madera' | 'concreto' | 'piedra' | 'cesped';
 
 export type RailingType = 'vidrio' | 'muro' | 'celosia';
@@ -58,6 +61,8 @@ export interface Room {
   height?: number;
   /** stairs only: which way it goes up (default 'n'). */
   up?: StairUp;
+  /** stairs only: straight flight or U-shaped (default 'recta'). */
+  stairShape?: StairShape;
   /** floor finish (rooms and balconies) */
   floorMaterial?: FloorMaterial;
   /** balconies only: kind of railing on the open edges (default 'vidrio'). */
