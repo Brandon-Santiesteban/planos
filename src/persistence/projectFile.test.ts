@@ -1,0 +1,44 @@
+import { createEmptyProject } from '../model/defaults';
+import { addOpening, addRoom, addWall } from '../model/ops';
+import { parseProject, serializeProject } from './projectFile';
+
+function sampleProject() {
+  const p = createEmptyProject('Apartamento');
+  const f = p.floors[0].id;
+  const w = addWall(p, f, { x: 0, y: 0 }, { x: 4, y: 0 })!;
+  addOpening(p, f, w, 'door', 2);
+  addRoom(p, f, [{ x: 0, y: 0 }, { x: 4, y: 0 }, { x: 4, y: 3 }], 'Sala');
+  p.floors[0].background = {
+    dataUrl: 'data:image/png;base64,AAAA', origin: { x: 0, y: 0 }, metresPerPixel: 0.01, opacity: 0.5, widthPx: 10, heightPx: 20,
+  };
+  return p;
+}
+
+test('round-trips a project', () => {
+  const p = sampleProject();
+  const r = parseProject(serializeProject(p));
+  expect(r).toEqual({ ok: true, project: p });
+});
+
+test('rejects broken JSON', () => {
+  const r = parseProject('{');
+  expect(r.ok).toBe(false);
+});
+
+test('rejects unsupported version with a Spanish message', () => {
+  const p = { ...sampleProject(), version: 2 };
+  const r = parseProject(JSON.stringify(p));
+  expect(r.ok).toBe(false);
+  if (!r.ok) expect(r.error).toMatch(/versión/i);
+});
+
+test('rejects an opening pointing to a missing wall', () => {
+  const p = sampleProject();
+  p.floors[0].openings[0].wallId = 'missing';
+  expect(parseProject(serializeProject(p)).ok).toBe(false);
+});
+
+test('rejects a project without floors', () => {
+  const p = { ...sampleProject(), floors: [] };
+  expect(parseProject(JSON.stringify(p)).ok).toBe(false);
+});
