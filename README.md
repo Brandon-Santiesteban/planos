@@ -22,6 +22,14 @@ Haz doble clic en **`iniciar.bat`**. La primera vez instala lo necesario (tarda 
 - **Guardar**: crea un archivo `.casa.json` en tu PC. Después de guardarlo (o abrirlo) una vez, ese archivo se actualiza solo con cada cambio.
 - **Modo oscuro**: botón de la luna arriba a la derecha.
 
+## Ejemplos
+
+Abre un ejemplo directamente con su enlace (la primera vez se carga el ejemplo; después, tu copia con tus cambios):
+
+- Casa etapa 1 en 3D: http://localhost:5173/?abrir=ejemplos/casa-etapa-1.casa.json&vista=3d
+
+Los archivos están en `public/ejemplos/`.
+
 ## Atajos
 
 | Tecla | Acción |

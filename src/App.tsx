@@ -3,6 +3,8 @@ import GridControls from './editor2d/GridControls';
 import Plan2D from './editor2d/Plan2D';
 import { library, writeLinkedFile } from './persistence/appLibrary';
 import { startAutosave } from './persistence/autosave';
+import { fetchText, projectFromUrl } from './persistence/openFromUrl';
+import { notify } from './ui/toasts';
 import { trackProjectLoads } from './persistence/currentFile';
 import { useEditor } from './store/editorStore';
 import { DialogHost } from './ui/Dialog';
@@ -22,7 +24,7 @@ const Scene3D = lazy(() => import('./view3d/Scene3D'));
 type Layout = 'split' | '2d' | '3d';
 
 export default function App() {
-  const [layout, setLayout] = useState<Layout>('split');
+  const [layout, setLayout] = useState<Layout>(() => (new URLSearchParams(location.search).get('vista') === '3d' ? '3d' : 'split'));
   const { save, open } = useProjectFile();
   const theme = useTheme((s) => s.theme);
   useEffect(() => applyTheme(theme), [theme]);
@@ -33,11 +35,19 @@ export default function App() {
   useEffect(() => {
     let stop: (() => void) | undefined;
     let cancelled = false;
-    void library.last().catch(() => null).then((p) => {
+    void (async () => {
+      const fromUrl = await projectFromUrl(location.search, fetchText, library);
+      const p = fromUrl && 'project' in fromUrl ? fromUrl.project : await library.last().catch(() => null);
       if (cancelled) return;
-      if (p) useEditor.getState().loadProject(p);
+      if (p) {
+        useEditor.getState().loadProject(p);
+        // Opened from a link: start on the top floor so the 3D view shows the whole house.
+        if (fromUrl) useEditor.getState().setActiveFloor(p.floors[p.floors.length - 1].id);
+      }
+      if (fromUrl && 'error' in fromUrl) notify({ kind: 'error', text: fromUrl.error });
+      if (fromUrl) history.replaceState(null, '', location.pathname); // a reload keeps your edits
       stop = startAutosave({ lib: library, writeFile: writeLinkedFile });
-    });
+    })();
     return () => {
       cancelled = true;
       stop?.();
