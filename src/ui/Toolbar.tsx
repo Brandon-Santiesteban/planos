@@ -7,6 +7,7 @@ export const TOOLS: { tool: Tool; label: string; key: string; icon: IconName }[]
   { tool: 'door', label: 'Puerta', key: 'P', icon: 'door' },
   { tool: 'window', label: 'Ventana', key: 'N', icon: 'window' },
   { tool: 'room', label: 'Habitación', key: 'H', icon: 'room' },
+  { tool: 'quickRoom', label: 'Rápida', key: 'R', icon: 'quickRoom' },
 ];
 
 export default function Toolbar() {

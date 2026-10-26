@@ -18,6 +18,25 @@ export default function PreviewLayer({ preview, pxPerMetre }: { preview: ToolPre
       </g>
     );
   }
+  if (preview.kind === 'quickRoom') {
+    const font = 12 / pxPerMetre;
+    const c = preview.interior;
+    const cx = (c[0].x + c[2].x) / 2;
+    const cy = (c[0].y + c[2].y) / 2;
+    return (
+      <g className="preview">
+        {preview.corners.map((a, i) => {
+          const b = preview.corners[(i + 1) % 4];
+          const fp = wallFootprint({ id: 'q', a, b, thickness: preview.thickness, height: null }, true, true);
+          return <polygon key={i} className="preview-wall" points={pts(fp)} />;
+        })}
+        <polygon className="preview-polygon" points={pts(c)} />
+        <text className="preview-length" x={cx} y={cy} fontSize={font} textAnchor="middle" dominantBaseline="middle">
+          {preview.label}
+        </text>
+      </g>
+    );
+  }
   if (preview.kind === 'polygon') {
     const all = [...preview.points, preview.cursor];
     return (

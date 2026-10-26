@@ -4,6 +4,7 @@ import { polygonArea } from '../geometry/polygons';
 import { add, dist, normalize, scale, sub } from '../geometry/vec';
 import { createFloor, DEFAULTS } from './defaults';
 import { newId } from './ids';
+import { quickRoomOutline, uncoveredParts } from './quickRoom';
 import type { Background, Floor, Opening, OpeningKind, Project, RoomKind, Vec2, Wall } from './types';
 
 function getFloor(p: Project, floorId: string): Floor {
@@ -196,6 +197,31 @@ export function addRoom(p: Project, floorId: string, points: Vec2[], name: strin
   const id = newId();
   getFloor(p, floorId).rooms.push({ id, name, kind: 'room', points: points.map((q) => ({ ...q })) });
   return id;
+}
+
+/**
+ * Adds a rectangular room measuring `w` × `d` inside, with walls around it. Walls that would lie on top of
+ * existing ones are not duplicated, so neighbouring rooms share them. Returns the room id.
+ */
+export function addRectRoom(
+  p: Project,
+  floorId: string,
+  origin: Vec2,
+  w: number,
+  d: number,
+  name: string,
+  thickness: number = DEFAULTS.wallThickness,
+): string | null {
+  if (!(w > 0) || !(d > 0)) return null;
+  const f = getFloor(p, floorId);
+  const { corners, interior } = quickRoomOutline(origin, w, d, thickness);
+  for (let i = 0; i < 4; i++) {
+    const existing = [...f.walls];
+    for (const [a, b] of uncoveredParts(corners[i], corners[(i + 1) % 4], existing, DEFAULTS.minWallLength)) {
+      addWall(p, floorId, a, b, thickness);
+    }
+  }
+  return addRoom(p, floorId, interior, name);
 }
 
 export function renameRoom(p: Project, floorId: string, roomId: string, name: string): void {

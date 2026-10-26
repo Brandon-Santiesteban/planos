@@ -27,6 +27,8 @@ const PATHS = {
   info: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 11v5 M12 7.5v.01',
   alert: 'M12 3l9.5 17h-19z M12 10v4 M12 17v.01',
   layers: 'M12 3l9 5-9 5-9-5z M3 13l9 5 9-5',
+  quickRoom: 'M4 4h16v16H4z M12 8.5v7 M8.5 12h7',
+  rotate: 'M20 12a8 8 0 1 1-2.34-5.66 M20 4v4h-4',
   grid: 'M4 4h16v16H4z M4 9.33h16 M4 14.67h16 M9.33 4v16 M14.67 4v16',
   copy: 'M9 9h11v11H9z M5 15V4h11',
 } as const;

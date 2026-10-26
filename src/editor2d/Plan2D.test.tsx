@@ -20,7 +20,7 @@ test('renders a room with name and area', () => {
   apply((d) => void addRoom(d, activeFloorId, [{ x: 0, y: 0 }, { x: 4, y: 0 }, { x: 4, y: 3 }, { x: 0, y: 3 }], 'Sala'));
   render(<Plan2D />);
   expect(screen.getByText('Sala')).toBeInTheDocument();
-  expect(screen.getByText('12,00 m²')).toBeInTheDocument();
+  expect(screen.getByText('12,00 m² · 4,00 × 3,00 m')).toBeInTheDocument();
 });
 
 test('hiding the grid removes its lines', async () => {
@@ -29,4 +29,11 @@ test('hiding the grid removes its lines', async () => {
   const { container } = render(<Plan2D />);
   expect(container.querySelectorAll('.grid line')).toHaveLength(0);
   useGrid.setState({ visible: true, step: 0.5 });
+});
+
+test('rectangular rooms also show their inside size', () => {
+  const { apply, activeFloorId } = useEditor.getState();
+  apply((d) => void addRoom(d, activeFloorId, [{ x: 0, y: 0 }, { x: 3, y: 0 }, { x: 3, y: 4 }, { x: 0, y: 4 }], 'Dormitorio'));
+  render(<Plan2D />);
+  expect(screen.getByText('12,00 m² · 3,00 × 4,00 m')).toBeInTheDocument();
 });

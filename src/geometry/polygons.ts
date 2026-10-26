@@ -14,6 +14,17 @@ export function polygonArea(pts: Vec2[]): number {
   return Math.abs(signedArea(pts));
 }
 
+/** Width and height of an axis-aligned rectangle, or null for any other shape. */
+export function rectangleSize(pts: Vec2[]): { w: number; h: number } | null {
+  if (pts.length !== 4) return null;
+  const xs = new Set(pts.map((p) => Math.round(p.x * 1e6)));
+  const ys = new Set(pts.map((p) => Math.round(p.y * 1e6)));
+  if (xs.size !== 2 || ys.size !== 2) return null;
+  const [x0, x1] = [...xs].map((v) => v / 1e6);
+  const [y0, y1] = [...ys].map((v) => v / 1e6);
+  return { w: Math.abs(x1 - x0), h: Math.abs(y1 - y0) };
+}
+
 export function pointInPolygon(p: Vec2, pts: Vec2[]): boolean {
   let inside = false;
   for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {

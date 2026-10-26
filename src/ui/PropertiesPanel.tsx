@@ -8,6 +8,7 @@ import { formatArea } from '../model/units';
 import { useEditor } from '../store/editorStore';
 import BackgroundControls from './BackgroundControls';
 import { LengthField, TextField } from './fields';
+import QuickRoomPanel from './QuickRoomPanel';
 import Icon from './Icon';
 import SegmentedSwitch from './SegmentedSwitch';
 import { notify } from './toasts';
@@ -101,7 +102,10 @@ export default function PropertiesPanel() {
   const project = useEditor((s) => s.project);
   const activeFloorId = useEditor((s) => s.activeFloorId);
   const selection = useEditor((s) => s.selection);
+  const tool = useEditor((s) => s.tool);
   const floor = project.floors.find((f) => f.id === activeFloorId) ?? project.floors[0];
+
+  if (tool === 'quickRoom') return <QuickRoomPanel />;
 
   if (!selection) {
     return (

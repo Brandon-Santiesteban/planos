@@ -9,6 +9,7 @@ Haz doble clic en **`iniciar.bat`**. La primera vez instala lo necesario (tarda 
 ## Qué puedes hacer (fase 1)
 
 - **Muros**: herramienta *Muro* (M). Clic para empezar, clic para terminar; sigue encadenando muros. Los puntos se pegan a las puntas de la cuadrícula (también en diagonal). Mientras dibujas, escribe una medida (`3,5`, `350 cm`) y pulsa **Enter**. **Esc** o doble clic termina. **Shift** fija ángulos de 45°. **Alt** desactiva el ajuste.
+- **Habitación rápida**: herramienta *Rápida* (R). Escribe el ancho y el largo **por dentro**, y la habitación sigue al ratón; clic para colocarla, **R** para girarla. Si la acercas a otra se pega y comparten el muro; luego une las dos con una *Puerta*. Dentro de cada habitación rectangular ves su área y sus medidas interiores.
 - **Puertas y ventanas**: herramientas *Puerta* (P) y *Ventana* (N). Clic sobre un muro.
 - **Habitaciones y balcones**: herramienta *Habitación* (H). Clic en cada esquina y clic en el primer punto (o Enter) para cerrar. En el panel puedes cambiar el nombre y convertirla en **Balcón** (lleva barandilla en 3D).
 - **Seleccionar y editar**: herramienta *Seleccionar* (V). Arrastra esquinas, muros o puertas. Cambia medidas en el panel derecho. **Supr** elimina.
@@ -26,7 +27,7 @@ Haz doble clic en **`iniciar.bat`**. La primera vez instala lo necesario (tarda 
 |---|---|
 | Ctrl+Z / Ctrl+Y | Deshacer / Rehacer |
 | Ctrl+S / Ctrl+O | Guardar / Mis proyectos |
-| V, M, P, N, H | Herramientas |
+| V, M, P, N, H, R | Herramientas |
 | Rueda | Zoom en el plano |
 | Botón central/derecho o Espacio + arrastrar | Mover el plano |
 
