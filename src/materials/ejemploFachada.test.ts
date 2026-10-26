@@ -78,6 +78,27 @@ test('railings: parapets on the balcony and terrace, black celosía fence on the
   expect(room('Primer piso', 'Acceso vehicular')).toMatchObject({ railing: 'celosia', railingColor: COLORS.negro });
 });
 
+test('bathrooms: tiled inside faces, stone accent behind the jacuzzi; the rooms next door keep their paint', () => {
+  const p = applyFacadeProposal(load());
+  const f = floorNamed(p, 'Segundo piso');
+  const tiles = { finish: 'enchape', color: COLORS.enchape };
+  const paint = { finish: 'pintura', color: COLORS.hueso };
+  // The back wall is split at the bathroom's corner: stone behind the jacuzzi, paint in the office.
+  const back = wallBetween(f, 0, 0, 2.6, 0)!; // a → b goes +x: left = +y (inside)
+  expect(back.sides?.left).toEqual({ finish: 'piedra' });
+  expect(back.sides?.right).toEqual({ finish: 'pintura', color: COLORS.huesoArenilla });
+  expect(f.openings.filter((o) => o.wallId === back.id).map((o) => o.kind)).toEqual(['window']);
+  expect(wallBetween(f, 2.6, 0, 5.5, 0)!.sides?.left).toEqual(paint);
+  // The wall to the office is split where the vestier starts.
+  const east = wallBetween(f, 2.6, 0, 2.6, 2.8)!; // +y: left = −x (bathroom)
+  expect(east.sides).toEqual({ left: tiles, right: paint });
+  expect(wallBetween(f, 2.6, 2.8, 2.6, 4.8)!.sides).toEqual({ left: paint, right: paint });
+  const toVestier = wallBetween(f, 2.6, 2.8, 0, 2.8)!; // −x: left = −y (bathroom)
+  expect(toVestier.sides).toEqual({ left: tiles, right: paint });
+  const party = wallBetween(f, 0, 2.8, 0, 0)!; // −y: left = +x (bathroom)
+  expect(party.sides).toEqual({ left: tiles, right: { finish: 'pintura', color: COLORS.grisClaro } });
+});
+
 test('is idempotent and the result is a valid project file', () => {
   const once = applyFacadeProposal(load());
   const twice = applyFacadeProposal(structuredClone(once));

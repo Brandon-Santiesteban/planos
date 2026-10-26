@@ -3,6 +3,8 @@
 import { type ThreeEvent, useThree } from '@react-three/fiber';
 import { type ReactElement, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { byElevation } from '../model/furnitureOps';
 import type { Floor, Furniture } from '../model/types';
 import { useEditor } from '../store/editorStore';
@@ -46,7 +48,8 @@ function S({ p, r, c, sc }: { p: V3; r: number; c: string; sc?: V3 }) {
   );
 }
 
-type P = { w: number; d: number; h: number; c: string; item?: CatalogItem };
+/** `seed` is stable per piece (from its id): trees use it to vary their shape and greens. */
+type P = { w: number; d: number; h: number; c: string; item?: CatalogItem; seed?: number };
 type Builder = (p: P) => ReactElement;
 
 const METAL = '#5a5f66';
@@ -349,16 +352,6 @@ const basin: Builder = ({ w, d, h, c, item }) => {
   );
 };
 
-const shower: Builder = ({ w, d, h, c }) => (
-  <>
-    <B p={[0, 0.025, 0]} s={[w, 0.05, d]} c={WHITE} r={0.3} />
-    <B p={[0, h / 2, d / 2 - 0.005]} s={[w, h, 0.01]} c={c} o={0.25} r={0.05} />
-    <B p={[w / 2 - 0.005, h / 2, 0]} s={[0.01, h, d]} c={c} o={0.25} r={0.05} />
-    <C p={[0, h - 0.15, -d / 2 + 0.25]} r={0.1} h={0.02} c={STEEL} m={0.9} rough={0.2} />
-    <B p={[0, h - 0.13, -d / 2 + 0.13]} s={[0.02, 0.02, 0.26]} c={STEEL} m={0.9} r={0.2} />
-  </>
-);
-
 const tub: Builder = ({ w, d, h, c }) => (
   <>
     <B p={[0, h / 2, 0]} s={[w, h, d]} c={c} r={0.25} />
@@ -393,21 +386,6 @@ const plant: Builder = ({ w, d, h, c }) => {
       <C p={[0, pot + foliage * 0.25, 0]} r={0.02} h={foliage * 0.5} c={'#6b4e2e'} />
       <S p={[0, pot + foliage * 0.55, 0]} r={r * 1.05} c={GREEN} sc={[1, foliage / (2 * r) * 0.8, 1]} />
       <S p={[r * 0.35, pot + foliage * 0.8, r * 0.2]} r={r * 0.6} c={shade(GREEN, 1.15)} />
-    </>
-  );
-};
-
-/** Trunk plus a rounded crown in the piece's colour; low pieces (shrubs) are almost all crown. */
-const tree: Builder = ({ w, d, h, c }) => {
-  const r = Math.min(w, d) / 2;
-  const trunk = h < 1.5 ? h * 0.15 : h * 0.4;
-  const crown = h - trunk;
-  return (
-    <>
-      <C p={[0, trunk / 2, 0]} r={Math.max(0.04, r * 0.08)} top={Math.max(0.03, r * 0.06)} h={trunk} c={'#6b4e2e'} rough={0.95} />
-      <S p={[0, trunk + crown * 0.45, 0]} r={r * 0.9} c={c} sc={[1, crown / (2 * r) * 1.05, 1]} />
-      <S p={[r * 0.35, trunk + crown * 0.62, r * 0.25]} r={r * 0.55} c={shade(c, 1.12)} />
-      <S p={[-r * 0.3, trunk + crown * 0.55, -r * 0.3]} r={r * 0.5} c={shade(c, 0.9)} />
     </>
   );
 };
@@ -587,6 +565,666 @@ const planter: Builder = ({ w, d, h, c }) => {
   );
 };
 
+/** Deterministic pseudo-random numbers in [0, 1) from a seed (mulberry32). */
+function rng(seed: number) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Stable number from a string (a piece's id), so every tree keeps its own shape. */
+export function hashSeed(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+  return h >>> 0;
+}
+
+// --- Mirrors: a light silver face that reflects a soft studio room, so it never reads as a dark screen ---
+
+let mirrorEnv: { gl: THREE.WebGLRenderer; tex: THREE.Texture } | null = null;
+
+function MirrorFace({ p, s, c }: { p: V3; s: V3; c: string }) {
+  const gl = useThree((st) => st.gl);
+  const env = useMemo(() => {
+    if (mirrorEnv?.gl !== gl) {
+      const pmrem = new THREE.PMREMGenerator(gl);
+      mirrorEnv = { gl, tex: pmrem.fromScene(new RoomEnvironment(), 0.02).texture };
+      pmrem.dispose();
+    }
+    return mirrorEnv.tex;
+  }, [gl]);
+  return (
+    <mesh position={p} receiveShadow>
+      <boxGeometry args={s} />
+      <meshStandardMaterial color={c} metalness={0.95} roughness={0.04} envMap={env} envMapIntensity={1.15} emissive={c} emissiveIntensity={0.22} />
+    </mesh>
+  );
+}
+
+const mirror: Builder = ({ w, d, h, c }) => {
+  const f = 0.025; // thin frame
+  const fc = '#9aa0a6';
+  return (
+    <>
+      <B p={[0, h / 2, -d / 2 + 0.006]} s={[w, h, 0.012]} c={shade(fc, 0.7)} m={0.4} r={0.5} />
+      {[-1, 1].map((sx) => <B key={`v${sx}`} p={[sx * (w / 2 - f / 2), h / 2, 0]} s={[f, h, d]} c={fc} m={0.3} r={0.35} />)}
+      {[-1, 1].map((sy) => <B key={`h${sy}`} p={[0, h / 2 + sy * (h / 2 - f / 2), 0]} s={[w - 2 * f, f, d]} c={fc} m={0.3} r={0.35} />)}
+      <MirrorFace p={[0, h / 2, d / 2 - 0.012]} s={[w - 2 * f, h - 2 * f, 0.006]} c={c} />
+    </>
+  );
+};
+
+// --- Glow (LED strips, fire): a soft additive halo, brightest in the middle ---
+
+let glowTexture: THREE.Texture | null = null;
+function glowMap(): THREE.Texture {
+  if (glowTexture) return glowTexture;
+  const cv = document.createElement('canvas');
+  cv.width = 64;
+  cv.height = 64;
+  const ctx = cv.getContext('2d');
+  if (ctx) {
+    const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, 'rgba(255,255,255,1)');
+    g.addColorStop(0.45, 'rgba(255,255,255,0.45)');
+    g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 64, 64);
+  }
+  glowTexture = new THREE.CanvasTexture(cv);
+  return glowTexture;
+}
+
+function Glow({ p, s, c, o = 0.35, rot }: { p: V3; s: [number, number]; c: string; o?: number; rot?: V3 }) {
+  const map = useMemo(glowMap, []);
+  return (
+    <mesh position={p} rotation={rot} renderOrder={2}>
+      <planeGeometry args={s} />
+      <meshBasicMaterial color={c} map={map} transparent opacity={o} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
+    </mesh>
+  );
+}
+
+/** Bright, untonemapped emissive box (LEDs, neon). */
+function Neon({ p, s, c, k = 2.2, rot }: { p: V3; s: V3; c: string; k?: number; rot?: V3 }) {
+  return (
+    <mesh position={p} rotation={rot}>
+      <boxGeometry args={s} />
+      <meshStandardMaterial color={c} emissive={c} emissiveIntensity={k} toneMapped={false} />
+    </mesh>
+  );
+}
+
+/** LED strip on a wall (back at −z): the strip and the light it washes on the wall. */
+const ledStrip: Builder = ({ w, d, h, c }) => (
+  <>
+    <Neon p={[0, h / 2, 0]} s={[w, h, d]} c={c} />
+    <Glow p={[0, h / 2, -d / 2 + 0.002]} s={[w + 0.6, 1.0]} c={c} o={0.8} />
+  </>
+);
+
+// --- Entertainment centre ---
+
+const BOOKS = ['#6d4c41', '#3f5e74', '#8a7a5c', '#a1887f', '#455a64', '#c8b89a'];
+
+/** A few decorative objects on a shelf: books, a vase or a box (deterministic per slot). */
+function shelfDecor(x: number, y: number, z: number, room: number, k: number) {
+  const kind = k % 3;
+  if (kind === 0) {
+    const n = 4;
+    return (
+      <group key={`d${k}`}>
+        {Array.from({ length: n }, (_, i) => (
+          <B key={i} p={[x - room * 0.3 + i * 0.035, y + 0.11, z]} s={[0.03, 0.22 - (i % 2) * 0.03, 0.16]} c={BOOKS[(i + k) % BOOKS.length]} r={0.9} />
+        ))}
+      </group>
+    );
+  }
+  if (kind === 1) return <C key={`d${k}`} p={[x, y + 0.09, z]} r={0.045} top={0.03} h={0.18} c={k % 2 ? '#d8cfc2' : '#5f6f63'} rough={0.4} />;
+  return <B key={`d${k}`} p={[x + room * 0.15, y + 0.05, z]} s={[0.12, 0.1, 0.12]} c={'#b9a58a'} />;
+}
+
+const entertainment: Builder = ({ w, d, h, c }) => {
+  const tw = Math.min(0.45, w / 5);
+  const cab = Math.min(0.5, h * 0.27);
+  const bridge = Math.min(0.3, h * 0.16);
+  const t = 0.025;
+  const nw = w - 2 * tw;
+  const back = shade(c, 0.7);
+  const nShelves = 3;
+  const step = (h - cab) / nShelves;
+  const slats = Math.max(4, Math.round(nw / 0.07));
+  return (
+    <>
+      {/* Two towers with open shelves over a closed base */}
+      {[-1, 1].map((sx) => {
+        const cx = sx * (w / 2 - tw / 2);
+        return (
+          <group key={sx}>
+            <B p={[cx - tw / 2 + t / 2, h / 2, 0]} s={[t, h, d]} c={c} />
+            <B p={[cx + tw / 2 - t / 2, h / 2, 0]} s={[t, h, d]} c={c} />
+            <B p={[cx, h / 2, -d / 2 + 0.01]} s={[tw - 2 * t, h, 0.02]} c={back} />
+            <B p={[cx, cab / 2, 0]} s={[tw - 2 * t, cab, d - 0.02]} c={c} />
+            <B p={[cx, cab / 2 + 0.02, d / 2 - 0.004]} s={[tw - 2 * t - 0.02, cab - 0.06, 0.01]} c={shade(c, 1.08)} />
+            <B p={[cx - sx * (tw / 2 - 0.07), cab / 2 + 0.05, d / 2 + 0.008]} s={[0.012, 0.14, 0.012]} c={METAL} m={0.6} r={0.4} />
+            {Array.from({ length: nShelves }, (_, i) => (
+              <B key={i} p={[cx, cab + step * (i + 1) - t / 2, 0]} s={[tw - 2 * t, t, d - 0.02]} c={c} />
+            ))}
+            {Array.from({ length: nShelves }, (_, i) => shelfDecor(cx, cab + step * i + (i ? 0 : 0), 0, tw / 2 - t, i + (sx > 0 ? 1 : 0)))}
+          </group>
+        );
+      })}
+      {/* Low cabinet under the TV niche: two doors and a plinth */}
+      <B p={[0, 0.04, -0.02]} s={[nw, 0.08, d - 0.06]} c={shade(c, 0.55)} />
+      <B p={[0, (cab + 0.08) / 2, 0]} s={[nw, cab - 0.08, d]} c={c} />
+      {[-1, 1].map((sx) => (
+        <group key={`door${sx}`}>
+          <B p={[(sx * nw) / 4, (cab + 0.08) / 2, d / 2 + 0.004]} s={[nw / 2 - 0.02, cab - 0.12, 0.008]} c={shade(c, 1.08)} />
+          <B p={[sx * 0.08, (cab + 0.08) / 2, d / 2 + 0.014]} s={[0.012, 0.16, 0.012]} c={METAL} m={0.6} r={0.4} />
+        </group>
+      ))}
+      {/* Slatted back of the niche */}
+      <B p={[0, (cab + h - bridge) / 2, -d / 2 + 0.008]} s={[nw, h - bridge - cab, 0.016]} c={shade(c, 0.45)} />
+      {Array.from({ length: slats }, (_, i) => (
+        <B key={`s${i}`} p={[-nw / 2 + (nw * (i + 0.5)) / slats, (cab + h - bridge) / 2, -d / 2 + 0.024]} s={[nw / slats - 0.018, h - bridge - cab, 0.016]} c={back} />
+      ))}
+      {/* Bridge shelf on top, with a warm light strip under it */}
+      <B p={[0, h - bridge + t / 2, 0]} s={[nw, t, d]} c={c} />
+      <B p={[0, h - t / 2, 0]} s={[nw, t, d]} c={c} />
+      <B p={[0, h - bridge / 2, -d / 2 + 0.01]} s={[nw, bridge, 0.02]} c={back} />
+      <Neon p={[0, h - bridge - 0.004, d / 2 - 0.06]} s={[nw - 0.1, 0.006, 0.012]} c={'#ffd9a6'} k={1.2} />
+      {shelfDecor(-nw * 0.3, h - bridge + t, 0, 0.1, 0)}
+      {shelfDecor(nw * 0.05, h - bridge + t, 0, 0.1, 1)}
+      {shelfDecor(nw * 0.32, h - bridge + t, 0, 0.1, 2)}
+    </>
+  );
+};
+
+/** Console lying flat: white shell, black core and a blue light line. */
+const console_: Builder = ({ w, d, h, c }) => (
+  <>
+    <B p={[0, h * 0.5, 0]} s={[w, h * 0.38, d * 0.82]} c={DARK} r={0.4} />
+    {[-1, 1].map((sy) => <B key={sy} p={[0, h * 0.5 + sy * h * 0.3, 0]} s={[w, h * 0.3, d]} c={c} r={0.35} />)}
+    <Neon p={[0, h * 0.5, d * 0.41 + 0.002]} s={[w * 0.9, 0.006, 0.003]} c={'#4f9dff'} k={1.5} />
+    <B p={[w * 0.32, 0.02, d / 2 + 0.12]} s={[0.15, 0.04, 0.1]} c={c} r={0.4} />
+  </>
+);
+
+// --- Curtain: gathered fabric hanging from a rod ---
+
+const curtain: Builder = ({ w, d, h, c }) => {
+  const n = Math.max(3, Math.round(w / 0.09));
+  const fold = w / n;
+  return (
+    <>
+      <C p={[0, h - 0.03, -d / 2 + 0.03]} r={0.012} h={w + 0.1} c={METAL} m={0.7} rough={0.3} rot={[0, 0, Math.PI / 2]} />
+      {[-1, 1].map((sx) => <S key={sx} p={[sx * (w / 2 + 0.05), h - 0.03, -d / 2 + 0.03]} r={0.022} c={METAL} />)}
+      {Array.from({ length: n }, (_, i) => (
+        <C key={i} p={[-w / 2 + fold * (i + 0.5), (h - 0.06) / 2 + 0.01, (i % 2 ? 0.25 : -0.05) * d]} r={fold * 0.62} h={h - 0.08} c={i % 2 ? c : shade(c, 0.9)} rough={0.95} seg={10} />
+      ))}
+    </>
+  );
+};
+
+// --- Framed art ---
+
+/** Flat triangle (apex up) on the picture plane: base centre (x, y), base width bw, height th. */
+function Tri({ x, y, z, bw, th, c, e }: { x: number; y: number; z: number; bw: number; th: number; c: string; e?: boolean }) {
+  return (
+    <mesh position={[x, y + th / 3, z]} rotation={[-Math.PI / 2, 0, 0]} scale={[bw / Math.sqrt(3), 0.002, (th * 2) / 3]}>
+      <cylinderGeometry args={[1, 1, 1, 3]} />
+      <meshStandardMaterial color={c} roughness={0.85} emissive={e ? c : '#000000'} emissiveIntensity={e ? 1.4 : 0} toneMapped={!e} />
+    </mesh>
+  );
+}
+
+/** Flat disc on the picture plane. */
+function Disc({ x, y, z, r, c, e }: { x: number; y: number; z: number; r: number; c: string; e?: boolean }) {
+  return (
+    <mesh position={[x, y, z]} rotation={[Math.PI / 2, 0, 0]}>
+      <cylinderGeometry args={[r, r, 0.002, 28]} />
+      <meshStandardMaterial color={c} roughness={0.85} emissive={e ? c : '#000000'} emissiveIntensity={e ? 1.4 : 0} toneMapped={!e} />
+    </mesh>
+  );
+}
+
+const picture: Builder = ({ w, d, h, c, item }) => {
+  const art = item?.art ?? 'abstracto';
+  const f = Math.min(0.035, w * 0.06); // frame
+  const mat = art === 'paisaje' || art === 'byn' ? Math.min(0.06, w * 0.09) : 0; // passe-partout
+  const aw = w - 2 * f - 2 * mat;
+  const ah = h - 2 * f - 2 * mat;
+  const z0 = d / 2 - 0.004;
+  const cy = h / 2;
+  // Picture-plane helpers: (u, v) in [−0.5, 0.5] of the artwork, layers stack towards the viewer.
+  const X = (u: number) => u * aw;
+  const Y = (v: number) => cy + v * ah;
+  const R = (u0: number, v0: number, u1: number, v1: number, col: string, layer: number, glow = false) => {
+    const p: V3 = [X((u0 + u1) / 2), Y((v0 + v1) / 2), z0 + layer * 0.0012];
+    const s: V3 = [(u1 - u0) * aw, (v1 - v0) * ah, 0.0012];
+    return glow ? <Neon key={`${u0}${v0}${layer}`} p={p} s={s} c={col} k={1.3} /> : <B key={`${u0}${v0}${layer}`} p={p} s={s} c={col} r={0.85} />;
+  };
+  const z = (layer: number) => z0 + layer * 0.0012;
+  let artwork: ReactElement;
+  if (art === 'paisaje') {
+    artwork = (
+      <>
+        {R(-0.5, -0.05, 0.5, 0.5, '#bcd3df', 1)}
+        {R(-0.5, 0.2, 0.5, 0.5, '#d6e3ea', 2)}
+        <Disc x={X(0.27)} y={Y(0.27)} z={z(3)} r={ah * 0.09} c={'#f2dcae'} />
+        <Tri x={X(-0.22)} y={Y(-0.12)} z={z(4)} bw={aw * 0.8} th={ah * 0.5} c={'#8ea1ad'} />
+        <Tri x={X(0.25)} y={Y(-0.12)} z={z(5)} bw={aw * 0.7} th={ah * 0.38} c={'#7b8f9c'} />
+        {R(-0.5, -0.5, 0.5, -0.08, '#7f9a69', 6)}
+        <Tri x={X(-0.1)} y={Y(-0.2)} z={z(7)} bw={aw * 1.1} th={ah * 0.16} c={'#6c8858'} />
+        {R(-0.5, -0.5, 0.5, -0.3, '#a7b56f', 8)}
+        {R(-0.5, -0.36, 0.5, -0.33, '#c2c98f', 9)}
+      </>
+    );
+  } else if (art === 'byn') {
+    artwork = (
+      <>
+        {R(-0.5, -0.5, 0.5, 0.5, '#d9d9d6', 1)}
+        {R(-0.5, 0.15, 0.5, 0.5, '#ececea', 2)}
+        {R(-0.5, -0.5, 0.5, -0.12, '#7d7d7b', 3)}
+        {R(-0.5, -0.5, 0.5, -0.3, '#4a4a49', 4)}
+        <Tri x={X(0.18)} y={Y(-0.12)} z={z(5)} bw={aw * 0.55} th={ah * 0.42} c={'#2b2b2b'} />
+        {R(-0.32, -0.12, -0.3, 0.18, '#1d1d1d', 6)}
+        <Disc x={X(-0.31)} y={Y(0.2)} z={z(7)} r={aw * 0.12} c={'#262626'} />
+        <Disc x={X(-0.25)} y={Y(0.32)} z={z(8)} r={ah * 0.05} c={'#fafaf8'} />
+      </>
+    );
+  } else if (art === 'gamer') {
+    artwork = (
+      <>
+        {R(-0.5, -0.5, 0.5, 0.5, '#141522', 1)}
+        {R(-0.5, -0.5, 0.5, -0.15, '#24164a', 2)}
+        {Array.from({ length: 5 }, (_, i) => R(-0.5, -0.47 + i * 0.07, 0.5, -0.462 + i * 0.07, '#7b3cff', 3, true))}
+        <Tri x={X(-0.2)} y={Y(0.12)} z={z(4)} bw={aw * 0.28} th={ah * 0.18} c={'#2bff9a'} e />
+        <Tri x={X(-0.2)} y={Y(0.145)} z={z(5)} bw={aw * 0.16} th={ah * 0.105} c={'#141522'} />
+        <Disc x={X(0.2)} y={Y(0.2)} z={z(4)} r={aw * 0.13} c={'#ff3b6b'} e />
+        <Disc x={X(0.2)} y={Y(0.2)} z={z(5)} r={aw * 0.08} c={'#141522'} />
+        {R(-0.32, -0.06, -0.08, 0.0, '#38b6ff', 4, true)}
+        {R(-0.23, -0.15, -0.17, 0.09, '#38b6ff', 5, true)}
+        {R(0.08, -0.12, 0.32, 0.06, '#ff4fd8', 4, true)}
+        {R(0.12, -0.08, 0.28, 0.02, '#141522', 5)}
+        {R(-0.42, 0.36, 0.42, 0.42, '#ffd23f', 4, true)}
+      </>
+    );
+  } else {
+    artwork = (
+      <>
+        {R(-0.5, -0.5, 0.5, 0.5, '#efe5d3', 1)}
+        {R(-0.5, -0.5, 0.05, 0.05, '#e3b79c', 2)}
+        <Disc x={X(0.12)} y={Y(0.1)} z={z(3)} r={Math.min(aw, ah) * 0.27} c={'#c0623d'} />
+        {R(-0.38, -0.42, 0.42, -0.3, '#5b3a29', 4)}
+        {R(0.18, -0.3, 0.4, 0.42, '#d9a440', 5)}
+        {R(-0.42, 0.22, -0.12, 0.42, '#8f4a2f', 6)}
+      </>
+    );
+  }
+  return (
+    <>
+      <B p={[0, cy, 0]} s={[w, h, d - 0.006]} c={c} r={0.6} />
+      {mat > 0 && <B p={[0, cy, z0 - 0.001]} s={[w - 2 * f, h - 2 * f, 0.002]} c={'#f7f5f0'} r={0.9} />}
+      {artwork}
+    </>
+  );
+};
+
+// --- Floating shelf with collectibles ---
+
+const FIGURES = ['#e53935', '#1e88e5', '#fdd835', '#43a047', '#8e24aa', '#fb8c00', '#00acc1'];
+
+const collectiblesShelf: Builder = ({ w, d, h, c }) => {
+  const t = 0.03;
+  const levels = [0, h * 0.55];
+  const n = Math.max(3, Math.round(w / 0.17));
+  return (
+    <>
+      {levels.map((y, li) => (
+        <group key={li}>
+          <B p={[0, y + t / 2, 0]} s={[w, t, d]} c={c} r={0.5} />
+          {Array.from({ length: n }, (_, i) => {
+            const x = -w / 2 + (w * (i + 0.5)) / n;
+            const col = FIGURES[(i * 3 + li * 2) % FIGURES.length];
+            const kind = (i + li) % 4;
+            const base = y + t;
+            if (kind === 0) {
+              return (
+                <group key={i}>
+                  <C p={[x, base + 0.005, 0]} r={0.04} h={0.01} c={DARK} />
+                  <C p={[x, base + 0.07, 0]} r={0.028} top={0.022} h={0.12} c={col} rough={0.4} />
+                  <S p={[x, base + 0.16, 0]} r={0.035} c={col === '#fdd835' ? '#f1c27d' : shade(col, 1.25)} />
+                </group>
+              );
+            }
+            if (kind === 1) return <B key={i} p={[x, base + 0.09, -d * 0.15]} s={[0.13, 0.18, 0.02]} c={col} r={0.5} />;
+            if (kind === 2) {
+              return (
+                <group key={i}>
+                  <S p={[x, base + 0.06, 0]} r={0.06} c={col} sc={[1, 0.95, 1]} />
+                  <B p={[x, base + 0.065, 0.045]} s={[0.07, 0.025, 0.02]} c={DARK} r={0.2} />
+                </group>
+              );
+            }
+            return <B key={i} p={[x, base + 0.05, 0]} s={[0.09, 0.1, 0.09]} c={col} r={0.6} />;
+          })}
+        </group>
+      ))}
+    </>
+  );
+};
+
+// --- Bathroom ---
+
+/** Built-in jacuzzi: tiled apron, wide deck, water, jets, headrests and a chrome spout. */
+const jacuzzi: Builder = ({ w, d, h, c }) => {
+  const rim = Math.min(0.12, d * 0.15);
+  const iw = w - 2 * rim;
+  const id = d - 2 * rim;
+  const water = h - 0.1;
+  const tiles = Math.max(3, Math.round(w / 0.3));
+  return (
+    <>
+      <B p={[0, 0.04, 0.02]} s={[w - 0.04, 0.08, d - 0.08]} c={shade(c, 0.75)} />
+      {/* Walls and deck */}
+      <B p={[0, (h + 0.08) / 2, -d / 2 + rim / 2]} s={[w, h - 0.08, rim]} c={c} r={0.3} />
+      <B p={[0, (h + 0.08) / 2, d / 2 - rim / 2]} s={[w, h - 0.08, rim]} c={c} r={0.3} />
+      <B p={[-w / 2 + rim / 2, (h + 0.08) / 2, 0]} s={[rim, h - 0.08, id]} c={c} r={0.3} />
+      <B p={[w / 2 - rim / 2, (h + 0.08) / 2, 0]} s={[rim, h - 0.08, id]} c={c} r={0.3} />
+      <B p={[0, h - 0.015, -d / 2 + rim / 2]} s={[w, 0.03, rim]} c={shade(c, 1.04)} r={0.2} />
+      <B p={[0, h - 0.015, d / 2 - rim / 2]} s={[w, 0.03, rim]} c={shade(c, 1.04)} r={0.2} />
+      <B p={[-w / 2 + rim / 2, h - 0.015, 0]} s={[rim, 0.03, id]} c={shade(c, 1.04)} r={0.2} />
+      <B p={[w / 2 - rim / 2, h - 0.015, 0]} s={[rim, 0.03, id]} c={shade(c, 1.04)} r={0.2} />
+      {/* Tile joints on the apron */}
+      {Array.from({ length: tiles - 1 }, (_, i) => (
+        <B key={`j${i}`} p={[-w / 2 + (w * (i + 1)) / tiles, (h + 0.08) / 2 - 0.02, d / 2 + 0.001]} s={[0.004, h - 0.14, 0.002]} c={shade(c, 0.82)} />
+      ))}
+      <B p={[0, (h + 0.08) / 2 - 0.02, d / 2 + 0.001]} s={[w, 0.004, 0.002]} c={shade(c, 0.82)} />
+      {/* Basin and water */}
+      <B p={[0, 0.12, 0]} s={[iw, 0.04, id]} c={'#eef8fb'} r={0.2} />
+      {[-1, 1].map((sz) => [-0.3, 0, 0.3].map((u) => (
+        <C key={`jet${sz}${u}`} p={[u * iw, water - 0.18, sz * (id / 2 - 0.006)]} r={0.025} h={0.012} c={STEEL} m={0.55} rough={0.22} rot={[Math.PI / 2, 0, 0]} />
+      )))}
+      <mesh position={[0, (water + 0.14) / 2, 0]}>
+        <boxGeometry args={[iw - 0.002, water - 0.14, id - 0.002]} />
+        <meshStandardMaterial color={'#49b0e6'} transparent opacity={0.5} roughness={0.05} metalness={0} emissive={'#1d79b0'} emissiveIntensity={0.35} depthWrite={false} />
+      </mesh>
+      {Array.from({ length: 6 }, (_, i) => (
+        <C key={`b${i}`} p={[(((i * 37) % 10) / 10 - 0.45) * iw * 0.8, water + 0.002, (((i * 53) % 10) / 10 - 0.45) * id * 0.7]} r={0.012 + (i % 3) * 0.006} h={0.004} c={'#ffffff'} rough={0.3} e={'#ffffff'} />
+      ))}
+      {/* Headrests at both ends, spout and controls on the back deck */}
+      {[-1, 1].map((sx) => (
+        <B key={`hr${sx}`} p={[sx * (iw / 2 - 0.08), h + 0.01, 0]} s={[0.1, 0.06, Math.min(0.32, id * 0.6)]} c={'#7d868c'} r={0.9} />
+      ))}
+      <C p={[0, h + 0.05, -d / 2 + rim / 2]} r={0.018} h={0.1} c={STEEL} m={0.55} rough={0.22} />
+      <B p={[0, h + 0.1, -d / 2 + rim / 2 + 0.06]} s={[0.04, 0.025, 0.14]} c={STEEL} m={0.55} r={0.22} />
+      {[0.18, 0.26].map((x) => <C key={x} p={[x, h + 0.012, -d / 2 + rim / 2]} r={0.022} h={0.02} c={STEEL} m={0.55} rough={0.22} />)}
+    </>
+  );
+};
+
+/** Walk-in rain shower: low tray, one fixed glass panel on the +x side, wall column and a rain head on an arm. */
+const shower: Builder = ({ w, d, h, c }) => {
+  const head = Math.min(0.3, w * 0.36);
+  const armZ = -d / 2 + Math.min(0.45, d * 0.5);
+  return (
+    <>
+      <B p={[0, 0.02, 0]} s={[w, 0.04, d]} c={WHITE} r={0.3} />
+      <B p={[0, 0.041, -d / 2 + 0.12]} s={[w - 0.12, 0.003, 0.05]} c={STEEL} m={0.5} r={0.3} />
+      {/* Fixed glass panel with a thin profile and a stabiliser bar to the wall */}
+      <mesh position={[w / 2 - 0.01, (h - 0.05) / 2 + 0.04, 0]}>
+        <boxGeometry args={[0.01, h - 0.05, d - 0.02]} />
+        <meshStandardMaterial color={c} transparent opacity={0.22} roughness={0.05} metalness={0.1} depthWrite={false} />
+      </mesh>
+      <B p={[w / 2 - 0.01, 0.06, 0]} s={[0.02, 0.03, d - 0.02]} c={STEEL} m={0.55} r={0.22} />
+      <B p={[w / 2 - 0.01, h - 0.02, -0.05]} s={[0.015, 0.015, d - 0.1]} c={STEEL} m={0.55} r={0.22} />
+      {/* Column, mixer and hand shower on the back wall */}
+      <C p={[-w * 0.15, (h + 0.9) / 2, -d / 2 + 0.03]} r={0.012} h={h - 0.9} c={STEEL} m={0.55} rough={0.22} />
+      <C p={[-w * 0.15, 1.1, -d / 2 + 0.02]} r={0.06} h={0.03} c={STEEL} m={0.55} rough={0.22} rot={[Math.PI / 2, 0, 0]} />
+      <B p={[-w * 0.15, 1.1, -d / 2 + 0.06]} s={[0.025, 0.06, 0.05]} c={STEEL} m={0.55} r={0.22} />
+      <B p={[-w * 0.15 + 0.06, 1.35, -d / 2 + 0.05]} s={[0.035, 0.18, 0.035]} c={STEEL} m={0.55} r={0.22} />
+      {/* Arm out of the wall at the top and the wide rain head */}
+      <B p={[-w * 0.15 / 2, h - 0.04, -d / 2 + 0.03]} s={[w * 0.15, 0.02, 0.02]} c={STEEL} m={0.55} r={0.22} />
+      <B p={[0, h - 0.04, (-d / 2 + armZ) / 2]} s={[0.02, 0.02, armZ + d / 2]} c={STEEL} m={0.55} r={0.22} />
+      <B p={[0, h - 0.065, armZ]} s={[head, 0.012, head]} c={STEEL} m={0.55} r={0.22} />
+      <B p={[0, h - 0.072, armZ]} s={[head - 0.03, 0.003, head - 0.03]} c={'#8d9399'} m={0.6} r={0.4} />
+      {/* A small built-in niche shelf with bottles */}
+      <B p={[w * 0.25, 1.15, -d / 2 + 0.05]} s={[0.25, 0.015, 0.1]} c={WHITE} r={0.3} />
+      {[0.17, 0.25, 0.33].map((x, i) => <C key={x} p={[w * x, 1.22, -d / 2 + 0.05]} r={0.02} h={0.12 - i * 0.02} c={['#e9e4da', '#9fb7a6', '#c9b28c'][i]} rough={0.4} />)}
+    </>
+  );
+};
+
+/** Towel rail with two towels draped over it (the colour is the towels'). */
+const towelRail: Builder = ({ w, d, h, c }) => {
+  const barY = h - 0.05;
+  const tw = w * 0.42;
+  return (
+    <>
+      {[-1, 1].map((sx) => <B key={sx} p={[sx * (w / 2 - 0.02), barY, -d / 2 + d / 2]} s={[0.02, 0.03, d]} c={STEEL} m={0.55} r={0.22} />)}
+      <C p={[0, barY, d / 2 - 0.02]} r={0.01} h={w} c={STEEL} m={0.55} rough={0.22} rot={[0, 0, Math.PI / 2]} />
+      {[-1, 1].map((sx, i) => {
+        const col = i ? shade(c, 0.88) : c;
+        const len = (h - 0.08) * (i ? 0.8 : 0.95);
+        return (
+          <group key={`t${sx}`}>
+            <B p={[(sx * w) / 4.4, barY - len / 2, d / 2 - 0.035]} s={[tw, len, 0.02]} c={col} r={1} />
+            <B p={[(sx * w) / 4.4, barY - len * 0.4, d / 2 - 0.005]} s={[tw, len * 0.8, 0.02]} c={col} r={1} />
+            <B p={[(sx * w) / 4.4, barY - len * 0.68, d / 2 + 0.006]} s={[tw, 0.03, 0.003]} c={shade(col, 0.8)} r={1} />
+          </group>
+        );
+      })}
+    </>
+  );
+};
+
+// --- Rooftop lounge ---
+
+/** Fire pit: a low concrete drum with a steel bowl, lava stones, logs and a warm glowing fire. */
+const firePit: Builder = ({ w, d, h, c }) => {
+  const r = Math.min(w, d) / 2;
+  return (
+    <>
+      <C p={[0, (h - 0.04) / 2, 0]} r={r * 0.92} top={r} h={h - 0.04} c={c} rough={0.95} seg={28} />
+      <C p={[0, h - 0.02, 0]} r={r} h={0.04} c={'#2f3134'} m={0.6} rough={0.4} seg={28} />
+      <C p={[0, h - 0.005, 0]} r={r * 0.78} h={0.012} c={'#3a2a24'} rough={1} seg={28} />
+      {Array.from({ length: 10 }, (_, i) => {
+        const a = (i / 10) * Math.PI * 2;
+        return <S key={i} p={[Math.cos(a) * r * 0.6, h + 0.01, Math.sin(a) * r * 0.6]} r={0.04} c={'#444'} sc={[1, 0.6, 1]} />;
+      })}
+      {[0, 1, 2].map((i) => (
+        <C key={`l${i}`} p={[0, h + 0.04, 0]} r={0.035} h={r * 1.0} c={'#5a3b26'} rough={1} rot={[Math.PI / 2, (i * Math.PI) / 3, 0.25]} seg={8} />
+      ))}
+      <Neon p={[0, h + 0.012, 0]} s={[r * 0.9, 0.006, r * 0.9]} c={'#ff7a1a'} k={1.6} />
+      {[[0, 0, 0.32, 0.12], [0.07, 0.05, 0.22, 0.08], [-0.07, -0.04, 0.25, 0.09]].map(([x, z, fh, fr], i) => (
+        <mesh key={`f${i}`} position={[x, h + 0.04 + fh / 2, z]}>
+          <coneGeometry args={[fr, fh, 10]} />
+          <meshStandardMaterial color={i ? '#ffb347' : '#ff8a2a'} emissive={i ? '#ffb347' : '#ff7a1a'} emissiveIntensity={2} transparent opacity={0.85} toneMapped={false} depthWrite={false} />
+        </mesh>
+      ))}
+      <Glow p={[0, h + 0.2, 0]} s={[r * 2.2, r * 2.2]} c={'#ff9a40'} o={0.4} rot={[0, 0, 0]} />
+      <Glow p={[0, 0.005, 0]} s={[r * 4.5, r * 4.5]} c={'#ff8a30'} o={0.25} rot={[-Math.PI / 2, 0, 0]} />
+    </>
+  );
+};
+
+const pouf: Builder = ({ w, d, h, c }) => {
+  const r = Math.min(w, d) / 2;
+  return (
+    <>
+      <C p={[0, (h - 0.05) / 2, 0]} r={r * 0.95} top={r} h={h - 0.05} c={c} rough={0.95} seg={24} />
+      <S p={[0, h - 0.05, 0]} r={r} c={shade(c, 1.05)} sc={[1, 0.1 / r, 1]} />
+      <C p={[0, h * 0.55, 0]} r={r * 1.005} h={0.02} c={shade(c, 0.8)} seg={24} />
+    </>
+  );
+};
+
+/** Vertical garden: a frame on the wall covered with leafy clusters of several greens and a few flowers. */
+const verticalGarden: Builder = ({ w, d, h, c }) => {
+  const cols = Math.max(3, Math.round(w / 0.13));
+  const rows = Math.max(3, Math.round(h / 0.13));
+  const rand = rng(cols * 131 + rows);
+  const greens = [c, shade(c, 0.75), shade(c, 1.15), '#6f8f3e', '#3f6a3a', '#7d9a4a'];
+  const cell = Math.min(w / cols, h / rows);
+  return (
+    <>
+      <B p={[0, h / 2, -d / 2 + 0.015]} s={[w, h, 0.03]} c={'#3b3530'} />
+      {Array.from({ length: rows * cols }, (_, k) => {
+        const i = k % cols;
+        const j = Math.floor(k / cols);
+        const x = -w / 2 + cell / 2 + (w - cell) * (i / Math.max(1, cols - 1)) + (rand() - 0.5) * cell * 0.5;
+        const y = cell / 2 + (h - cell) * (j / Math.max(1, rows - 1)) + (rand() - 0.5) * cell * 0.5;
+        const r = cell * (0.6 + rand() * 0.3);
+        const leaf = greens[Math.floor(rand() * greens.length)];
+        const flower = rand() < 0.06;
+        return (
+          <group key={k}>
+            <Blob p={[x, y, -d / 2 + 0.03 + r * 0.45]} r={r} sc={[1, 0.85, 0.6]} c={leaf} v={k} />
+            {flower && <S p={[x, y + r * 0.2, -d / 2 + 0.03 + r * 0.95]} r={0.018} c={['#e8b9cc', '#f2dc8a', '#ffffff'][k % 3]} />}
+          </group>
+        );
+      })}
+    </>
+  );
+};
+
+// --- Trees: trunk splitting into branches, a crown of irregular overlapping clusters ---
+
+const blobCache = new Map<number, THREE.BufferGeometry>();
+
+/** A lumpy unit sphere (icosahedron with deterministic noise on its vertices); `v` picks one of a few variants. */
+function blobGeometry(v: number): THREE.BufferGeometry {
+  const key = v % 6;
+  const hit = blobCache.get(key);
+  if (hit) return hit;
+  const ico = new THREE.IcosahedronGeometry(1, 2);
+  ico.deleteAttribute('normal');
+  ico.deleteAttribute('uv');
+  const g = mergeVertices(ico); // shared vertices: smooth shading instead of facets
+  ico.dispose();
+  const pos = g.attributes.position as THREE.BufferAttribute;
+  const p = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    p.fromBufferAttribute(pos, i);
+    // Noise from the (shared) vertex position, so duplicated vertices move together and the surface stays closed.
+    const n = Math.sin(p.x * 5.1 + key * 1.7) * Math.cos(p.y * 4.3 - key) * Math.sin(p.z * 4.7 + key * 0.6);
+    const n2 = Math.sin((p.x + p.y * 0.7 + p.z * 0.3) * 9 + key * 2.3);
+    p.multiplyScalar(1 + n * 0.16 + n2 * 0.05);
+    pos.setXYZ(i, p.x, p.y, p.z);
+  }
+  g.computeVertexNormals();
+  blobCache.set(key, g);
+  return g;
+}
+
+function Blob({ p, r, sc = [1, 1, 1], c, v, rough = 0.92 }: { p: V3; r: number; sc?: V3; c: string; v: number; rough?: number }) {
+  const geometry = useMemo(() => blobGeometry(v), [v]);
+  return (
+    <mesh geometry={geometry} position={p} scale={[r * sc[0], r * sc[1], r * sc[2]]} rotation={[0, v * 1.3, 0]} castShadow receiveShadow>
+      <meshStandardMaterial color={c} roughness={rough} />
+    </mesh>
+  );
+}
+
+/** Colour with small deterministic changes of hue, saturation and lightness. */
+function vary(hex: string, rand: () => number, amount = 1): string {
+  const col = new THREE.Color(hex);
+  const hsl = { h: 0, s: 0, l: 0 };
+  col.getHSL(hsl);
+  col.setHSL(hsl.h + (rand() - 0.5) * 0.05 * amount, Math.min(1, hsl.s * (0.85 + rand() * 0.3)), hsl.l * (0.8 + rand() * 0.4 * amount));
+  return '#' + col.getHexString();
+}
+
+const BARK = '#5b4433';
+
+const tree: Builder = ({ w, d, h, c, item, seed = 1 }) => {
+  const rand = rng(seed);
+  const R = Math.min(w, d) / 2;
+  const shrub = h < 1.5;
+  const base = vary(c, rand, 0.6); // each tree its own green
+  const leaf = (k: number) => {
+    const t = rand();
+    const target = t < 0.35 ? shade(base, 0.78) : t < 0.7 ? base : shade(vary(base, rand), 1.1);
+    return k % 5 === 0 ? shade(base, 0.68) : target;
+  };
+  if (shrub) {
+    const n = 6 + Math.floor(rand() * 3);
+    return (
+      <>
+        {Array.from({ length: n }, (_, i) => {
+          const a = (i / n) * Math.PI * 2 + rand() * 0.6;
+          const dist = i === 0 ? 0 : R * (0.35 + rand() * 0.25);
+          const r = R * (i === 0 ? 0.6 : 0.38 + rand() * 0.18);
+          const y = Math.max(r * 0.75, h * (i === 0 ? 0.55 : 0.32 + rand() * 0.2));
+          return <Blob key={i} p={[Math.cos(a) * dist, y, Math.sin(a) * dist]} r={r} sc={[1, Math.min(1, h / (2 * R)) * 0.85, 1]} c={leaf(i)} v={seed + i} />;
+        })}
+      </>
+    );
+  }
+  const trunkH = h * (0.24 + rand() * 0.06);
+  const crownH = h - trunkH;
+  const tr = Math.max(0.06, R * 0.075);
+  const nBranches = 3 + Math.floor(rand() * 2);
+  const branches = Array.from({ length: nBranches }, (_, i) => {
+    const a = (i / nBranches) * Math.PI * 2 + rand() * 0.8;
+    const tilt = 0.55 + rand() * 0.35;
+    const len = crownH * (0.32 + rand() * 0.1);
+    return { a, tilt, len, end: [Math.cos(a) * Math.sin(tilt) * len, trunkH + Math.cos(tilt) * len, Math.sin(a) * Math.sin(tilt) * len] as V3 };
+  });
+  // Crown: one big flattened mass in the middle, a cluster at the end of every branch, a few filling the gaps and on top.
+  const clusters: { p: V3; r: number }[] = [{ p: [0, trunkH + crownH * 0.5, 0], r: R * 0.62 }];
+  for (const b of branches) clusters.push({ p: [b.end[0] * 1.05, b.end[1] + crownH * 0.05, b.end[2] * 1.05], r: R * (0.42 + rand() * 0.12) });
+  const extra = 6 + Math.floor(rand() * 3);
+  for (let i = 0; i < extra; i++) {
+    const a = (i / extra) * Math.PI * 2 + rand() * 0.7;
+    const dist = R * (0.3 + rand() * 0.35);
+    clusters.push({ p: [Math.cos(a) * dist, trunkH + crownH * (0.32 + rand() * 0.45), Math.sin(a) * dist], r: R * (0.3 + rand() * 0.14) });
+  }
+  const flat = 0.7;
+  // Keep the crown inside its box.
+  for (const cl of clusters) {
+    const out = Math.hypot(cl.p[0], cl.p[2]) + cl.r - R;
+    if (out > 0) {
+      const k = (Math.hypot(cl.p[0], cl.p[2]) - out) / Math.max(1e-6, Math.hypot(cl.p[0], cl.p[2]));
+      cl.p[0] *= Math.max(0, k);
+      cl.p[2] *= Math.max(0, k);
+    }
+    cl.p[1] = Math.min(cl.p[1], h - cl.r * flat);
+  }
+  const flowers = item?.flowers;
+  const blooms = flowers
+    ? Array.from({ length: 34 }, () => {
+      const cl = clusters[Math.floor(rand() * clusters.length)];
+      const a = rand() * Math.PI * 2;
+      const up = 0.15 + rand() * 0.8;
+      const s = Math.sqrt(1 - up * up);
+      return { p: [cl.p[0] + Math.cos(a) * s * cl.r * 0.95, cl.p[1] + up * cl.r * flat * 0.95, cl.p[2] + Math.sin(a) * s * cl.r * 0.95] as V3, r: R * (0.035 + rand() * 0.03) };
+    })
+    : [];
+  return (
+    <>
+      <C p={[0, trunkH / 2, 0]} r={tr} top={tr * 0.75} h={trunkH} c={BARK} rough={0.95} seg={10} />
+      <C p={[0, 0.03, 0]} r={tr * 1.6} top={tr} h={0.06} c={shade(BARK, 0.9)} rough={1} seg={10} />
+      {branches.map((b, i) => (
+        <group key={`b${i}`} position={[0, trunkH * 0.97, 0]} rotation={[0, -b.a, 0]}>
+          <mesh position={[(Math.sin(b.tilt) * b.len) / 2, (Math.cos(b.tilt) * b.len) / 2, 0]} rotation={[0, 0, -b.tilt]} castShadow>
+            <cylinderGeometry args={[tr * 0.35, tr * 0.7, b.len, 8]} />
+            <meshStandardMaterial color={shade(BARK, 1.05)} roughness={0.95} />
+          </mesh>
+        </group>
+      ))}
+      {clusters.map((cl, i) => <Blob key={i} p={cl.p} r={cl.r} sc={[1, flat, 1]} c={leaf(i)} v={seed + i} />)}
+      {blooms.map((f, i) => <Blob key={`f${i}`} p={f.p} r={f.r} c={vary(flowers!, rand, 0.5)} v={seed + i + 3} rough={0.8} />)}
+    </>
+  );
+};
+
 const rug: Builder = ({ w, d, h, c }) => <B p={[0, Math.max(h, 0.008) / 2, 0]} s={[w, Math.max(h, 0.008), d]} c={c} r={1} />;
 
 const BUILDERS: Record<FurnitureModel, Builder> = {
@@ -595,9 +1233,11 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   tablero: panel('#c9ccd0', { c: '#fbfbf9', r: 0.2, m: 0 }), estanteria: shelves, lampara: lamp, sofa, sofaL,
   sillon: sofa, mesaCentro: coffeeTable, muebleTV: cabinet(1), televisor: tv, alfombra: rug, mesa: table, silla: chair,
   meson: counter(), estufa: stove, nevera: fridge, lavaplatos: kitchenSink, alacena: doorsBox, sanitario: toilet,
-  lavamanos: basin, ducha: shower, banera: tub, espejo: panel('#8c9096', { c: '#dfe9ef', r: 0.02, m: 1 }),
+  lavamanos: basin, ducha: shower, banera: tub, espejo: mirror,
   lavadero: washtub, lavadora: washer, matera: plant, arbol: tree, poste: streetLamp, banca: bench, carro: car, moto, piscina: pool,
   asoleadora: lounger, sombrilla: umbrella, pergola, bar, parrilla: grill, jardinera: planter,
+  centroEntretenimiento: entertainment, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
+  repisa: collectiblesShelf, jacuzzi, toallero: towelRail, brasero: firePit, puf: pouf, jardinVertical: verticalGarden,
 };
 
 /** The model of one piece in its local frame (no position or rotation). */
@@ -605,7 +1245,7 @@ export function FurnitureModel3D({ f }: { f: Furniture }) {
   const item = catalogItem(f.type);
   const c = f.color ?? item?.color ?? '#b08a63';
   const build = item ? BUILDERS[item.model] : null;
-  return build ? build({ w: f.width, d: f.depth, h: f.height, c, item }) : <B p={[0, f.height / 2, 0]} s={[f.width, f.height, f.depth]} c={c} />;
+  return build ? build({ w: f.width, d: f.depth, h: f.height, c, item, seed: hashSeed(f.id) }) : <B p={[0, f.height / 2, 0]} s={[f.width, f.height, f.depth]} c={c} />;
 }
 
 function SelectionBox({ f, color }: { f: Furniture; color: string }) {

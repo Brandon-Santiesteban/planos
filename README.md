@@ -37,10 +37,11 @@ Botón **Exportar** en la barra de arriba. Eliges la planta (la actual o todas) 
 - En el plano la escalera se dibuja con sus escalones y una flecha que va hacia arriba. En las puertas, **Invertir apertura** cambia hacia qué lado abren.
 ## Muebles
 
-- **Catálogo**: herramienta *Muebles* (U). En el panel derecho busca por nombre o elige una categoría (Dormitorio, Sala, Comedor, Cocina, Baño, Oficina y setup, Lavandería, Exterior, Rooftop, Parqueadero). Toca un mueble: su silueta sigue al ratón y un clic lo coloca (puedes poner varios seguidos). **R** lo gira (Shift+R al otro lado). Cerca de un muro (a menos de 15 cm) se pega a él de espaldas y paralelo. **Esc** termina.
+- **Catálogo**: herramienta *Muebles* (U). En el panel derecho busca por nombre o elige una categoría (Dormitorio, Sala, Comedor, Cocina, Baño, Oficina y setup, Decoración, Lavandería, Exterior, Rooftop, Parqueadero). Toca un mueble: su silueta sigue al ratón y un clic lo coloca (puedes poner varios seguidos). **R** lo gira (Shift+R al otro lado). Cerca de un muro (a menos de 15 cm) se pega a él de espaldas y paralelo. **Esc** termina.
 - **Mover y editar**: con *Seleccionar* (V) arrastra un mueble (se ajusta cada 5 cm; con **Alt**, libre). Lo que está encima (un monitor sobre el escritorio) se mueve con él. **R** / **Shift+R** lo giran 90°, **Supr** lo elimina y **Ctrl+D** lo duplica. En el panel cambias ancho, fondo, alto, elevación, rotación y color, y tienes *Duplicar* y *Eliminar* (con *Deshacer*).
 - **En 3D**: clic en un mueble para seleccionarlo; arrástralo para moverlo por su planta. Si lo sueltas encima de otro, queda apoyado sobre él (por ejemplo un monitor sobre el escritorio). Todo se deshace con Ctrl+Z, igual que en el plano.
-- **Amueblar el ejemplo**: `node scripts/ejemplo-muebles.mjs public/ejemplos/casa-etapa-1.casa.json` pone muebles según el nombre de cada habitación (cambia los que hubiera) y muestra un resumen.
+- **Amueblar el ejemplo**: `node scripts/ejemplo-muebles.mjs public/ejemplos/casa-etapa-1.casa.json` pone muebles según el nombre de cada habitación (cambia los que hubiera, menos los árboles y el poste de la calle) y muestra un resumen. Avisa si un mueble estorba una puerta o si algo colgado (cuadros, espejos, tiras LED…) tapa una puerta o una ventana.
+- **Decoración**: cuadros (paisaje, abstracto cálido, blanco y negro y póster gamer) que se cuelgan con el centro a 1,5 m; espejo de cuerpo entero; cortinas; tira LED (su color es el de la luz); repisa con coleccionables. Los espejos son plateados claros, con marco delgado. Los árboles cambian un poco de forma y de verde según cada uno; el guayacán es verde con pocas flores amarillas.
 - Para añadir un mueble al catálogo basta una línea en `src/furniture/catalog.ts` si usa una forma que ya existe.
 ## Fotos y render
 
@@ -66,7 +67,7 @@ Los archivos están en `public/ejemplos/`.
 - **Piso**: en una habitación o balcón, elige cerámica, porcelanato (60 × 60 cm, mate), madera, concreto, piedra o césped.
 - **Baranda** de un balcón: *Vidrio*, *Muro* (muro de 1 m con remate) o *Celosía* (listones horizontales), con su color. En la planta baja la celosía es un cerramiento de 2 m sobre un muro de 0,6 m, que da privacidad y deja pasar el aire.
 - En 3D las texturas tienen su tamaño real: un ladrillo mide lo mismo en cualquier muro.
-- `node scripts/ejemplo-fachada.mjs [archivo.casa.json]` aplica a la casa de ejemplo la propuesta de fachada (hueso arenilla, frente de la escalera en madera, medianeras gris claro, cerramiento negro) y de pisos. Se puede correr varias veces.
+- `node scripts/ejemplo-fachada.mjs [archivo.casa.json]` aplica a la casa de ejemplo la propuesta de fachada (hueso arenilla, frente de la escalera en madera, medianeras gris claro, cerramiento negro) y de pisos; dentro de los baños, enchape claro y, detrás del jacuzzi, un muro de acento en piedra. Se puede correr varias veces.
 
 ## Atajos
 

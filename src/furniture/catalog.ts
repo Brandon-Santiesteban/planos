@@ -4,7 +4,8 @@
 // rotation 0), so a desk at rotation 0 has its back at −y and you sit at +y.
 
 export const CATEGORIES = [
-  'Dormitorio', 'Sala', 'Comedor', 'Cocina', 'Baño', 'Oficina y setup', 'Lavandería', 'Exterior', 'Rooftop', 'Parqueadero',
+  'Dormitorio', 'Sala', 'Comedor', 'Cocina', 'Baño', 'Oficina y setup', 'Decoración', 'Lavandería', 'Exterior', 'Rooftop',
+  'Parqueadero',
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
 
@@ -15,7 +16,11 @@ export type FurnitureModel =
   | 'muebleTV' | 'televisor' | 'alfombra' | 'mesa' | 'silla' | 'meson' | 'estufa' | 'nevera' | 'lavaplatos'
   | 'alacena' | 'sanitario' | 'lavamanos' | 'ducha' | 'banera' | 'espejo' | 'lavadero' | 'lavadora' | 'matera'
   | 'banca' | 'carro' | 'moto' | 'piscina' | 'asoleadora' | 'sombrilla' | 'pergola' | 'bar' | 'parrilla'
-  | 'jardinera' | 'arbol' | 'poste';
+  | 'jardinera' | 'arbol' | 'poste' | 'centroEntretenimiento' | 'cortina' | 'tiraLed' | 'cuadro' | 'repisa'
+  | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical';
+
+/** Artwork of a framed picture (model 'cuadro'). */
+export type Art = 'paisaje' | 'abstracto' | 'byn' | 'gamer';
 
 export interface CatalogItem {
   id: string;
@@ -36,6 +41,10 @@ export interface CatalogItem {
   onTop?: boolean;
   /** tables: the chairs come with it (drawn around it in 2D and 3D) */
   withChairs?: boolean;
+  /** framed pictures: what the artwork shows (the colour is the frame) */
+  art?: Art;
+  /** trees: colour of the (sparse) flowers in the crown */
+  flowers?: string;
 }
 
 const item = (
@@ -70,6 +79,9 @@ export const CATALOG: CatalogItem[] = [
   item('televisor', 'Televisor 55"', 'Sala', 'televisor', [1.23, 0.08, 0.72], '#1d1f22', { elevation: 0.5, onTop: true }),
   item('alfombra', 'Alfombra', 'Sala', 'alfombra', [2.0, 1.4, 0.01], '#c9b79c'),
   item('lampara-pie', 'Lámpara de pie', 'Sala', 'lampara', [0.35, 0.35, 1.6], '#e9dcc3'),
+  // Wall unit: low cabinet, two shelf towers, a bridge shelf on top and a niche for the TV (a separate piece).
+  item('centro-entretenimiento', 'Centro de entretenimiento', 'Sala', 'centroEntretenimiento', [2.4, 0.45, 1.9], NOGAL),
+  item('consola', 'Consola de videojuegos', 'Sala', 'consola', [0.39, 0.26, 0.1], '#f2f2f0', { elevation: 0.5, onTop: true }),
   // Comedor
   item('mesa-comedor-4', 'Mesa de comedor 4 puestos', 'Comedor', 'mesa', [1.2, 0.8, 0.75], ROBLE, { seats: 4 }),
   item('mesa-comedor-6', 'Mesa de comedor 6 puestos', 'Comedor', 'mesa', [1.8, 0.9, 0.75], ROBLE, { seats: 6 }),
@@ -84,9 +96,12 @@ export const CATALOG: CatalogItem[] = [
   item('sanitario', 'Sanitario', 'Baño', 'sanitario', [0.4, 0.7, 0.78], LOZA),
   item('lavamanos', 'Lavamanos', 'Baño', 'lavamanos', [0.6, 0.45, 0.85], LOZA),
   item('lavamanos-doble', 'Lavamanos doble', 'Baño', 'lavamanos', [1.2, 0.5, 0.85], LOZA, { double: true }),
-  item('ducha', 'Ducha', 'Baño', 'ducha', [0.9, 0.9, 2.0], '#cfd8dc'),
+  item('ducha', 'Ducha tipo lluvia (sin puerta)', 'Baño', 'ducha', [0.9, 0.9, 2.1], '#cfd8dc'),
   item('banera', 'Bañera', 'Baño', 'banera', [1.7, 0.75, 0.55], LOZA),
-  item('espejo', 'Espejo', 'Baño', 'espejo', [0.8, 0.03, 0.9], '#cfdde6', { elevation: 1.1 }),
+  item('jacuzzi', 'Jacuzzi', 'Baño', 'jacuzzi', [1.7, 0.8, 0.55], LOZA),
+  // Mirrors: a light, slightly bluish silver (never a dark screen).
+  item('espejo', 'Espejo', 'Baño', 'espejo', [0.8, 0.03, 0.9], '#dfe7ee', { elevation: 1.1 }),
+  item('toallero', 'Toallero con toallas', 'Baño', 'toallero', [0.6, 0.12, 0.5], '#e8e1d4', { elevation: 0.9 }),
   // Oficina y setup
   item('escritorio', 'Escritorio', 'Oficina y setup', 'escritorio', [1.4, 0.7, 0.75], ROBLE),
   item('escritorio-l', 'Escritorio en L', 'Oficina y setup', 'escritorioL', [1.6, 1.4, 0.75], ROBLE),
@@ -96,16 +111,27 @@ export const CATALOG: CatalogItem[] = [
   item('torre-pc', 'Torre de PC', 'Oficina y setup', 'torre', [0.22, 0.48, 0.48], '#25272b', { onTop: true }),
   item('tablero-blanco', 'Tablero blanco', 'Oficina y setup', 'tablero', [1.2, 0.03, 0.9], '#fbfbf9', { elevation: 0.9 }),
   item('estanteria', 'Estantería', 'Oficina y setup', 'estanteria', [0.8, 0.35, 1.8], ROBLE),
+  // A thin glowing strip; its colour is the light's colour.
+  item('tira-led', 'Tira LED', 'Oficina y setup', 'tiraLed', [1.0, 0.02, 0.02], '#8a5cff', { elevation: 1.0 }),
+  item('poster-gamer', 'Póster gamer', 'Oficina y setup', 'cuadro', [0.6, 0.02, 0.85], '#15161a', { elevation: 1.07, art: 'gamer' }),
+  // Decoración (wall pieces hang with their centre at about 1,5 m)
+  item('cuadro-paisaje', 'Cuadro paisaje', 'Decoración', 'cuadro', [1.0, 0.04, 0.7], '#e9e4da', { elevation: 1.15, art: 'paisaje' }),
+  item('cuadro-abstracto', 'Cuadro abstracto cálido', 'Decoración', 'cuadro', [0.8, 0.04, 0.8], '#2b2622', { elevation: 1.1, art: 'abstracto' }),
+  item('cuadro-byn', 'Cuadro blanco y negro', 'Decoración', 'cuadro', [0.5, 0.04, 0.7], '#1e1e1e', { elevation: 1.15, art: 'byn' }),
+  item('espejo-cuerpo', 'Espejo de cuerpo entero', 'Decoración', 'espejo', [0.6, 0.05, 1.7], '#dfe7ee', { elevation: 0.25 }),
+  item('cortina', 'Cortina', 'Decoración', 'cortina', [1.2, 0.08, 2.4], '#d8cdbb'),
+  item('repisa-coleccionables', 'Repisa con coleccionables', 'Decoración', 'repisa', [1.0, 0.25, 0.6], '#2e3036', { elevation: 1.45 }),
   // Lavandería
   item('lavadero', 'Lavadero', 'Lavandería', 'lavadero', [0.7, 0.6, 0.85], '#c9c6c0'),
   item('lavadora', 'Lavadora', 'Lavandería', 'lavadora', [0.6, 0.65, 0.95], LOZA),
   // Exterior
   item('matera', 'Matera con planta', 'Exterior', 'matera', [0.45, 0.45, 1.0], '#a0522d'),
   item('banca', 'Banca de exterior', 'Exterior', 'banca', [1.2, 0.45, 0.45], '#9a7650'),
-  // Street trees: colour = crown. Guayacán amarillo flowers yellow; the small one is a green crown.
-  item('arbol-guayacan', 'Árbol guayacán amarillo', 'Exterior', 'arbol', [3.0, 3.0, 6.0], '#e3b42b'),
-  item('arbol-pequeno', 'Árbol pequeño', 'Exterior', 'arbol', [2.0, 2.0, 3.5], '#5f8a3e'),
-  item('arbusto', 'Arbusto', 'Exterior', 'arbol', [1.0, 1.0, 1.0], '#557a38'),
+  // Street trees: colour = foliage (each tree varies it a little). The guayacán is mostly green with a few
+  // muted yellow flowers.
+  item('arbol-guayacan', 'Árbol guayacán amarillo', 'Exterior', 'arbol', [3.0, 3.0, 6.0], '#6a8c42', { flowers: '#e0c552' }),
+  item('arbol-pequeno', 'Árbol pequeño', 'Exterior', 'arbol', [2.0, 2.0, 3.5], '#5d8642'),
+  item('arbusto', 'Arbusto', 'Exterior', 'arbol', [1.0, 1.0, 1.0], '#557e3c'),
   item('poste-alumbrado', 'Poste de alumbrado', 'Exterior', 'poste', [0.3, 1.2, 6.0], '#3b3f45'),
   // Rooftop
   item('piscina', 'Piscina elevada', 'Rooftop', 'piscina', [3.0, 2.4, 1.1], '#eae6df'),
@@ -119,6 +145,10 @@ export const CATALOG: CatalogItem[] = [
   item('parrilla', 'Parrilla (BBQ)', 'Rooftop', 'parrilla', [1.2, 0.6, 1.0], '#3b3f45'),
   item('jardinera', 'Jardinera larga', 'Rooftop', 'jardinera', [1.8, 0.4, 0.6], '#9b9188'),
   item('matera-alta', 'Matera alta', 'Rooftop', 'matera', [0.45, 0.45, 1.6], '#6b625b'),
+  item('brasero', 'Brasero (fogata)', 'Rooftop', 'brasero', [0.8, 0.8, 0.4], '#6e6a64'),
+  item('sillon-exterior', 'Sillón de exterior', 'Rooftop', 'sillon', [0.75, 0.75, 0.75], '#cfc6b6'),
+  item('puf', 'Puf de exterior', 'Rooftop', 'puf', [0.5, 0.5, 0.4], '#b9764f'),
+  item('jardin-vertical', 'Jardín vertical', 'Rooftop', 'jardinVertical', [1.6, 0.12, 1.8], '#4f6f3a', { elevation: 0.2 }),
   // Parqueadero (length along the width: the nose of a vehicle points to +x)
   item('carro', 'Carro (sedán)', 'Parqueadero', 'carro', [4.5, 1.8, 1.45], '#5d6d7e'),
   item('moto', 'Moto', 'Parqueadero', 'moto', [2.0, 0.75, 1.1], '#7b2d26'),
