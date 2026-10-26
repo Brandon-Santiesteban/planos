@@ -49,3 +49,39 @@ test('search ignores accents and case, and can be limited to a category', () => 
   expect(searchCatalog('silla', 'Comedor').map((i) => i.id)).toEqual(['silla-comedor']);
   expect(searchCatalog('', 'Parqueadero').map((i) => i.id)).toEqual(['carro', 'moto']);
 });
+
+test('entertainment centre, full-length mirror, curtains, LED strips, jacuzzi and a fire pit', () => {
+  expect(catalogItem('centro-entretenimiento')).toMatchObject({ width: 2.4, depth: 0.45, height: 1.9, elevation: 0 });
+  expect(catalogItem('espejo-cuerpo')).toMatchObject({ model: 'espejo', width: 0.6, depth: 0.05, height: 1.7 });
+  expect(catalogItem('cortina')).toMatchObject({ width: 1.2, depth: 0.08, height: 2.4, elevation: 0 });
+  const led = catalogItem('tira-led')!;
+  expect(led.height).toBeLessThanOrEqual(0.03);
+  expect(led.depth).toBeLessThanOrEqual(0.03);
+  expect(catalogItem('jacuzzi')).toMatchObject({ category: 'Baño', width: 1.7, depth: 0.8, height: 0.55 });
+  expect(catalogItem('brasero')).toMatchObject({ category: 'Rooftop', elevation: 0 });
+  expect(catalogItem('brasero')!.height).toBeLessThanOrEqual(0.5);
+  for (const id of ['repisa-coleccionables', 'consola', 'toallero', 'poster-gamer', 'sillon-exterior', 'puf', 'jardin-vertical']) {
+    expect(catalogItem(id), id).toBeDefined();
+  }
+});
+
+test('framed art hangs with its centre at about 1,5 m, in several schemes', () => {
+  const art = CATALOG.filter((i) => i.model === 'cuadro');
+  expect(new Set(art.map((i) => i.art))).toEqual(new Set(['paisaje', 'abstracto', 'byn', 'gamer']));
+  for (const i of art) {
+    expect(i.elevation + i.height / 2, i.id).toBeGreaterThan(1.4);
+    expect(i.elevation + i.height / 2, i.id).toBeLessThan(1.6);
+    expect(i.depth, i.id).toBeLessThanOrEqual(0.05);
+  }
+});
+
+test('every mirror is wall-mounted and a light, slightly bluish silver', () => {
+  const mirrors = CATALOG.filter((x) => x.model === 'espejo');
+  expect(mirrors.length).toBeGreaterThanOrEqual(2);
+  for (const i of mirrors) {
+    expect(i.elevation, i.id).toBeGreaterThan(0);
+    const [r, g, b] = [1, 3, 5].map((k) => parseInt(i.color.slice(k, k + 2), 16));
+    expect(Math.min(r, g, b), i.id).toBeGreaterThan(180);
+    expect(b, i.id).toBeGreaterThanOrEqual(r);
+  }
+});

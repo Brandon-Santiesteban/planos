@@ -16,10 +16,11 @@ const here = dirname(fileURLToPath(import.meta.url));
 /** Reads sizes and default elevations straight from the app's catalog, so there is a single source of truth. */
 export function readCatalog(file = join(here, '../src/furniture/catalog.ts')) {
   const src = readFileSync(file, 'utf8');
-  const re = /item\('([^']+)',\s*'([^']+)',\s*'[^']+',\s*'[^']+',\s*\[([\d.]+),\s*([\d.]+),\s*([\d.]+)\][^)]*?(?:elevation:\s*([\d.]+))?[^)]*\)/g;
+  const re = /item\('([^']+)',\s*'([^']+)',\s*'[^']+',\s*'[^']+',\s*\[([\d.]+),\s*([\d.]+),\s*([\d.]+)\]([^)]*)\)/g;
   const out = new Map();
   for (const m of src.matchAll(re)) {
-    out.set(m[1], { name: m[2], width: +m[3], depth: +m[4], height: +m[5], elevation: m[6] ? +m[6] : 0 });
+    const elevation = /elevation:\s*([\d.]+)/.exec(m[6]);
+    out.set(m[1], { name: m[2], width: +m[3], depth: +m[4], height: +m[5], elevation: elevation ? +elevation[1] : 0 });
   }
   return out;
 }
@@ -90,6 +91,7 @@ const RECIPES = {
   Entrada(k, r) {
     k.onWall('e', 'banca', r.y0 + 0.85);
     k.onWall('e', 'matera', r.y1 - 0.25, { gap: 0.02 });
+    k.onWall('e', 'cuadro-byn', r.y0 + 0.85);
   },
   Sala(k, r) {
     // Mueble de TV en el muro de la derecha; sofá mirándolo, de espaldas a la cocina abierta.
@@ -98,6 +100,8 @@ const RECIPES = {
     k.onWall('e', 'televisor', cy, { gap: 0.2, elevation: 0.5 });
     k.onWall('w', 'sofa-3', cy, { width: Math.min(2.1, r.y1 - r.y0 - 0.06), gap: 0.05 });
     k.piece('mesa-centro', r.x0 + 0.05 + 0.9 + 0.4 + 0.3, cy, 90);
+    // Cuadro en el tramo de muro de abajo, junto al sofá (la ventana de la cocina queda a la izquierda).
+    k.onWall('s', 'cuadro-abstracto', r.x0 + 0.65);
   },
   Comedor(k, r) {
     // Mesa hacia la cocina; la puerta doble al patio (arriba a la derecha) queda libre.
@@ -108,6 +112,8 @@ const RECIPES = {
       k.piece('silla-comedor', cx + dx, cy - 0.4 - 0.2, 0);
       k.piece('silla-comedor', cx + dx, cy + 0.4 + 0.2, 180);
     }
+    // Paisaje sobre la mesa, en el muro de arriba, a la izquierda de la puerta al patio.
+    k.onWall('n', 'cuadro-paisaje', cx);
   },
   Cocina(k, r) {
     // Cocina lineal contra el muro medianero (izquierda, el largo): nevera, mesón, lavaplatos, mesón, estufa.
@@ -132,6 +138,7 @@ const RECIPES = {
     k.onWall('w', 'cama-doble', cy);
     k.onWall('w', 'mesa-noche', cy - 0.7 - 0.25);
     k.onWall('s', 'closet', r.x1 - 0.15 - 0.6);
+    k.onWall('w', 'cuadro-paisaje', cy);
   },
   'Habitación 2 (existente)'(k, r) {
     // Cabecera arriba, entre las dos puertas; clóset en el muro izquierdo.
@@ -139,6 +146,7 @@ const RECIPES = {
     k.onWall('n', 'cama-doble', cx);
     k.onWall('n', 'mesa-noche', cx - 0.7 - 0.25);
     k.onWall('w', 'closet', r.y1 - 0.75);
+    k.onWall('n', 'cuadro-byn', cx);
   },
   Lavadero(k, r) {
     k.onWall('n', 'lavadero', r.x0 + 0.35);
@@ -152,16 +160,21 @@ const RECIPES = {
   Patio(k, r) {
     k.onWall('e', 'banca', r.y0 + (r.y1 - r.y0) * 0.6);
     k.onWall('e', 'matera', r.y0 + 2.6, { gap: 0.03 });
-    k.onWall('n', 'matera', r.x1 - 0.28, { gap: 0.03 });
-    k.onWall('n', 'matera', r.x1 - 1.0, { gap: 0.03 });
+    // The top wall has the door to the corridor: the second plant goes on the right wall, clear of it.
+    k.onWall('e', 'matera', r.y0 + 1.3, { gap: 0.03 });
   },
   'Habitación principal'(k, r) {
-    // Cabecera en el muro izquierdo (sin la puerta del balcón), mesas de noche a los lados, cómoda enfrente.
+    // Cabecera en el muro izquierdo (sin la puerta del balcón), mesas de noche a los lados y un paisaje encima.
+    // Enfrente, en el muro derecho, el centro de entretenimiento con el televisor en su nicho (la puerta al
+    // pasillo queda libre, más arriba). Espejo de cuerpo entero en el muro de arriba, junto a la puerta del vestier.
     const cy = (r.y0 + r.y1) / 2 + 0.2;
     k.onWall('w', 'cama-queen', cy);
     k.onWall('w', 'mesa-noche', cy - 0.8 - 0.25);
     k.onWall('w', 'mesa-noche', cy + 0.8 + 0.25);
-    k.onWall('e', 'comoda', cy + 0.3);
+    k.onWall('w', 'cuadro-paisaje', cy, { width: 1.2, height: 0.75, elevation: 1.13 });
+    k.onWall('e', 'centro-entretenimiento', cy);
+    k.onWall('e', 'televisor', cy, { gap: 0.045, elevation: 0.68 });
+    k.onWall('n', 'espejo-cuerpo', r.x1 - 0.65);
   },
   Vestier(k, r) {
     // Los dos muros largos tienen las puertas (dormitorio y baño): los clósets van en los muros de los lados.
@@ -171,41 +184,75 @@ const RECIPES = {
     }
   },
   'Baño (ducha)'(k, r) {
-    k.piece('ducha', r.x1 - 0.45, r.y0 + 0.45);
-    k.onWall('w', 'sanitario', r.y0 + 0.55);
-    const cy = r.y0 + 0.9 + 0.1 + 0.6;
+    // Ducha tipo lluvia en la esquina del fondo a la izquierda; el jacuzzi a lo largo del muro del fondo, bajo la
+    // ventana alta. Lavamanos doble con su espejo en el muro derecho y sanitario en el izquierdo; el centro queda
+    // libre para circular y la puerta (abajo) abre sin estorbo.
+    const shower = 0.9;
+    k.piece('ducha', r.x0 + shower / 2, r.y0 + shower / 2);
+    const tubLen = r.x1 - r.x0 - shower;
+    k.onWall('n', 'jacuzzi', r.x0 + shower + tubLen / 2, { width: tubLen });
+    const cy = r.y0 + 0.8 + 0.15 + 0.6;
     k.onWall('e', 'lavamanos-doble', cy);
-    k.onWall('e', 'espejo', cy, { width: 1.2, elevation: 1.1 });
+    k.onWall('e', 'espejo', cy, { width: 1.1, elevation: 1.1 });
+    k.onWall('w', 'sanitario', r.y0 + shower + 0.45);
+    k.onWall('s', 'toallero', r.x0 + 0.42);
+    k.piece('matera', r.x1 - 0.2, r.y1 - 0.2, 0, { width: 0.35, depth: 0.35, height: 0.8 });
   },
   Salita(k, r) {
-    const cy = (r.y0 + r.y1) / 2 + 0.05;
-    k.onWall('w', 'sofa-3', cy, { width: 1.6 });
+    // Sofá frente al televisor; debajo del televisor, un mueble bajo con la consola de videojuegos. Todo un poco
+    // hacia abajo para dejar libre la puerta de la oficina (arriba a la derecha).
+    const cy = r.y1 - 0.75 - 0.005;
+    k.onWall('w', 'sofa-3', cy, { width: 1.5 });
+    k.onWall('w', 'cuadro-abstracto', cy);
     k.piece('mesa-centro', r.x0 + 0.9 + 0.35 + 0.3, cy, 90);
-    k.onWall('e', 'televisor', cy, { elevation: 1.0 });
+    k.onWall('e', 'mueble-tv', cy, { width: 0.95 });
+    k.onWall('e', 'consola', cy - 0.15, { gap: 0.06, elevation: 0.5 });
+    k.onWall('e', 'televisor', cy, { elevation: 0.9 });
+  },
+  Pasillo(k, r) {
+    k.onWall('e', 'cuadro-byn', (r.y0 + r.y1) / 2);
   },
   Oficina(k, r) {
-    // Escritorio en el muro izquierdo con 3 monitores; quien se sienta da la espalda al muro derecho, que queda
-    // liso para las videollamadas. Tablero blanco junto a la puerta, en su mismo muro.
+    // Setup gamer. Escritorio en el muro izquierdo con 3 monitores y una tira LED detrás; encima, una repisa con
+    // coleccionables (con su tira LED debajo) y un póster. Quien se sienta da la espalda al muro derecho, que
+    // queda liso y blanco para las videollamadas. Tablero blanco y otro póster junto a la puerta; cortinas oscuras
+    // a los lados de la ventana del fondo.
     const len = 1.85;
     const cy = r.y0 + 0.1 + len / 2;
     k.onWall('w', 'escritorio', cy, { width: len });
     for (const i of [-1, 0, 1]) k.onWall('w', 'monitor', cy + i * 0.61, { gap: 0.05, elevation: 0.75 });
     k.onWall('w', 'torre-pc', cy + len / 2 - 0.2, { gap: 0.08, turn: 0 });
-    k.piece('silla-oficina', r.x0 + 0.7 + 0.35, cy, 90);
+    k.onWall('w', 'tira-led', cy, { width: len - 0.05, elevation: 0.95 });
+    k.onWall('w', 'repisa-coleccionables', cy + 0.35);
+    k.onWall('w', 'tira-led', cy + 0.35, { width: 1.0, elevation: 1.42, color: '#22d3ee' });
+    k.onWall('w', 'poster-gamer', cy - 0.6, { elevation: 1.3 });
+    k.piece('silla-gamer', r.x0 + 0.7 + 0.35, cy, 90);
     k.onWall('s', 'tablero-blanco', r.x0 + 1.2);
+    k.onWall('s', 'poster-gamer', r.x0 + 0.3, { width: 0.45, height: 0.64, elevation: 1.2 });
+    const win = 4.0; // centre of the back window (1,4 m wide)
+    for (const sx of [-1, 1]) k.onWall('n', 'cortina', win + sx * (0.7 + 0.15), { width: 0.6, height: 2.55, color: '#3a3f4b' });
   },
   'Cuarto (existente)'(k, r) {
     k.onWall('n', 'cama-doble', r.x0 + 1.45);
     k.onWall('w', 'closet', r.y1 - 0.8);
+    k.onWall('n', 'cuadro-abstracto', r.x0 + 1.45);
   },
   'Terraza (pretil)'(k, r) {
-    // Rooftop (sin piscina: el usuario la deja para el módulo 2). Adelante (abajo en el plano), a la izquierda de la
-    // escalera: zona de asoleo con jardinera en el pretil, dos asoleadoras y sombrilla; detrás, mesa de exterior;
-    // en el centro la pérgola con sofá y mesa; al fondo bar y parrilla; jardineras y materas en el pretil.
+    // Rooftop (sin piscina: el usuario la deja para el módulo 2). Adelante (abajo en el plano), a la izquierda del
+    // casetón de la escalera: rincón de estar con brasero, dos sillones y un puf, jardinera en el pretil, materas
+    // altas en las esquinas y un jardín vertical en el muro del casetón; detrás, mesa de exterior; en el centro la
+    // pérgola con sofá y mesa; al fondo bar y parrilla; jardineras y materas en el pretil.
     const front = k.onWall('s', 'jardinera', r.x0 + 1.45, { turn: 180 });
-    const loungerY = front.y - 0.2 - 0.1 - 0.975;
-    for (const x of [r.x0 + 0.55, r.x0 + 1.45]) k.piece('asoleadora', x, loungerY, 0);
-    k.piece('sombrilla', r.x0 + 2.15, loungerY, 0, { width: 1.8, depth: 1.8 });
+    const loungerY = front.y - 0.2 - 0.1 - 0.975; // (the rest of the terrace is placed from here)
+    const pit = { x: r.x0 + 1.35, y: front.y - 0.2 - 0.45 - 0.4 };
+    const stairHead = 3.3 - 0.075; // west face of the stair head
+    k.piece('brasero', pit.x, pit.y, 0);
+    k.piece('sillon-exterior', r.x0 + 0.375, pit.y, 270);
+    k.piece('sillon-exterior', pit.x, pit.y - 0.4 - 0.2 - 0.375, 0);
+    k.piece('puf', pit.x + 0.4 + 0.3 + 0.25, pit.y, 0);
+    k.piece('jardin-vertical', stairHead - 0.06, pit.y - 0.05, 90);
+    k.piece('matera-alta', r.x0 + 0.225, r.y1 - 0.225, 0);
+    k.piece('matera-alta', stairHead - 0.25, r.y1 - 0.225, 0);
     k.piece('mesa-exterior', r.x0 + 1.2, loungerY - 0.975 - 0.15 - 0.9, 0);
     const pg = { x: r.x0 + 2.4, y: r.y0 + 1.3 + 1.4 };
     k.piece('pergola', pg.x, pg.y, 0, { depth: 2.8 });
@@ -240,6 +287,28 @@ function doorZones(floor) {
   return zones;
 }
 
+/** Pieces hung on a wall: they must never cover a window, nor sit over a door. */
+const WALL_HUNG = /^(cuadro|poster|espejo|tira-led|repisa|toallero|jardin-vertical|tablero|televisor|alacena|centro-entretenimiento)/;
+
+/** Every opening as a plan box a little thicker than its wall, with its vertical range (a door up to the ceiling). */
+function openingBoxes(floor) {
+  const out = [];
+  for (const o of floor.openings) {
+    const w = floor.walls.find((x) => x.id === o.wallId);
+    if (!w) continue;
+    const len = Math.hypot(w.b.x - w.a.x, w.b.y - w.a.y);
+    const d = { x: (w.b.x - w.a.x) / len, y: (w.b.y - w.a.y) / len };
+    const c = { x: w.a.x + d.x * o.offset, y: w.a.y + d.y * o.offset };
+    const across = w.thickness / 2 + 0.1;
+    const ex = Math.abs(d.x) * (o.width / 2) + Math.abs(d.y) * across;
+    const ey = Math.abs(d.y) * (o.width / 2) + Math.abs(d.x) * across;
+    const bottom = o.kind === 'door' ? 0 : o.sill ?? 0;
+    const top = o.kind === 'door' ? Infinity : bottom + o.height;
+    out.push({ kind: o.kind, x0: c.x - ex, x1: c.x + ex, y0: c.y - ey, y1: c.y + ey, bottom, top });
+  }
+  return out;
+}
+
 function footprint(f) {
   const t = (f.rotation * Math.PI) / 180;
   const hx = (Math.abs(Math.cos(t)) * f.width + Math.abs(Math.sin(t)) * f.depth) / 2;
@@ -253,8 +322,9 @@ const overlaps = (a, b, m = 0.01) => a.x0 < b.x1 - m && b.x0 < a.x1 - m && a.y0 
 export function furnish(project, catalog = readCatalog()) {
   const lines = [];
   for (const floor of project.floors) {
-    floor.furniture = [];
+    floor.furniture = (floor.furniture ?? []).filter((f) => f.id.startsWith('entorno-')); // the street (ejemplo-entorno.mjs)
     const zones = doorZones(floor);
+    const openings = openingBoxes(floor);
     for (const room of floor.rooms) {
       const recipe = RECIPES[room.name];
       if (!recipe) continue;
@@ -275,6 +345,12 @@ export function furnish(project, catalog = readCatalog()) {
           if (!['pergola'].includes(p.type)) lines.push(`  AVISO: ${p.type} se sale de ${room.name}`);
         }
         if (p.elevation < 0.9 && zones.some((z) => overlaps(fp, z))) lines.push(`  AVISO: ${p.type} estorba una puerta en ${room.name}`);
+        if (WALL_HUNG.test(p.type)) {
+          for (const o of openings) {
+            const vertical = p.elevation < o.top && p.elevation + p.height > o.bottom;
+            if (vertical && overlaps(fp, o)) lines.push(`  AVISO: ${p.type} tapa una ${o.kind === 'door' ? 'puerta' : 'ventana'} en ${room.name}`);
+          }
+        }
       }
     }
   }

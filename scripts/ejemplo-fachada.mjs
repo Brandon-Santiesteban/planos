@@ -19,7 +19,12 @@ export const COLORS = {
   hueso: '#EDE4D3', // every inside face
   grisClaro: '#C8CBCE', // party walls outside
   negro: '#1E1E1E', // fence and railings
+  enchape: '#F2EDE5', // bathroom tiles: light grey with a beige warmth
 };
+
+const isBathroom = (room) => room.kind === 'room' && /^baño/i.test(room.name);
+/** The bathroom with the jacuzzi: its back wall (top of the plan, behind the tub) is a stone accent. */
+const hasAccentWall = (room) => /^baño \(ducha\)/i.test(room.name);
 
 const near = (a, b) => Math.abs(a - b) <= TOL;
 const sub = (a, b) => ({ x: a.x - b.x, y: a.y - b.y });
@@ -64,13 +69,31 @@ export function isOutside(floor, w, side) {
   const ps = probes(w, side);
   const onModule = inModule(w.a) && inModule(w.b);
   if (onModule && !strictlyInModule(ps[0])) return true;
-  const enclosed = floor.rooms.filter((r) => r.kind !== 'roof' && r.kind !== 'balcony' && !/patio/i.test(r.name));
+  // The stair head on the terrace is drawn as a roof ("Techo casetón") but is a room inside.
+  const enclosed = floor.rooms.filter((r) => (r.kind !== 'roof' || /caset/i.test(r.name)) && r.kind !== 'balcony' && !/patio/i.test(r.name));
   return !ps.some((p) => enclosed.some((r) => pointInPolygon(p, r.points)));
 }
 
 const isPartyWall = (w) => (near(w.a.x, MODULE.x0) && near(w.b.x, MODULE.x0)) || (near(w.a.x, MODULE.x1) && near(w.b.x, MODULE.x1));
 const onFront = (w) => near(w.a.y, MODULE.y1) && near(w.b.y, MODULE.y1);
 const isStairFront = (w) => onFront(w) && Math.min(w.a.x, w.b.x) >= STAIR_X - TOL && Math.max(w.a.x, w.b.x) <= MODULE.x1 + TOL;
+
+/** Cuts wall `w` in two at point `s` (on it), moving the openings beyond the cut. False if an opening straddles it. */
+function splitWallAt(floor, w, s) {
+  const t = len(sub(s, w.a));
+  const own = floor.openings.filter((o) => o.wallId === w.id);
+  if (own.some((o) => o.offset - o.width / 2 < t && o.offset + o.width / 2 > t)) return false;
+  const second = { ...structuredClone(w), id: randomUUID(), a: { ...s } };
+  w.b = { ...s };
+  floor.walls.splice(floor.walls.indexOf(w) + 1, 0, second);
+  for (const o of own) {
+    if (o.offset > t) {
+      o.wallId = second.id;
+      o.offset -= t;
+    }
+  }
+  return true;
+}
 
 /** Splits a front wall that runs across x = 3,3 so the stair volume's front can have its own finish. */
 function splitFrontWalls(floor) {
@@ -79,20 +102,31 @@ function splitFrontWalls(floor) {
     const lo = Math.min(w.a.x, w.b.x);
     const hi = Math.max(w.a.x, w.b.x);
     if (!(lo < STAIR_X - 0.05 && hi > STAIR_X + 0.05)) continue;
-    const s = { x: STAIR_X, y: w.a.y };
-    const t = len(sub(s, w.a));
-    const own = floor.openings.filter((o) => o.wallId === w.id);
-    if (own.some((o) => o.offset - o.width / 2 < t && o.offset + o.width / 2 > t)) continue; // an opening straddles the cut
-    const second = { ...structuredClone(w), id: randomUUID(), a: s };
-    w.b = { ...s };
-    floor.walls.splice(floor.walls.indexOf(w) + 1, 0, second);
-    for (const o of own) {
-      if (o.offset > t) {
-        o.wallId = second.id;
-        o.offset -= t;
-      }
+    splitWallAt(floor, w, { x: STAIR_X, y: w.a.y });
+  }
+}
+
+/** Splits every wall that runs past a corner of `room`, so the room's faces can have their own finish. */
+function splitAtCorners(floor, room) {
+  for (const c of room.points) {
+    for (const w of [...floor.walls]) {
+      const d = sub(w.b, w.a);
+      const l = len(d);
+      const t = ((c.x - w.a.x) * d.x + (c.y - w.a.y) * d.y) / l;
+      const off = Math.abs((c.x - w.a.x) * d.y - (c.y - w.a.y) * d.x) / l;
+      if (off <= TOL && t > 0.05 && t < l - 0.05) splitWallAt(floor, w, { x: c.x, y: c.y });
     }
   }
+}
+
+/** Inside finish of a face looking into a bathroom: tiles, and stone on the accent wall behind the jacuzzi. */
+function bathroomFace(floor, w, side) {
+  const probe = probes(w, side)[0];
+  const room = floor.rooms.find((r) => isBathroom(r) && pointInPolygon(probe, r.points));
+  if (!room) return null;
+  const top = Math.min(...room.points.map((q) => q.y));
+  if (hasAccentWall(room) && near(w.a.y, top) && near(w.b.y, top)) return { finish: 'piedra' };
+  return { finish: 'enchape', color: COLORS.enchape };
 }
 
 function floorMaterialFor(room) {
@@ -116,10 +150,11 @@ function railingFor(room, groundFloor) {
 export function applyFacadeProposal(project) {
   project.floors.forEach((floor, index) => {
     splitFrontWalls(floor);
+    for (const room of floor.rooms) if (isBathroom(room)) splitAtCorners(floor, room);
     for (const w of floor.walls) {
       const sides = {};
       for (const side of ['left', 'right']) {
-        if (!isOutside(floor, w, side)) sides[side] = { finish: 'pintura', color: COLORS.hueso };
+        if (!isOutside(floor, w, side)) sides[side] = bathroomFace(floor, w, side) ?? { finish: 'pintura', color: COLORS.hueso };
         else if (isPartyWall(w)) sides[side] = { finish: 'pintura', color: COLORS.grisClaro };
         else if (isStairFront(w)) sides[side] = { finish: 'madera' };
         else sides[side] = { finish: 'pintura', color: COLORS.huesoArenilla };

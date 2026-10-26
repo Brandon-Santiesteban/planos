@@ -272,6 +272,40 @@ const planter: Builder = ({ w, d }) => (
   </>
 );
 
+const entertainment: Builder = ({ w, d }) => {
+  const tw = Math.min(0.45, w / 5);
+  return (
+    <>
+      {rect(-w / 2, -d / 2, tw, d, 0, 'l')}
+      {rect(w / 2 - tw, -d / 2, tw, d, 0, 'r')}
+      {line(-w / 2 + tw, d / 2 - 0.04, w / 2 - tw, d / 2 - 0.04)}
+    </>
+  );
+};
+
+/** Gathered fabric: a zigzag along the panel. */
+const curtain: Builder = ({ w, d }) => {
+  const n = Math.max(3, Math.round(w / 0.12));
+  const pts = range(n + 1).map((i) => `${-w / 2 + (i * w) / n},${i % 2 ? d / 2 : -d / 2}`).join(' ');
+  return <polyline className="mueble-detalle" points={pts} />;
+};
+
+const jacuzzi: Builder = ({ w, d }) => (
+  <>
+    {rect(-w / 2 + 0.1, -d / 2 + 0.1, w - 0.2, d - 0.2, Math.min(w, d) * 0.3)}
+    {[-1, 1].map((s) => circle((s * w) / 4, -d / 2 + 0.16, 0.025, s))}
+    {circle(w / 2 - 0.22, 0, 0.03, 'g')}
+  </>
+);
+
+const firePit: Builder = ({ w, d }) => <>{circle(0, 0, Math.min(w, d) * 0.32)}{circle(0, 0, Math.min(w, d) * 0.15, 'c')}</>;
+
+const pouf: Builder = ({ w, d }) => circle(0, 0, Math.min(w, d) * 0.3);
+
+const shelfDots: Builder = ({ w, d }) => (
+  <>{line(-w / 2, d / 2 - 0.02, w / 2, d / 2 - 0.02)}{range(Math.max(2, Math.round(w / 0.25))).map((i, _, a) => circle(-w / 2 + ((i + 0.5) * w) / a.length, 0, Math.min(d * 0.25, 0.04), i))}</>
+);
+
 const BUILDERS: Record<FurnitureModel, Builder> = {
   piscina: pool, asoleadora: lounger, sombrilla: umbrella, pergola, bar, parrilla: grill, jardinera: planter,
   cama: bed, mesaNoche: doors(1), closet, comoda: doors(), escritorio: counter, escritorioL: () => <></>,
@@ -280,12 +314,14 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   mesa: table, silla: chair, meson: counter, estufa: stove, nevera: fridge, lavaplatos: kitchenSink, alacena: doors(),
   sanitario: toilet, lavamanos: sink, ducha: shower, banera: tub, espejo: flat, lavadero: washtub, lavadora: washer,
   matera: plant, arbol: plant, poste: plant, banca: bench, carro: car, moto,
+  centroEntretenimiento: entertainment, cortina: curtain, tiraLed: flat, cuadro: flat, repisa: shelfDots, consola: box(0.03),
+  jacuzzi, toallero: flat, brasero: firePit, puf: pouf, jardinVertical: shelfDots,
 };
 
 /** Outline (rounded for organic pieces) plus the piece's symbol, in local coordinates. */
 export function FurnitureSymbol({ item, w, d }: { item?: CatalogItem; w: number; d: number }) {
   const model = item?.model;
-  const round = model === 'matera' || model === 'lampara' || model === 'sombrilla' ? Math.min(w, d) / 2 : model === 'carro' ? 0.35 : model === 'moto' ? 0.2 : 0.02;
+  const round = model === 'matera' || model === 'lampara' || model === 'sombrilla' || model === 'brasero' || model === 'puf' ? Math.min(w, d) / 2 : model === 'carro' ? 0.35 : model === 'moto' ? 0.2 : 0.02;
   const outline = model === 'escritorioL' ? null : (
     <rect className="mueble-contorno" x={-w / 2} y={-d / 2} width={w} height={d} rx={Math.min(round, w / 2, d / 2)} />
   );
