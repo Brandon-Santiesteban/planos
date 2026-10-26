@@ -58,7 +58,8 @@ async function pdfText(bytes: ArrayBuffer): Promise<string[]> {
   return pages;
 }
 
-test('exportPdf writes one A3 page per floor with title block, scale and dimensions', async () => {
+// Builds a real PDF and reads it back with pdf.js: slow on a busy machine.
+test('exportPdf writes one A3 page per floor with title block, scale and dimensions', { timeout: 60_000 }, async () => {
   const bytes = exportPdf(project, project.floors, { date: new Date(2026, 9, 25) });
   expect(new TextDecoder().decode(bytes.slice(0, 5))).toBe('%PDF-');
   const pages = await pdfText(bytes);

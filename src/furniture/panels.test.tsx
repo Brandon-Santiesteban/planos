@@ -78,3 +78,15 @@ test('the Muebles tool shows the catalog: search, categories and choosing a piec
   expect(usePlacement.getState().itemId).toBe('carro');
   expect(screen.getByText(/4,50 × 1,80 m/)).toBeInTheDocument();
 }, 30000); // renders the whole catalog several times: slow on a busy machine
+
+test('a gate can be opened and closed from its panel', () => {
+  s().apply((d) => void addFurniture(d, d.floors[0].id, furnitureFromCatalog('porton-telescopico', { x: 1.65, y: 10 })));
+  const gate = () => s().project.floors[0].furniture[1];
+  s().select({ kind: 'furniture', id: gate().id });
+  render(<PropertiesPanel />);
+  const toggle = screen.getByRole('checkbox', { name: 'Portón abierto' });
+  fireEvent.click(toggle);
+  expect(gate().open).toBe(true);
+  fireEvent.click(toggle);
+  expect(gate().open).toBe(false);
+});

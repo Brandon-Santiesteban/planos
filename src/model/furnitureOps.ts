@@ -76,6 +76,11 @@ export function rotateFurniture(p: Project, floorId: string, id: string, delta: 
   if (f) f.rotation = normalizeRotation(f.rotation + delta);
 }
 
+export function setGateOpen(p: Project, floorId: string, id: string, open: boolean): void {
+  const f = p.floors.find((fl) => fl.id === floorId)?.furniture.find((x) => x.id === id);
+  if (f) f.open = open;
+}
+
 export function deleteFurniture(p: Project, floorId: string, id: string): void {
   const fl = getFloor(p, floorId);
   fl.furniture = fl.furniture.filter((x) => x.id !== id);

@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from 'react';
-import { updateFurniture, type FurniturePatch } from '../model/furnitureOps';
+import { setGateOpen, updateFurniture, type FurniturePatch } from '../model/furnitureOps';
 import type { Floor } from '../model/types';
 import { formatMetres, parseLength } from '../model/units';
 import { useEditor } from '../store/editorStore';
@@ -130,6 +130,19 @@ export default function FurnitureProps({ floor, id }: { floor: Floor; id: string
           {item && <span className="hint">{item.category}</span>}
         </div>
       </div>
+      {item?.model === 'porton' && (
+        <label className="toggle-linea">
+          <input
+            type="checkbox"
+            checked={f.open === true}
+            onChange={(e) => {
+              const { apply, activeFloorId } = useEditor.getState();
+              apply((d) => setGateOpen(d, activeFloorId, id, e.target.checked));
+            }}
+          />
+          Portón abierto
+        </label>
+      )}
       <LengthField label="Ancho" value={f.width} onCommit={(v) => set(id, { width: v! })} />
       <LengthField label="Fondo" value={f.depth} onCommit={(v) => set(id, { depth: v! })} />
       <LengthField label="Alto" value={f.height} onCommit={(v) => set(id, { height: v! })} />

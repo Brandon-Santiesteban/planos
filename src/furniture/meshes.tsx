@@ -11,6 +11,7 @@ import { useEditor } from '../store/editorStore';
 import { usePalette } from '../view3d/palette';
 import { beginFurnitureDrag, dragFurnitureTo, type FurnitureDrag } from './actions';
 import { type CatalogItem, catalogItem, type FurnitureModel } from './catalog';
+import { gatePanels } from './gate';
 
 type V3 = [number, number, number];
 
@@ -49,7 +50,7 @@ function S({ p, r, c, sc }: { p: V3; r: number; c: string; sc?: V3 }) {
 }
 
 /** `seed` is stable per piece (from its id): trees use it to vary their shape and greens. */
-type P = { w: number; d: number; h: number; c: string; item?: CatalogItem; seed?: number };
+type P = { w: number; d: number; h: number; c: string; item?: CatalogItem; seed?: number; open?: boolean };
 type Builder = (p: P) => ReactElement;
 
 const METAL = '#5a5f66';
@@ -386,6 +387,33 @@ const plant: Builder = ({ w, d, h, c }) => {
       <C p={[0, pot + foliage * 0.25, 0]} r={0.02} h={foliage * 0.5} c={'#6b4e2e'} />
       <S p={[0, pot + foliage * 0.55, 0]} r={r * 1.05} c={GREEN} sc={[1, foliage / (2 * r) * 0.8, 1]} />
       <S p={[r * 0.35, pot + foliage * 0.8, r * 0.2]} r={r * 0.6} c={shade(GREEN, 1.15)} />
+    </>
+  );
+};
+
+/** Telescopic sliding gate: framed leaves of horizontal slats (celosía) on two tracks, slid aside when open. */
+const slidingGate: Builder = ({ w, d, h, c, open }) => {
+  const slat = 0.1;
+  const gap = 0.025;
+  const rows = Math.floor((h - 0.08) / (slat + gap));
+  return (
+    <>
+      {gatePanels(w, open === true).map((pn, i) => {
+        const cx = (pn.x0 + pn.x1) / 2;
+        const lw = pn.x1 - pn.x0;
+        const z = (pn.track === 0 ? -1 : 1) * (d / 4);
+        return (
+          <group key={i} position={[cx, 0, z]}>
+            <B p={[-lw / 2 + 0.02, h / 2, 0]} s={[0.04, h, 0.04]} c={c} />
+            <B p={[lw / 2 - 0.02, h / 2, 0]} s={[0.04, h, 0.04]} c={c} />
+            <B p={[0, h - 0.02, 0]} s={[lw, 0.04, 0.04]} c={c} />
+            {Array.from({ length: rows }, (_, r) => (
+              <B key={r} p={[0, 0.06 + r * (slat + gap) + slat / 2, 0]} s={[lw - 0.04, slat, 0.025]} c={c} />
+            ))}
+            <C p={[-lw / 2 + 0.15, 0.04, 0]} r={0.035} h={0.03} c={METAL} />
+          </group>
+        );
+      })}
     </>
   );
 };
@@ -1234,7 +1262,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   sillon: sofa, mesaCentro: coffeeTable, muebleTV: cabinet(1), televisor: tv, alfombra: rug, mesa: table, silla: chair,
   meson: counter(), estufa: stove, nevera: fridge, lavaplatos: kitchenSink, alacena: doorsBox, sanitario: toilet,
   lavamanos: basin, ducha: shower, banera: tub, espejo: mirror,
-  lavadero: washtub, lavadora: washer, matera: plant, arbol: tree, poste: streetLamp, banca: bench, carro: car, moto, piscina: pool,
+  porton: slidingGate, lavadero: washtub, lavadora: washer, matera: plant, arbol: tree, poste: streetLamp, banca: bench, carro: car, moto, piscina: pool,
   asoleadora: lounger, sombrilla: umbrella, pergola, bar, parrilla: grill, jardinera: planter,
   centroEntretenimiento: entertainment, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
   repisa: collectiblesShelf, jacuzzi, toallero: towelRail, brasero: firePit, puf: pouf, jardinVertical: verticalGarden,
@@ -1245,7 +1273,7 @@ export function FurnitureModel3D({ f }: { f: Furniture }) {
   const item = catalogItem(f.type);
   const c = f.color ?? item?.color ?? '#b08a63';
   const build = item ? BUILDERS[item.model] : null;
-  return build ? build({ w: f.width, d: f.depth, h: f.height, c, item, seed: hashSeed(f.id) }) : <B p={[0, f.height / 2, 0]} s={[f.width, f.height, f.depth]} c={c} />;
+  return build ? build({ w: f.width, d: f.depth, h: f.height, c, item, seed: hashSeed(f.id), open: f.open }) : <B p={[0, f.height / 2, 0]} s={[f.width, f.height, f.depth]} c={c} />;
 }
 
 function SelectionBox({ f, color }: { f: Furniture; color: string }) {

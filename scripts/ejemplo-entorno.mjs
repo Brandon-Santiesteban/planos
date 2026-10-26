@@ -36,6 +36,7 @@ const PIECES = {
   'arbol-pequeno': { w: 2.0, d: 2.0, h: 3.5, color: '#5d8642' },
   arbusto: { w: 1.0, d: 1.0, h: 1.0, color: '#557e3c' },
   'poste-alumbrado': { w: 0.3, d: 1.2, h: 6.0, color: '#3b3f45' },
+  'porton-telescopico': { w: 3.3, d: 0.12, h: 2.0, color: '#1e1e1e' },
 };
 const yTrees = yGreen + GREEN / 2;
 const PLACED = [
@@ -45,6 +46,9 @@ const PLACED = [
   ['arbusto', -3.5, yGreen + 0.7], ['arbusto', 0.6, yGreen + 0.7], ['arbusto', 4.9, yGreen + 0.7], ['arbusto', 9, yGreen + 0.7],
   // The existing power pole on the house-side sidewalk, to the RIGHT of the house (user), arm over the street.
   ['poste-alumbrado', 6.1, FRONT + 0.4],
+  // Telescopic sliding gate on the fence line in front of the parking (closed); open, its two leaves stack
+  // behind the garden fence (x 3,3…5,0) and the whole 3,3 m are free for the car.
+  ['porton-telescopico', 1.65, FRONT - 0.06],
 ];
 
 const p = JSON.parse(readFileSync(path, 'utf8'));

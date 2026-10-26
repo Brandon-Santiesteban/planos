@@ -47,7 +47,7 @@ test('search ignores accents and case, and can be limited to a category', () => 
   expect(searchCatalog('banera').map((i) => i.id)).toEqual(['banera']);
   expect(searchCatalog('silla').map((i) => i.id)).toEqual(expect.arrayContaining(['silla-oficina', 'silla-gamer', 'silla-comedor']));
   expect(searchCatalog('silla', 'Comedor').map((i) => i.id)).toEqual(['silla-comedor']);
-  expect(searchCatalog('', 'Parqueadero').map((i) => i.id)).toEqual(['carro', 'moto']);
+  expect(searchCatalog('', 'Parqueadero').map((i) => i.id)).toEqual(['porton-telescopico', 'carro', 'moto']);
 });
 
 test('entertainment centre, full-length mirror, curtains, LED strips, jacuzzi and a fire pit', () => {

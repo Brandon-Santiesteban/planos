@@ -17,7 +17,7 @@ function Piece({ f, selected, pxPerMetre, ghost = false }: { f: Furniture; selec
   return (
     <g className={`mueble${selected ? ' selected' : ''}${ghost ? ' fantasma' : ''}${f.elevation > 0.05 ? ' elevado' : ''}`} data-id={ghost ? undefined : f.id}>
       <g transform={`translate(${f.x} ${f.y}) rotate(${f.rotation})`}>
-        <FurnitureSymbol item={item} w={f.width} d={f.depth} />
+        <FurnitureSymbol item={item} w={f.width} d={f.depth} open={f.open} />
       </g>
       {showName && (
         <text className="mueble-nombre" x={f.x} y={f.y} fontSize={font} textAnchor="middle" dominantBaseline="middle">

@@ -1,8 +1,9 @@
 // Top-view symbols, drawn in the piece's local frame: centred, width along x, depth along y, front towards +y.
 import type { ReactElement } from 'react';
 import type { CatalogItem, FurnitureModel } from './catalog';
+import { gatePanels } from './gate';
 
-type P = { w: number; d: number; item?: CatalogItem };
+type P = { w: number; d: number; item?: CatalogItem; open?: boolean };
 type Builder = (p: P) => ReactElement;
 
 const rect = (x: number, y: number, w: number, h: number, r = 0, key?: string | number, cls = 'mueble-detalle') => (
@@ -316,10 +317,15 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   matera: plant, arbol: plant, poste: plant, banca: bench, carro: car, moto,
   centroEntretenimiento: entertainment, cortina: curtain, tiraLed: flat, cuadro: flat, repisa: shelfDots, consola: box(0.03),
   jacuzzi, toallero: flat, brasero: firePit, puf: pouf, jardinVertical: shelfDots,
+  porton: ({ w, d, open }) => (
+    <>
+      {gatePanels(w, open === true).map((pn, i) => rect(pn.x0, (pn.track === 0 ? -d / 2 : 0), pn.x1 - pn.x0, d / 2, 0, i))}
+    </>
+  ),
 };
 
 /** Outline (rounded for organic pieces) plus the piece's symbol, in local coordinates. */
-export function FurnitureSymbol({ item, w, d }: { item?: CatalogItem; w: number; d: number }) {
+export function FurnitureSymbol({ item, w, d, open }: { item?: CatalogItem; w: number; d: number; open?: boolean }) {
   const model = item?.model;
   const round = model === 'matera' || model === 'lampara' || model === 'sombrilla' || model === 'brasero' || model === 'puf' ? Math.min(w, d) / 2 : model === 'carro' ? 0.35 : model === 'moto' ? 0.2 : 0.02;
   const outline = model === 'escritorioL' ? null : (
@@ -330,7 +336,7 @@ export function FurnitureSymbol({ item, w, d }: { item?: CatalogItem; w: number;
       {model === 'escritorioL'
         ? <polygon className="mueble-contorno" points={`${-w / 2},${-d / 2} ${w / 2},${-d / 2} ${w / 2},${-d / 2 + Math.min(0.7, d)} ${-w / 2 + Math.min(0.6, w)},${-d / 2 + Math.min(0.7, d)} ${-w / 2 + Math.min(0.6, w)},${d / 2} ${-w / 2},${d / 2}`} />
         : outline}
-      {model ? BUILDERS[model]({ w, d, item }) : null}
+      {model ? BUILDERS[model]({ w, d, item, open }) : null}
     </>
   );
 }

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "id": "f99978ea-3c06-4a25-aa7d-f8e0e831b1af",
+  "id": "02c60876-57c3-402a-9d1b-5ade81212218",
   "name": "Casa etapa 1",
   "north": 0,
   "floors": [
@@ -935,7 +935,7 @@
           "elevation": 0
         },
         {
-          "id": "entorno-53df6a5b-cb22-4b6b-98e7-59af18129a08",
+          "id": "entorno-59c3a578-b73a-4592-b5ae-79246dba2768",
           "type": "arbol-guayacan",
           "x": -5.5,
           "y": 20.8,
@@ -947,7 +947,7 @@
           "color": "#6a8c42"
         },
         {
-          "id": "entorno-df4ad381-23fa-4270-a5cc-cab10e0fc2ab",
+          "id": "entorno-accc51f9-34e0-4a19-a6b4-946bafb80317",
           "type": "arbol-guayacan",
           "x": 2.75,
           "y": 20.8,
@@ -959,7 +959,7 @@
           "color": "#6a8c42"
         },
         {
-          "id": "entorno-c7ae095b-fbd1-4d17-acc8-2946b851ee30",
+          "id": "entorno-c0cd2e86-16c4-4982-b98c-301c65624564",
           "type": "arbol-guayacan",
           "x": 11,
           "y": 20.8,
@@ -971,7 +971,7 @@
           "color": "#6a8c42"
         },
         {
-          "id": "entorno-4b5fb430-4a20-428c-b7c7-2a1d40396a8b",
+          "id": "entorno-307d5911-d11a-45aa-a246-7c1a070c108c",
           "type": "arbol-pequeno",
           "x": -1.4,
           "y": 21.1,
@@ -983,7 +983,7 @@
           "color": "#5d8642"
         },
         {
-          "id": "entorno-f80f1f13-535e-4fee-8beb-5641ecdce964",
+          "id": "entorno-0a43e5e1-76ee-4990-bcdd-953fbd0868f5",
           "type": "arbol-pequeno",
           "x": 6.9,
           "y": 21.1,
@@ -995,7 +995,7 @@
           "color": "#5d8642"
         },
         {
-          "id": "entorno-829bbd9b-b36d-4092-a870-9525fc7a7d19",
+          "id": "entorno-7fd5d8ad-5b62-4338-83b9-79ea95da1692",
           "type": "arbusto",
           "x": -3.5,
           "y": 20,
@@ -1007,7 +1007,7 @@
           "color": "#557e3c"
         },
         {
-          "id": "entorno-641e33c0-ed5b-4592-86d8-298b2c6d01f8",
+          "id": "entorno-f294974b-8885-456e-9d87-8259116a6226",
           "type": "arbusto",
           "x": 0.6,
           "y": 20,
@@ -1019,7 +1019,7 @@
           "color": "#557e3c"
         },
         {
-          "id": "entorno-d9a5906a-e747-496b-9844-b48236a866cf",
+          "id": "entorno-12706be4-e1a5-448c-862b-d32ae96f84ec",
           "type": "arbusto",
           "x": 4.9,
           "y": 20,
@@ -1031,7 +1031,7 @@
           "color": "#557e3c"
         },
         {
-          "id": "entorno-b33f6a03-ed0d-4b4e-8722-dd4b0655a21a",
+          "id": "entorno-613a22d3-3346-4149-9b93-cb75d87be4c3",
           "type": "arbusto",
           "x": 9,
           "y": 20,
@@ -1043,7 +1043,7 @@
           "color": "#557e3c"
         },
         {
-          "id": "entorno-d5248017-abd5-45d2-973f-14cc2f9a82af",
+          "id": "entorno-d2bf0151-4724-45f1-8e4e-ec4ff8b1155c",
           "type": "poste-alumbrado",
           "x": 6.1,
           "y": 10.6,
@@ -1053,6 +1053,18 @@
           "height": 6,
           "elevation": 0,
           "color": "#3b3f45"
+        },
+        {
+          "id": "entorno-e7735640-c879-47cd-8394-446a0a42fd01",
+          "type": "porton-telescopico",
+          "x": 1.65,
+          "y": 10.139999999999999,
+          "rotation": 0,
+          "width": 3.3,
+          "depth": 0.12,
+          "height": 2,
+          "elevation": 0,
+          "color": "#1e1e1e"
         }
       ],
       "openings": [
@@ -1642,7 +1654,7 @@
           "floorMaterial": "porcelanato"
         },
         {
-          "id": "f497d566-e0bf-449d-a58a-374b536989d2",
+          "id": "96394f17-1e96-4657-a225-c917eb51b5c2",
           "kind": "exterior",
           "name": "Andén",
           "points": [
@@ -1666,7 +1678,7 @@
           "floorMaterial": "concreto"
         },
         {
-          "id": "ddb86484-d65f-45fc-bb09-9c97725bcb13",
+          "id": "16859fa0-39cf-4724-95d0-ac05462208aa",
           "kind": "exterior",
           "name": "Calle (doble sentido)",
           "points": [
@@ -1690,7 +1702,7 @@
           "floorMaterial": "asfalto"
         },
         {
-          "id": "e9491200-b0f0-4564-a28e-3e44b8e046f6",
+          "id": "b2187241-d14e-4e18-ade3-e888b3bf2253",
           "kind": "exterior",
           "name": "Sardinel",
           "points": [
@@ -1714,7 +1726,7 @@
           "floorMaterial": "concreto"
         },
         {
-          "id": "4927fde3-d9e1-41cf-80a5-fc42b552425e",
+          "id": "793cad33-d4e5-480a-9a7a-99a374ef0962",
           "kind": "exterior",
           "name": "Zona verde (propuesta)",
           "points": [

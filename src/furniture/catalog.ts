@@ -17,7 +17,7 @@ export type FurnitureModel =
   | 'alacena' | 'sanitario' | 'lavamanos' | 'ducha' | 'banera' | 'espejo' | 'lavadero' | 'lavadora' | 'matera'
   | 'banca' | 'carro' | 'moto' | 'piscina' | 'asoleadora' | 'sombrilla' | 'pergola' | 'bar' | 'parrilla'
   | 'jardinera' | 'arbol' | 'poste' | 'centroEntretenimiento' | 'cortina' | 'tiraLed' | 'cuadro' | 'repisa'
-  | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical';
+  | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical' | 'porton';
 
 /** Artwork of a framed picture (model 'cuadro'). */
 export type Art = 'paisaje' | 'abstracto' | 'byn' | 'gamer';
@@ -133,6 +133,8 @@ export const CATALOG: CatalogItem[] = [
   item('arbol-pequeno', 'Árbol pequeño', 'Exterior', 'arbol', [2.0, 2.0, 3.5], '#5d8642'),
   item('arbusto', 'Arbusto', 'Exterior', 'arbol', [1.0, 1.0, 1.0], '#557e3c'),
   item('poste-alumbrado', 'Poste de alumbrado', 'Exterior', 'poste', [0.3, 1.2, 6.0], '#3b3f45'),
+  // Two leaves on parallel tracks; open, they stack beside the opening (see gate.ts). Same celosía as the front fence.
+  item('porton-telescopico', 'Portón corredizo telescópico', 'Parqueadero', 'porton', [3.3, 0.12, 2.0], '#1e1e1e'),
   // Rooftop
   item('piscina', 'Piscina elevada', 'Rooftop', 'piscina', [3.0, 2.4, 1.1], '#eae6df'),
   item('asoleadora', 'Asoleadora', 'Rooftop', 'asoleadora', [0.7, 1.95, 0.85], '#e8e2d6'),

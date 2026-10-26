@@ -92,6 +92,8 @@ export interface Furniture {
   /** height of its base above the floor (stacking: a monitor on a desk) */
   elevation: number;
   color?: string;
+  /** gates: open (leaves slid aside) or closed */
+  open?: boolean;
 }
 
 export interface Background {
