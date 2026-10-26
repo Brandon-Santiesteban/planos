@@ -31,6 +31,8 @@ export interface CatalogItem {
   seats?: number;
   /** a double basin, a queen bed with two pillows… */
   double?: boolean;
+  /** placed over another piece, it sits on top of it (a monitor on a desk) */
+  onTop?: boolean;
 }
 
 const item = (
@@ -62,7 +64,7 @@ export const CATALOG: CatalogItem[] = [
   item('sillon', 'Sillón', 'Sala', 'sillon', [0.85, 0.85, 0.85], '#a78b6d'),
   item('mesa-centro', 'Mesa de centro', 'Sala', 'mesaCentro', [1.1, 0.6, 0.42], NOGAL),
   item('mueble-tv', 'Mueble de TV', 'Sala', 'muebleTV', [1.6, 0.4, 0.5], NOGAL),
-  item('televisor', 'Televisor 55"', 'Sala', 'televisor', [1.23, 0.08, 0.72], '#1d1f22', { elevation: 0.5 }),
+  item('televisor', 'Televisor 55"', 'Sala', 'televisor', [1.23, 0.08, 0.72], '#1d1f22', { elevation: 0.5, onTop: true }),
   item('alfombra', 'Alfombra', 'Sala', 'alfombra', [2.0, 1.4, 0.01], '#c9b79c'),
   item('lampara-pie', 'Lámpara de pie', 'Sala', 'lampara', [0.35, 0.35, 1.6], '#e9dcc3'),
   // Comedor
@@ -87,8 +89,8 @@ export const CATALOG: CatalogItem[] = [
   item('escritorio-l', 'Escritorio en L', 'Oficina y setup', 'escritorioL', [1.6, 1.4, 0.75], ROBLE),
   item('silla-oficina', 'Silla de oficina', 'Oficina y setup', 'sillaOficina', [0.62, 0.62, 1.1], GRAFITO),
   item('silla-gamer', 'Silla gamer', 'Oficina y setup', 'sillaGamer', [0.7, 0.7, 1.35], '#2b2d31'),
-  item('monitor', 'Monitor 27"', 'Oficina y setup', 'monitor', [0.61, 0.2, 0.45], '#1d1f22', { elevation: 0.75 }),
-  item('torre-pc', 'Torre de PC', 'Oficina y setup', 'torre', [0.22, 0.48, 0.48], '#25272b'),
+  item('monitor', 'Monitor 27"', 'Oficina y setup', 'monitor', [0.61, 0.2, 0.45], '#1d1f22', { elevation: 0.75, onTop: true }),
+  item('torre-pc', 'Torre de PC', 'Oficina y setup', 'torre', [0.22, 0.48, 0.48], '#25272b', { onTop: true }),
   item('tablero-blanco', 'Tablero blanco', 'Oficina y setup', 'tablero', [1.2, 0.03, 0.9], '#fbfbf9', { elevation: 0.9 }),
   item('estanteria', 'Estantería', 'Oficina y setup', 'estanteria', [0.8, 0.35, 1.8], ROBLE),
   // Lavandería

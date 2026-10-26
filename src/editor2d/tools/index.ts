@@ -5,6 +5,7 @@ import { dist } from '../../geometry/vec';
 import type { EditorState, Tool } from '../../store/editorStore';
 import { useGrid } from '../gridSettings';
 import type { View } from '../viewport';
+import { createPlaceFurnitureTool } from '../../furniture/placeTool';
 import { createCalibrateTool, createMoveBackgroundTool } from './calibrateTool';
 import { createOpeningTool } from './openingTool';
 import { createQuickRoomTool } from './quickRoomTool';
@@ -72,6 +73,7 @@ const factories: Partial<Record<Tool, () => ToolHandler>> = {
   quickRoom: createQuickRoomTool,
   calibrate: createCalibrateTool,
   moveBackground: createMoveBackgroundTool,
+  furniture: createPlaceFurnitureTool,
 };
 
 /** Registers a tool factory (used by tool modules added later). */

@@ -3,8 +3,8 @@ import { create } from 'zustand';
 import { createEmptyProject } from '../model/defaults';
 import type { Project } from '../model/types';
 
-export type Tool = 'select' | 'wall' | 'door' | 'window' | 'room' | 'calibrate' | 'moveBackground' | 'quickRoom';
-export type Selection = { kind: 'wall' | 'opening' | 'room'; id: string } | null;
+export type Tool = 'select' | 'wall' | 'door' | 'window' | 'room' | 'calibrate' | 'moveBackground' | 'quickRoom' | 'furniture';
+export type Selection = { kind: 'wall' | 'opening' | 'room' | 'furniture'; id: string } | null;
 
 export interface EditorState {
   project: Project;
@@ -38,7 +38,8 @@ function selectionExists(p: Project, s: Selection): boolean {
   return p.floors.some((f) =>
     s.kind === 'wall' ? f.walls.some((w) => w.id === s.id)
       : s.kind === 'opening' ? f.openings.some((o) => o.id === s.id)
-        : f.rooms.some((r) => r.id === s.id),
+        : s.kind === 'furniture' ? f.furniture.some((m) => m.id === s.id)
+          : f.rooms.some((r) => r.id === s.id),
   );
 }
 

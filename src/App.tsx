@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import GridControls from './editor2d/GridControls';
+import { duplicateSelectedFurniture } from './furniture/actions';
 import Plan2D from './editor2d/Plan2D';
 import { library, writeLinkedFile } from './persistence/appLibrary';
 import { startAutosave } from './persistence/autosave';
@@ -64,6 +65,7 @@ export default function App() {
         else if (key === 'y' || (key === 'z' && e.shiftKey)) s.redo();
         else if (key === 's') void save();
         else if (key === 'o') openProjectsDialog();
+        else if (key === 'd') duplicateSelectedFurniture();
         else return;
         e.preventDefault();
         return;

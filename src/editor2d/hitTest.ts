@@ -1,14 +1,15 @@
 import { pointInPolygon } from '../geometry/polygons';
 import { dist } from '../geometry/vec';
 import { projectOntoWall } from '../geometry/walls';
+import { furnitureAt } from '../model/furnitureOps';
 import type { Floor, Vec2 } from '../model/types';
 
 export type Hit =
   | { kind: 'endpoint'; wallId: string; end: 'a' | 'b' }
-  | { kind: 'opening' | 'wall' | 'room'; id: string }
+  | { kind: 'opening' | 'wall' | 'furniture' | 'room'; id: string }
   | null;
 
-/** What is under `p`, by priority: endpoint > opening > wall > room. */
+/** What is under `p`, by priority: endpoint > opening > wall > furniture (highest first) > room. */
 export function hitTest(floor: Floor, p: Vec2, tolerance: number): Hit {
   for (const w of floor.walls) {
     if (dist(w.a, p) <= tolerance) return { kind: 'endpoint', wallId: w.id, end: 'a' };
@@ -25,6 +26,8 @@ export function hitTest(floor: Floor, p: Vec2, tolerance: number): Hit {
   for (const w of floor.walls) {
     if (projectOntoWall(w, p).distance <= w.thickness / 2 + tolerance) return { kind: 'wall', id: w.id };
   }
+  const piece = furnitureAt(floor.furniture ?? [], p);
+  if (piece) return { kind: 'furniture', id: piece.id };
   for (let i = floor.rooms.length - 1; i >= 0; i--) {
     if (pointInPolygon(p, floor.rooms[i].points)) return { kind: 'room', id: floor.rooms[i].id };
   }

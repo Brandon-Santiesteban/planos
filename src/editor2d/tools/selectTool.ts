@@ -2,10 +2,12 @@ import { snapToGrid } from '../../geometry/snap';
 import { dist, sub } from '../../geometry/vec';
 import { projectOntoWall } from '../../geometry/walls';
 import { DEFAULTS } from '../../model/defaults';
+import { deleteFurniture } from '../../model/furnitureOps';
 import {
   deleteOpening, deleteRoom, deleteWall, type Joint, jointsAt, setJoints, translateJoints, updateOpening, wallJoints,
 } from '../../model/ops';
 import type { Vec2 } from '../../model/types';
+import { dragFurnitureTo, rotateSelectedFurniture } from '../../furniture/actions';
 import { useEditor } from '../../store/editorStore';
 import { useGrid } from '../gridSettings';
 import { hitTest } from '../hitTest';
@@ -18,7 +20,8 @@ const DRAG_START_PX = 3;
 type Drag =
   | { kind: 'endpoint'; wallId: string; end: 'a' | 'b'; joints: Joint[] }
   | { kind: 'wall'; wallId: string; applied: Vec2; joints: Joint[] }
-  | { kind: 'opening'; openingId: string; wallId: string };
+  | { kind: 'opening'; openingId: string; wallId: string }
+  | { kind: 'furniture'; id: string; start: Vec2 };
 
 export function createSelectTool(): ToolHandler {
   let drag: Drag | null = null;
@@ -45,6 +48,10 @@ export function createSelectTool(): ToolHandler {
         select({ kind: 'opening', id: hit.id });
         const o = floor.openings.find((x) => x.id === hit.id)!;
         drag = { kind: 'opening', openingId: hit.id, wallId: o.wallId };
+      } else if (hit.kind === 'furniture') {
+        select({ kind: 'furniture', id: hit.id });
+        const f = floor.furniture.find((x) => x.id === hit.id)!;
+        drag = { kind: 'furniture', id: hit.id, start: { x: f.x, y: f.y } };
       } else {
         select({ kind: 'room', id: hit.id });
       }
@@ -61,7 +68,9 @@ export function createSelectTool(): ToolHandler {
       const floorId = store.activeFloorId;
       const floor = activeFloor(store);
       const d = drag;
-      if (d.kind === 'endpoint') {
+      if (d.kind === 'furniture') {
+        dragFurnitureTo(d.id, { x: d.start.x + p.x - downAt.x, y: d.start.y + p.y - downAt.y }, ctx.state.snapping && !ctx.altKey);
+      } else if (d.kind === 'endpoint') {
         const wall = floor.walls.find((w) => w.id === d.wallId);
         if (!wall) return;
         const to = snapForTool(p, ctx, [], wall[d.end]).point;
@@ -92,13 +101,15 @@ export function createSelectTool(): ToolHandler {
       started = false;
     },
 
-    onKey(key) {
+    onKey(key, ctx) {
+      if (key.toLowerCase() === 'r') return rotateSelectedFurniture(ctx.shiftKey ? -90 : 90);
       if (key !== 'Delete' && key !== 'Backspace') return false;
       const { selection, activeFloorId, apply, select } = useEditor.getState();
       if (!selection) return false;
       apply((d) => {
         if (selection.kind === 'wall') deleteWall(d, activeFloorId, selection.id);
         else if (selection.kind === 'opening') deleteOpening(d, activeFloorId, selection.id);
+        else if (selection.kind === 'furniture') deleteFurniture(d, activeFloorId, selection.id);
         else deleteRoom(d, activeFloorId, selection.id);
       });
       select(null);
