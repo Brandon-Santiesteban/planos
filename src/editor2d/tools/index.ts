@@ -3,7 +3,7 @@ import type { Vec2 } from '../../model/types';
 import { snapPoint } from '../../geometry/snap';
 import { dist } from '../../geometry/vec';
 import type { EditorState, Tool } from '../../store/editorStore';
-import { gridStepFor } from '../gridStep';
+import { useGrid } from '../gridSettings';
 import type { View } from '../viewport';
 import { createCalibrateTool, createMoveBackgroundTool } from './calibrateTool';
 import { createOpeningTool } from './openingTool';
@@ -53,7 +53,10 @@ export function snapForTool(
     .walls.flatMap((w) => [w.a, w.b])
     .concat(extra)
     .filter((e) => !exclude || dist(e, exclude) > DEFAULTS.joinTolerance);
-  return snapPoint(p, { gridStep: gridStepFor(ctx.view.pxPerMetre), endpoints, radius: SNAP_RADIUS_PX / ctx.view.pxPerMetre });
+  const grid = useGrid.getState();
+  const r = snapPoint(p, { gridStep: grid.step, endpoints, radius: SNAP_RADIUS_PX / ctx.view.pxPerMetre });
+  // With the grid hidden only wall corners attract the pointer.
+  return r.kind === 'grid' && !grid.visible ? { point: p, kind: 'none' } : r;
 }
 
 const noopTool: ToolHandler = { preview: () => null, reset: () => {} };

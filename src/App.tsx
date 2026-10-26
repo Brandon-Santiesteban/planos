@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
+import GridControls from './editor2d/GridControls';
 import Plan2D from './editor2d/Plan2D';
 import { library, writeLinkedFile } from './persistence/appLibrary';
 import { startAutosave } from './persistence/autosave';
@@ -74,6 +75,7 @@ export default function App() {
           <section className="view view-2d">
             <Plan2D />
             <span className="etiqueta-vista">Plano 2D</span>
+            <GridControls />
             <button className="maximise btn btn-chico" onClick={() => setLayout(layout === '2d' ? 'split' : '2d')}>
               <Icon name={layout === '2d' ? 'split' : 'maximize'} size={16} />{layout === '2d' ? 'Dividir' : 'Ampliar'}
             </button>

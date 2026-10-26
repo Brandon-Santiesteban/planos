@@ -8,21 +8,24 @@ Haz doble clic en **`iniciar.bat`**. La primera vez instala lo necesario (tarda 
 
 ## Qué puedes hacer (fase 1)
 
-- **Muros**: herramienta *Muro* (M). Clic para empezar, clic para terminar; sigue encadenando muros. Mientras dibujas, escribe una medida (`3,5`, `350 cm`) y pulsa **Enter**. **Esc** o doble clic termina. **Shift** fija ángulos de 45°. **Alt** desactiva el ajuste.
+- **Muros**: herramienta *Muro* (M). Clic para empezar, clic para terminar; sigue encadenando muros. Los puntos se pegan a las puntas de la cuadrícula (también en diagonal). Mientras dibujas, escribe una medida (`3,5`, `350 cm`) y pulsa **Enter**. **Esc** o doble clic termina. **Shift** fija ángulos de 45°. **Alt** desactiva el ajuste.
 - **Puertas y ventanas**: herramientas *Puerta* (P) y *Ventana* (N). Clic sobre un muro.
 - **Habitaciones y balcones**: herramienta *Habitación* (H). Clic en cada esquina y clic en el primer punto (o Enter) para cerrar. En el panel puedes cambiar el nombre y convertirla en **Balcón** (lleva barandilla en 3D).
 - **Seleccionar y editar**: herramienta *Seleccionar* (V). Arrastra esquinas, muros o puertas. Cambia medidas en el panel derecho. **Supr** elimina.
 - **Plantas**: panel *Plantas* (añadir, renombrar con doble clic, altura, subir/bajar, eliminar). La planta de abajo se ve en gris como referencia.
 - **Calcar un plano**: sin nada seleccionado, *Cargar plano de fondo* (imagen o PDF), luego *Calibrar escala*: clic en dos puntos de distancia conocida, escribe la medida real y Enter.
 - **3D**: arrastra para girar, rueda para acercar, botón derecho para desplazar. *Mostrar plantas superiores* enseña las plantas por encima de la actual.
-- **Guardar / Abrir**: archivos `.casa.json` en tu PC. Además se guarda solo en el navegador cada segundo.
+- **Cuadrícula**: abajo a la izquierda del plano puedes mostrarla u ocultarla y elegir 10 cm, 50 cm o 1 m. Oculta, los puntos solo se pegan a las esquinas de los muros.
+- **Mis proyectos**: todo se guarda solo, cada proyecto por separado, y arriba ves la hora del último guardado. *Nuevo* no borra el anterior: lo encuentras en *Mis proyectos*.
+- **Guardar**: crea un archivo `.casa.json` en tu PC. Después de guardarlo (o abrirlo) una vez, ese archivo se actualiza solo con cada cambio.
+- **Modo oscuro**: botón de la luna arriba a la derecha.
 
 ## Atajos
 
 | Tecla | Acción |
 |---|---|
 | Ctrl+Z / Ctrl+Y | Deshacer / Rehacer |
-| Ctrl+S / Ctrl+O | Guardar / Abrir |
+| Ctrl+S / Ctrl+O | Guardar / Mis proyectos |
 | V, M, P, N, H | Herramientas |
 | Rueda | Zoom en el plano |
 | Botón central/derecho o Espacio + arrastrar | Mover el plano |

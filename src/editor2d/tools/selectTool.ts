@@ -7,7 +7,7 @@ import {
 } from '../../model/ops';
 import type { Vec2 } from '../../model/types';
 import { useEditor } from '../../store/editorStore';
-import { gridStepFor } from '../gridStep';
+import { useGrid } from '../gridSettings';
 import { hitTest } from '../hitTest';
 import type { ToolContext, ToolHandler } from './index';
 import { activeFloor, snapForTool } from './index';
@@ -68,7 +68,8 @@ export function createSelectTool(): ToolHandler {
         store.apply((draft) => void setJoints(draft, floorId, d.joints, to), { record: false });
       } else if (d.kind === 'wall') {
         let total = sub(p, downAt);
-        if (ctx.state.snapping && !ctx.altKey) total = snapToGrid(total, gridStepFor(ctx.view.pxPerMetre));
+        const grid = useGrid.getState();
+        if (ctx.state.snapping && !ctx.altKey && grid.visible) total = snapToGrid(total, grid.step);
         const step = sub(total, d.applied);
         if (step.x === 0 && step.y === 0) return;
         let moved = false;

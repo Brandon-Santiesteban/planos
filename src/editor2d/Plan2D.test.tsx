@@ -22,3 +22,11 @@ test('renders a room with name and area', () => {
   expect(screen.getByText('Sala')).toBeInTheDocument();
   expect(screen.getByText('12,00 m²')).toBeInTheDocument();
 });
+
+test('hiding the grid removes its lines', async () => {
+  const { useGrid } = await import('./gridSettings');
+  useGrid.setState({ visible: false, step: 0.5 });
+  const { container } = render(<Plan2D />);
+  expect(container.querySelectorAll('.grid line')).toHaveLength(0);
+  useGrid.setState({ visible: true, step: 0.5 });
+});

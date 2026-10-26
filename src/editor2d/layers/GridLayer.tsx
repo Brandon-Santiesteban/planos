@@ -1,9 +1,10 @@
 import type { Size, View } from '../viewport';
-import { gridStepFor } from '../gridStep';
+import { useGrid, visibleMinorStep } from '../gridSettings';
 import { screenToWorld } from '../viewport';
 
-/** Metre grid plus the snapping grid of the current zoom (50 cm or 10 cm) covering the visible area. */
+/** Metre grid plus the chosen snapping grid (10 or 50 cm) covering the visible area. */
 export default function GridLayer({ view, size }: { view: View; size: Size }) {
+  const { visible, step } = useGrid();
   const tl = screenToWorld(view, size, { x: 0, y: 0 });
   const br = screenToWorld(view, size, { x: size.w, y: size.h });
   const lines: React.ReactElement[] = [];
@@ -15,8 +16,9 @@ export default function GridLayer({ view, size }: { view: View; size: Size }) {
       lines.push(<line key={`${cls}y${y.toFixed(2)}`} className={cls} x1={tl.x} y1={y} x2={br.x} y2={y} />);
     }
   };
-  const step = gridStepFor(view.pxPerMetre);
-  if (step < 1) addLines(step, 'grid-minor');
+  if (!visible) return null;
+  const minor = visibleMinorStep(step, view.pxPerMetre);
+  if (minor) addLines(minor, 'grid-minor');
   addLines(1, 'grid-major');
   return <g className="grid">{lines}</g>;
 }

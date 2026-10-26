@@ -282,3 +282,11 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 }
 [data-tema="oscuro"] .etiqueta-estado { background: color-mix(in srgb, var(--ok) 18%, var(--sup)); }
 .fila-cargando { height: 48px; margin-bottom: 4px; border-radius: 8px; background: linear-gradient(90deg, var(--sup2), var(--sup), var(--sup2)); background-size: 200% 100%; animation: brillo 1.4s ease infinite; }
+
+/* ---------- Grid controls (bottom-left of the plan) ---------- */
+.controles-cuadricula {
+  position: absolute; left: 10px; bottom: 10px; display: flex; align-items: center; gap: 8px;
+  background: var(--sup); border-radius: 12px; padding: 4px; box-shadow: var(--sombra), 0 0 0 1px var(--contorno);
+}
+.controles-cuadricula .btn { height: 32px; border-radius: 9px; }
+.controles-cuadricula .carril { min-width: 200px; }
