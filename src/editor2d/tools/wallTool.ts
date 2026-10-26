@@ -74,7 +74,8 @@ export function createWallTool(): ToolHandler {
       return false;
     },
     preview(): ToolPreview | null {
-      if (!start || !cursor) return null;
+      if (!cursor) return null;
+      if (!start) return { kind: 'marker', at: cursor };
       return {
         kind: 'wall',
         a: start,

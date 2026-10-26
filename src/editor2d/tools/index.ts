@@ -3,6 +3,7 @@ import type { Vec2 } from '../../model/types';
 import { snapPoint } from '../../geometry/snap';
 import { dist } from '../../geometry/vec';
 import type { EditorState, Tool } from '../../store/editorStore';
+import { gridStepFor } from '../gridStep';
 import type { View } from '../viewport';
 import { createCalibrateTool, createMoveBackgroundTool } from './calibrateTool';
 import { createOpeningTool } from './openingTool';
@@ -52,7 +53,7 @@ export function snapForTool(
     .walls.flatMap((w) => [w.a, w.b])
     .concat(extra)
     .filter((e) => !exclude || dist(e, exclude) > DEFAULTS.joinTolerance);
-  return snapPoint(p, { gridStep: DEFAULTS.gridStep, endpoints, radius: SNAP_RADIUS_PX / ctx.view.pxPerMetre });
+  return snapPoint(p, { gridStep: gridStepFor(ctx.view.pxPerMetre), endpoints, radius: SNAP_RADIUS_PX / ctx.view.pxPerMetre });
 }
 
 const noopTool: ToolHandler = { preview: () => null, reset: () => {} };

@@ -89,6 +89,20 @@ test('snaps the end to a nearby existing endpoint', () => {
   expect(walls()[1].b).toEqual({ x: 4, y: 0 });
 });
 
+test('points land on the visible grid nodes, diagonals included', () => {
+  const t = createWallTool(); // 100 px/m → 0.5 m grid
+  t.onPointerDown!({ x: 0.2, y: 0.1 }, ctx());
+  t.onPointerDown!({ x: 3.3, y: 2.2 }, ctx());
+  expect(walls()[0].a).toEqual({ x: 0, y: 0 });
+  expect(walls()[0].b).toEqual({ x: 3.5, y: 2 });
+});
+
+test('before the first click the tool shows the grid node it will use', () => {
+  const t = createWallTool();
+  t.onPointerMove!({ x: 1.2, y: 0.9 }, ctx());
+  expect(t.preview()).toEqual({ kind: 'marker', at: { x: 1, y: 1 } });
+});
+
 test('Shift locks the angle to 45° steps', () => {
   const t = createWallTool();
   t.onPointerDown!({ x: 0, y: 0 }, ctx());
