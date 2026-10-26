@@ -7,6 +7,7 @@ import {
 import type { Floor, Project, RoomKind } from '../model/types';
 import { formatArea } from '../model/units';
 import { useEditor } from '../store/editorStore';
+import BackgroundControls from './BackgroundControls';
 import { LengthField, TextField } from './fields';
 
 type Recipe = (d: Project, floorId: string) => void;
@@ -97,6 +98,7 @@ export default function PropertiesPanel() {
         <>
           <h2>Propiedades</h2>
           <p className="hint">Selecciona un muro, una puerta, una ventana o una habitación.</p>
+          <BackgroundControls floor={floor} />
         </>
       )}
     </aside>

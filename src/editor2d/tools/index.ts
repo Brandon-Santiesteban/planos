@@ -4,6 +4,7 @@ import { snapPoint } from '../../geometry/snap';
 import { dist } from '../../geometry/vec';
 import type { EditorState, Tool } from '../../store/editorStore';
 import type { View } from '../viewport';
+import { createCalibrateTool, createMoveBackgroundTool } from './calibrateTool';
 import { createOpeningTool } from './openingTool';
 import { createRoomTool } from './roomTool';
 import { createSelectTool } from './selectTool';
@@ -62,6 +63,8 @@ const factories: Partial<Record<Tool, () => ToolHandler>> = {
   door: () => createOpeningTool('door'),
   window: () => createOpeningTool('window'),
   room: createRoomTool,
+  calibrate: createCalibrateTool,
+  moveBackground: createMoveBackgroundTool,
 };
 
 /** Registers a tool factory (used by tool modules added later). */

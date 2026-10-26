@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { createEmptyProject } from '../model/defaults';
 import type { Project } from '../model/types';
 
-export type Tool = 'select' | 'wall' | 'door' | 'window' | 'room' | 'calibrate';
+export type Tool = 'select' | 'wall' | 'door' | 'window' | 'room' | 'calibrate' | 'moveBackground';
 export type Selection = { kind: 'wall' | 'opening' | 'room'; id: string } | null;
 
 export interface EditorState {

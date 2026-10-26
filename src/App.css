@@ -111,3 +111,7 @@ button.danger { color: var(--danger); border-color: #fca5a5; margin-top: 6px; }
 button.danger:hover { background: #fef2f2; border-color: var(--danger); }
 .preview-opening { stroke: rgba(37, 99, 235, 0.7); stroke-width: 8px; vector-effect: non-scaling-stroke; stroke-linecap: butt; }
 .preview-opening.invalid { stroke: rgba(220, 38, 38, 0.6); }
+.bg-controls { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+.bg-controls h3 { font-size: 13px; margin: 0; }
+.bg-controls button.active { background: var(--accent-soft); border-color: var(--accent); }
+.plan2d-wrap.tool-moveBackground .plan2d { cursor: move; }

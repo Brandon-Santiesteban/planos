@@ -165,7 +165,7 @@ export default function Plan2D() {
           <PreviewLayer preview={preview} pxPerMetre={k} />
         </g>
       </svg>
-      {typing && typingAt && <LengthInput text={typing.typed} valid={typing.typedValid} x={typingAt.x} y={typingAt.y} />}
+      {typing && typingAt && <LengthInput text={typing.typed} valid={typing.typedValid} x={typingAt.x} y={typingAt.y} label={toolName === 'calibrate' ? 'Medida real' : 'Longitud'} />}
     </div>
   );
 }

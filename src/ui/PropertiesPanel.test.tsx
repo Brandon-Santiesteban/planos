@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { fireEvent, render, screen } from '@testing-library/react';
 import { wallLength } from '../geometry/walls';
 import { createEmptyProject } from '../model/defaults';

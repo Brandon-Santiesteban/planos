@@ -4,7 +4,7 @@ import { polygonArea } from '../geometry/polygons';
 import { add, dist, normalize, scale, sub } from '../geometry/vec';
 import { createFloor, DEFAULTS } from './defaults';
 import { newId } from './ids';
-import type { Floor, Opening, OpeningKind, Project, RoomKind, Vec2, Wall } from './types';
+import type { Background, Floor, Opening, OpeningKind, Project, RoomKind, Vec2, Wall } from './types';
 
 function getFloor(p: Project, floorId: string): Floor {
   const f = p.floors.find((fl) => fl.id === floorId);
@@ -188,6 +188,19 @@ export function deleteFloor(p: Project, floorId: string): boolean {
   const before = p.floors.length;
   p.floors = p.floors.filter((f) => f.id !== floorId);
   return p.floors.length < before;
+}
+
+export function setBackground(p: Project, floorId: string, bg: Background | null): void {
+  getFloor(p, floorId).background = bg;
+}
+
+export function updateBackground(
+  p: Project,
+  floorId: string,
+  patch: Partial<Pick<Background, 'origin' | 'metresPerPixel' | 'opacity'>>,
+): void {
+  const bg = getFloor(p, floorId).background;
+  if (bg) Object.assign(bg, patch);
 }
 
 export function floorElevation(p: Project, floorId: string): number {
