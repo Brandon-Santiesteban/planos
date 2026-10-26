@@ -85,9 +85,9 @@ function OpeningProps({ floor, id }: { floor: Floor; id: string }) {
   );
 }
 
-const KIND_NAMES: Record<RoomKind, string> = { room: 'Habitación', balcony: 'Balcón', roof: 'Cubierta', stairs: 'Escalera' };
+const KIND_NAMES: Record<RoomKind, string> = { room: 'Habitación', balcony: 'Balcón', roof: 'Cubierta', stairs: 'Escalera', exterior: 'Exterior' };
 const KIND_REMOVED: Record<RoomKind, string> = {
-  room: 'Habitación eliminada', balcony: 'Balcón eliminado', roof: 'Cubierta eliminada', stairs: 'Escalera eliminada',
+  room: 'Habitación eliminada', balcony: 'Balcón eliminado', roof: 'Cubierta eliminada', stairs: 'Escalera eliminada', exterior: 'Zona exterior eliminada',
 };
 
 function StairsFields({ r, id }: { r: Room; id: string }) {

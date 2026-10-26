@@ -38,9 +38,10 @@ export interface Opening {
 
 /**
  * room = interior; balcony = exterior with railing; roof = a covering slab only (e.g. a patio roof);
- * stairs = a flight going up to the next floor (no slab: the 3D view draws steps).
+ * stairs = a flight going up to the next floor (no slab: the 3D view draws steps);
+ * exterior = open ground outside the house (sidewalk, street, green strip): a surface only, no lights or railing.
  */
-export type RoomKind = 'room' | 'balcony' | 'roof' | 'stairs';
+export type RoomKind = 'room' | 'balcony' | 'roof' | 'stairs' | 'exterior';
 
 /** Direction a stairs room goes up, in plan terms: n = towards the top of the plan (−y), s = +y, e = +x, w = −x. */
 export type StairUp = 'n' | 's' | 'e' | 'w';
@@ -48,7 +49,7 @@ export type StairUp = 'n' | 's' | 'e' | 'w';
 /** recta = one straight flight; u = two flights side by side with a landing at the far end, arriving back on the start side. */
 export type StairShape = 'recta' | 'u';
 
-export type FloorMaterial = 'ceramica' | 'porcelanato' | 'madera' | 'concreto' | 'piedra' | 'cesped';
+export type FloorMaterial = 'ceramica' | 'porcelanato' | 'madera' | 'concreto' | 'piedra' | 'cesped' | 'asfalto' | 'tierra';
 
 export type RailingType = 'vidrio' | 'muro' | 'celosia';
 

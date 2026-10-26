@@ -25,7 +25,7 @@ export const WALL_FINISHES: Record<WallFinish, MaterialDef> = {
   enchape: { label: 'Enchape', tile: [0.6, 0.6], chip: '#E6E9EC', roughness: 0.35 },
 };
 
-export const FLOOR_MATERIAL_ORDER: FloorMaterial[] = ['ceramica', 'porcelanato', 'madera', 'concreto', 'piedra', 'cesped'];
+export const FLOOR_MATERIAL_ORDER: FloorMaterial[] = ['ceramica', 'porcelanato', 'madera', 'concreto', 'piedra', 'cesped', 'asfalto', 'tierra'];
 
 export const FLOOR_MATERIALS: Record<FloorMaterial, MaterialDef> = {
   // 45 × 45 cm tiles.
@@ -37,6 +37,8 @@ export const FLOOR_MATERIALS: Record<FloorMaterial, MaterialDef> = {
   concreto: { label: 'Concreto', tile: [2, 2], chip: '#A9A8A3', roughness: 0.9 },
   piedra: { label: 'Piedra', tile: [1.2, 1.2], chip: '#A39A8C', roughness: 0.95 },
   cesped: { label: 'Césped', tile: [1, 1], chip: '#6E8A58', roughness: 1 },
+  asfalto: { label: 'Asfalto', tile: [2, 2], chip: '#4A4C4F', roughness: 0.95 },
+  tierra: { label: 'Tierra', tile: [1.5, 1.5], chip: '#8B6A4A', roughness: 1 },
 };
 
 /** What a face looks like: finish and colour (paint colour, or a tint for the textured finishes; white = natural). */

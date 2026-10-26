@@ -20,9 +20,9 @@ test('the swatches (house palette included) are valid colours with Spanish names
   for (const s of SWATCHES) expect(normalizeHex(s.hex)).toBe(s.hex);
 });
 
-test('catalog lists the 5 wall finishes and 6 floor materials with real-world tile sizes', () => {
+test('catalog lists the 5 wall finishes and 8 floor materials with real-world tile sizes', () => {
   expect(WALL_FINISH_ORDER).toEqual(['pintura', 'ladrillo', 'piedra', 'madera', 'enchape']);
-  expect(FLOOR_MATERIAL_ORDER).toEqual(['ceramica', 'porcelanato', 'madera', 'concreto', 'piedra', 'cesped']);
+  expect(FLOOR_MATERIAL_ORDER).toEqual(['ceramica', 'porcelanato', 'madera', 'concreto', 'piedra', 'cesped', 'asfalto', 'tierra']);
   for (const f of WALL_FINISH_ORDER) {
     const [w, h] = WALL_FINISHES[f].tile;
     expect(w).toBeGreaterThan(0.1);
@@ -53,4 +53,9 @@ test('resolveWallSide: paint keeps its colour, textured finishes default to no t
 
 test('resolveWallSide ignores an invalid stored colour', () => {
   expect(resolveWallSide({ color: 'nope' }, '#F4F1EA')).toEqual({ finish: 'pintura', color: '#F4F1EA' });
+});
+
+test('outdoor ground materials for streets and gardens', () => {
+  expect(FLOOR_MATERIALS.asfalto.label).toBe('Asfalto');
+  expect(FLOOR_MATERIALS.tierra.label).toBe('Tierra');
 });

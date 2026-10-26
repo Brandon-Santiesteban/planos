@@ -15,7 +15,7 @@ export type FurnitureModel =
   | 'muebleTV' | 'televisor' | 'alfombra' | 'mesa' | 'silla' | 'meson' | 'estufa' | 'nevera' | 'lavaplatos'
   | 'alacena' | 'sanitario' | 'lavamanos' | 'ducha' | 'banera' | 'espejo' | 'lavadero' | 'lavadora' | 'matera'
   | 'banca' | 'carro' | 'moto' | 'piscina' | 'asoleadora' | 'sombrilla' | 'pergola' | 'bar' | 'parrilla'
-  | 'jardinera';
+  | 'jardinera' | 'arbol' | 'poste';
 
 export interface CatalogItem {
   id: string;
@@ -102,6 +102,11 @@ export const CATALOG: CatalogItem[] = [
   // Exterior
   item('matera', 'Matera con planta', 'Exterior', 'matera', [0.45, 0.45, 1.0], '#a0522d'),
   item('banca', 'Banca de exterior', 'Exterior', 'banca', [1.2, 0.45, 0.45], '#9a7650'),
+  // Street trees: colour = crown. Guayacán amarillo flowers yellow; the small one is a green crown.
+  item('arbol-guayacan', 'Árbol guayacán amarillo', 'Exterior', 'arbol', [3.0, 3.0, 6.0], '#e3b42b'),
+  item('arbol-pequeno', 'Árbol pequeño', 'Exterior', 'arbol', [2.0, 2.0, 3.5], '#5f8a3e'),
+  item('arbusto', 'Arbusto', 'Exterior', 'arbol', [1.0, 1.0, 1.0], '#557a38'),
+  item('poste-alumbrado', 'Poste de alumbrado', 'Exterior', 'poste', [0.3, 1.2, 6.0], '#3b3f45'),
   // Rooftop
   item('piscina', 'Piscina elevada', 'Rooftop', 'piscina', [3.0, 2.4, 1.1], '#eae6df'),
   item('asoleadora', 'Asoleadora', 'Rooftop', 'asoleadora', [0.7, 1.95, 0.85], '#e8e2d6'),

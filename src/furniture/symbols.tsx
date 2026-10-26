@@ -279,7 +279,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   lampara: lamp, sofa, sofaL, sillon: sofa, mesaCentro: box(0.05), muebleTV: doors(), televisor: flat, alfombra: rug,
   mesa: table, silla: chair, meson: counter, estufa: stove, nevera: fridge, lavaplatos: kitchenSink, alacena: doors(),
   sanitario: toilet, lavamanos: sink, ducha: shower, banera: tub, espejo: flat, lavadero: washtub, lavadora: washer,
-  matera: plant, banca: bench, carro: car, moto,
+  matera: plant, arbol: plant, poste: plant, banca: bench, carro: car, moto,
 };
 
 /** Outline (rounded for organic pieces) plus the piece's symbol, in local coordinates. */

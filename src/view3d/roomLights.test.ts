@@ -65,3 +65,12 @@ test('roofs (cubiertas) get no lights of their own', () => {
   expect(roomLights(p, [g])).toEqual([]);
   expect(outdoorLights(p, [g])).toEqual([]);
 });
+
+test('outdoor ground zones (sidewalk, street, green strip) get no lights', () => {
+  const p = createEmptyProject();
+  const g = p.floors[0].id;
+  const id = addRoom(p, g, sq(0, 10, 6), 'Calle')!;
+  setRoomKind(p, g, id, 'exterior');
+  expect(roomLights(p, [g])).toEqual([]);
+  expect(outdoorLights(p, [g])).toEqual([]);
+});

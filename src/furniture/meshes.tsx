@@ -397,6 +397,30 @@ const plant: Builder = ({ w, d, h, c }) => {
   );
 };
 
+/** Trunk plus a rounded crown in the piece's colour; low pieces (shrubs) are almost all crown. */
+const tree: Builder = ({ w, d, h, c }) => {
+  const r = Math.min(w, d) / 2;
+  const trunk = h < 1.5 ? h * 0.15 : h * 0.4;
+  const crown = h - trunk;
+  return (
+    <>
+      <C p={[0, trunk / 2, 0]} r={Math.max(0.04, r * 0.08)} top={Math.max(0.03, r * 0.06)} h={trunk} c={'#6b4e2e'} rough={0.95} />
+      <S p={[0, trunk + crown * 0.45, 0]} r={r * 0.9} c={c} sc={[1, crown / (2 * r) * 1.05, 1]} />
+      <S p={[r * 0.35, trunk + crown * 0.62, r * 0.25]} r={r * 0.55} c={shade(c, 1.12)} />
+      <S p={[-r * 0.3, trunk + crown * 0.55, -r * 0.3]} r={r * 0.5} c={shade(c, 0.9)} />
+    </>
+  );
+};
+
+/** Street lamp: pole, arm over the street (+y) and the lamp head. */
+const streetLamp: Builder = ({ d, h, c }) => (
+  <>
+    <C p={[0, h / 2, -d / 2 + 0.1]} r={0.06} top={0.045} h={h} c={c} />
+    <B p={[0, h - 0.05, 0]} s={[0.06, 0.06, d - 0.1]} c={c} />
+    <B p={[0, h - 0.12, d / 2 - 0.15]} s={[0.25, 0.08, 0.35]} c={'#f2e6c9'} />
+  </>
+);
+
 const bench: Builder = ({ w, d, h, c }) => (
   <>
     {Array.from({ length: 4 }, (_, i) => <B key={i} p={[0, h - 0.02, -d / 2 + (d * (i + 0.5)) / 4]} s={[w, 0.035, d / 4 - 0.02]} c={c} />)}
@@ -572,7 +596,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   sillon: sofa, mesaCentro: coffeeTable, muebleTV: cabinet(1), televisor: tv, alfombra: rug, mesa: table, silla: chair,
   meson: counter(), estufa: stove, nevera: fridge, lavaplatos: kitchenSink, alacena: doorsBox, sanitario: toilet,
   lavamanos: basin, ducha: shower, banera: tub, espejo: panel('#8c9096', { c: '#dfe9ef', r: 0.02, m: 1 }),
-  lavadero: washtub, lavadora: washer, matera: plant, banca: bench, carro: car, moto, piscina: pool,
+  lavadero: washtub, lavadora: washer, matera: plant, arbol: tree, poste: streetLamp, banca: bench, carro: car, moto, piscina: pool,
   asoleadora: lounger, sombrilla: umbrella, pergola, bar, parrilla: grill, jardinera: planter,
 };
 

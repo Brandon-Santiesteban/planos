@@ -185,6 +185,26 @@ const FLOOR: Record<FloorMaterial, Painter> = {
     speckle(g, W, H, rnd, 9000, 0.2, 0.004);
   },
   piedra: (g, W, H, rnd, wrap) => stones(g, W, H, rnd, wrap, '#7E776C', ['#A39A8C', '#B3AA99', '#978E80', '#ABA190', '#8F877A'], 3),
+  asfalto: (g, W, H, rnd) => {
+    g.fillStyle = '#4A4C4F';
+    g.fillRect(0, 0, W, H);
+    // Aggregate speckles, light and dark.
+    for (let i = 0; i < 5000; i++) {
+      g.fillStyle = rnd() < 0.5 ? '#5a5c5f' : '#3e4043';
+      const s = 0.004 + rnd() * 0.006;
+      g.fillRect(rnd() * W, rnd() * H, s, s);
+    }
+  },
+  tierra: (g, W, H, rnd) => {
+    g.fillStyle = '#8B6A4A';
+    g.fillRect(0, 0, W, H);
+    const tones = ['#7a5c3f', '#9a7856', '#6f5238', '#a0835f'];
+    for (let i = 0; i < 3000; i++) {
+      g.fillStyle = tones[i % tones.length];
+      const s = 0.006 + rnd() * 0.02;
+      g.fillRect(rnd() * W, rnd() * H, s, s * (0.5 + rnd()));
+    }
+  },
   cesped: (g, W, H, rnd) => {
     g.fillStyle = '#6E8A58';
     g.fillRect(0, 0, W, H);

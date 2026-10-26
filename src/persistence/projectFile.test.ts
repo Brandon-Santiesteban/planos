@@ -120,3 +120,9 @@ test('a U-shaped stairs keeps its shape', () => {
   bad.floors[0].rooms[0].stairShape = 'caracol';
   expect(parseProject(JSON.stringify(bad)).ok).toBe(false);
 });
+
+test('outdoor zones with asphalt or soil survive a save/open', () => {
+  const p = sampleProject();
+  p.floors[0].rooms[0] = { ...p.floors[0].rooms[0], kind: 'exterior', floorMaterial: 'asfalto' };
+  expect(parseProject(serializeProject(p))).toEqual({ ok: true, project: p });
+});
