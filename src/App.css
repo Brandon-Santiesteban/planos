@@ -258,3 +258,27 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
   background: var(--sup); border-radius: 8px; padding: 6px 10px; font-size: 13px; box-shadow: var(--sombra), 0 0 0 1px var(--contorno);
 }
 .scene-toggle input { accent-color: var(--acento); }
+
+/* ---------- Mis proyectos ---------- */
+.estado-guardado.error, .estado-guardado.error .icono { color: var(--peligro); }
+.lista-proyectos { list-style: none; margin: 16px 0 0; padding: 0; max-height: 50vh; overflow-y: auto; }
+.lista-proyectos li { display: flex; align-items: center; gap: 4px; border-radius: 8px; }
+.lista-proyectos li:hover { background: var(--fondo); }
+.fila-proyecto {
+  flex: 1; display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: 0; background: transparent;
+  color: var(--tinta); font: inherit; text-align: left; cursor: pointer; border-radius: 8px;
+}
+.fila-proyecto:disabled { cursor: default; }
+.fila-proyecto .inicial {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--sup2); color: var(--tenue);
+  display: grid; place-items: center; font-weight: 500; flex: none;
+}
+.fila-proyecto .datos { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.fila-proyecto .nombre { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fila-proyecto .secundario { font-size: 12px; color: var(--tenue); font-variant-numeric: tabular-nums; }
+.etiqueta-estado {
+  font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 6px;
+  color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, var(--sup));
+}
+[data-tema="oscuro"] .etiqueta-estado { background: color-mix(in srgb, var(--ok) 18%, var(--sup)); }
+.fila-cargando { height: 48px; margin-bottom: 4px; border-radius: 8px; background: linear-gradient(90deg, var(--sup2), var(--sup), var(--sup2)); background-size: 200% 100%; animation: brillo 1.4s ease infinite; }

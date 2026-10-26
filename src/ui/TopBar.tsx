@@ -1,29 +1,26 @@
 import { createEmptyProject } from '../model/defaults';
 import { useEditor } from '../store/editorStore';
-import { askConfirm } from './Dialog';
+import { useSaveStatus } from '../persistence/autosave';
+import { openProjectsDialog } from './ProjectsDialog';
+import { notify } from './toasts';
 import Icon from './Icon';
 import { useTheme } from './theme';
 import { useProjectFile } from './useProjectFile';
 
 export default function TopBar() {
   const name = useEditor((s) => s.project.name);
-  const dirty = useEditor((s) => s.dirty);
   const canUndo = useEditor((s) => s.past.length > 0);
   const canRedo = useEditor((s) => s.future.length > 0);
   const snapping = useEditor((s) => s.snapping);
   const theme = useTheme((s) => s.theme);
-  const { save, open, saving } = useProjectFile();
+  const { save, saving } = useProjectFile();
+  const status = useSaveStatus();
 
-  const onNew = async () => {
-    if (
-      useEditor.getState().dirty &&
-      !(await askConfirm({
-        title: '¿Empezar un proyecto nuevo?',
-        text: 'Hay cambios que no has guardado en un archivo. Si empiezas uno nuevo, este proyecto solo quedará en el guardado automático.',
-        confirmLabel: 'Empezar nuevo',
-      }))
-    ) return;
+  // Nothing is lost: the current project stays in Mis proyectos (autosave).
+  const onNew = () => {
+    const previous = useEditor.getState().project.name;
     useEditor.getState().loadProject(createEmptyProject());
+    notify({ kind: 'ok', text: `«${previous}» quedó guardado en Mis proyectos`, action: { label: 'Ver', run: openProjectsDialog } });
   };
 
   const rename = () => {
@@ -35,7 +32,7 @@ export default function TopBar() {
     <header className="topbar">
       <span className="marca"><Icon name="layers" size={20} />Diseñador de casa</span>
       <button className="btn btn-sec" onClick={onNew}><Icon name="new" size={16} />Nuevo</button>
-      <button className="btn btn-sec" onClick={open} title="Ctrl+O"><Icon name="open" size={16} />Abrir</button>
+      <button className="btn btn-sec" onClick={openProjectsDialog} title="Mis proyectos (Ctrl+O)"><Icon name="open" size={16} />Mis proyectos</button>
       <span className="sep" />
       <button
         className="btn-icono btn"
@@ -65,6 +62,7 @@ export default function TopBar() {
         <Icon name="magnet" size={16} />Ajustar a cuadrícula
       </button>
       <div className="derecha">
+        <SaveStatusChip status={status} />
         <button className="btn btn-icono project-name" style={{ width: 'auto', padding: '0 8px', color: 'var(--tinta)' }} onClick={rename} title="Cambiar nombre">
           {name}
         </button>
@@ -78,9 +76,26 @@ export default function TopBar() {
         </button>
         <button className="btn btn-pri" onClick={save} disabled={saving} title="Ctrl+S">
           <Icon name={saving ? 'redo' : 'save'} size={16} className={saving ? 'girando' : undefined} />
-          {saving ? 'Guardando…' : dirty ? 'Guardar' : 'Guardado'}
+          {saving ? 'Guardando…' : 'Guardar'}
         </button>
       </div>
     </header>
   );
+}
+
+const hhmm = (ms: number) => new Date(ms).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+
+function SaveStatusChip({ status }: { status: ReturnType<typeof useSaveStatus.getState> }) {
+  if (status.state === 'saving') return <span className="estado-guardado" data-testid="estado-guardado">Guardando…</span>;
+  if (status.state === 'error') {
+    return <span className="estado-guardado error" data-testid="estado-guardado"><Icon name="alert" size={14} />No se pudo guardar</span>;
+  }
+  if (status.state === 'saved' && status.at) {
+    return (
+      <span className="estado-guardado" data-testid="estado-guardado" title={status.file ? `También en ${status.file}` : 'En Mis proyectos de este navegador'}>
+        <Icon name="check" size={14} />Guardado {hhmm(status.at)}{status.file ? ` · ${status.file}` : ''}
+      </span>
+    );
+  }
+  return null;
 }

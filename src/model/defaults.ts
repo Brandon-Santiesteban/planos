@@ -25,5 +25,5 @@ export function createFloor(name: string): Floor {
 }
 
 export function createEmptyProject(name = 'Mi casa'): Project {
-  return { version: 1, name, floors: [createFloor('Planta baja')] };
+  return { version: 1, id: newId(), name, floors: [createFloor('Planta baja')] };
 }

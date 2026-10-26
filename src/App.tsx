@@ -1,11 +1,13 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import Plan2D from './editor2d/Plan2D';
-import { loadAutosave, startAutosave } from './persistence/autosave';
+import { library, writeLinkedFile } from './persistence/appLibrary';
+import { startAutosave } from './persistence/autosave';
 import { trackProjectLoads } from './persistence/currentFile';
 import { useEditor } from './store/editorStore';
 import { DialogHost } from './ui/Dialog';
 import FloorsPanel from './ui/FloorsPanel';
 import Icon from './ui/Icon';
+import ProjectsDialog, { openProjectsDialog } from './ui/ProjectsDialog';
 import PropertiesPanel from './ui/PropertiesPanel';
 import Toolbar, { TOOLS } from './ui/Toolbar';
 import { isEditableTarget } from './ui/keys';
@@ -30,11 +32,10 @@ export default function App() {
   useEffect(() => {
     let stop: (() => void) | undefined;
     let cancelled = false;
-    void loadAutosave().then((p) => {
+    void library.last().catch(() => null).then((p) => {
       if (cancelled) return;
-      // Restored work only lives in the browser: keep it marked unsaved so Nuevo/Abrir ask first.
-      if (p) useEditor.getState().loadProject(p, { dirty: true });
-      stop = startAutosave();
+      if (p) useEditor.getState().loadProject(p);
+      stop = startAutosave({ lib: library, writeFile: writeLinkedFile });
     });
     return () => {
       cancelled = true;
@@ -51,7 +52,7 @@ export default function App() {
         if (key === 'z' && !e.shiftKey) s.undo();
         else if (key === 'y' || (key === 'z' && e.shiftKey)) s.redo();
         else if (key === 's') void save();
-        else if (key === 'o') void open();
+        else if (key === 'o') openProjectsDialog();
         else return;
         e.preventDefault();
         return;
@@ -95,6 +96,7 @@ export default function App() {
         <PropertiesPanel />
       </div>
       <ToastHost />
+      <ProjectsDialog onOpenFile={open} />
       <DialogHost />
     </div>
   );

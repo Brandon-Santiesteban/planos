@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { fitOpening, wallLength } from '../geometry/walls';
 import { DEFAULTS } from '../model/defaults';
+import { newId } from '../model/ids';
 import type { Opening, Project } from '../model/types';
 
 const vec = z.object({ x: z.number().finite(), y: z.number().finite() });
@@ -28,7 +29,8 @@ const floor = z
   .refine((f) => f.openings.every((o) => f.walls.some((w) => w.id === o.wallId)), {
     message: 'Hay una puerta o ventana en un muro que no existe',
   });
-const project = z.object({ version: z.literal(1), name: z.string(), floors: z.array(floor).min(1) });
+// Files saved before projects had an id get one when opened.
+const project = z.object({ version: z.literal(1), id: z.string().min(1).optional(), name: z.string(), floors: z.array(floor).min(1) });
 
 const INVALID = 'El archivo no es un proyecto válido';
 
@@ -48,9 +50,10 @@ export function parseProject(text: string): { ok: true; project: Project } | { o
   }
   const r = project.safeParse(data);
   if (!r.success) return { ok: false, error: INVALID };
-  const problem = geometryProblem(r.data as Project);
+  const parsed = { ...r.data, id: r.data.id ?? newId() } as Project;
+  const problem = geometryProblem(parsed);
   if (problem) return { ok: false, error: `${INVALID}: ${problem}` };
-  return { ok: true, project: r.data as Project };
+  return { ok: true, project: parsed };
 }
 
 /** Rejects geometry the editor itself would never produce. Returns a Spanish message or null. */

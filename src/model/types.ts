@@ -53,6 +53,8 @@ export interface Floor {
 
 export interface Project {
   version: 1;
+  /** Stable id used by the saved-projects library. */
+  id: string;
   name: string;
   /** ordered bottom to top */
   floors: Floor[];
