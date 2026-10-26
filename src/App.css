@@ -102,3 +102,10 @@ input.invalid { border-color: var(--danger); background: #fef2f2; }
 .length-input .label, .length-input .unit { color: var(--muted); font-size: 11px; }
 .length-input .value { font-weight: 700; min-width: 2ch; }
 .length-input.invalid { border-color: var(--danger); background: #fef2f2; }
+.field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.field label, .field .label { font-size: 12px; color: var(--muted); }
+.field select { font: inherit; border: 1px solid var(--border); border-radius: 6px; padding: 4px 6px; }
+.with-unit { display: flex; align-items: center; gap: 6px; }
+.with-unit .unit { color: var(--muted); }
+button.danger { color: var(--danger); border-color: #fca5a5; margin-top: 6px; }
+button.danger:hover { background: #fef2f2; border-color: var(--danger); }

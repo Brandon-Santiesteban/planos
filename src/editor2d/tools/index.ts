@@ -1,8 +1,10 @@
 import { DEFAULTS } from '../../model/defaults';
 import type { Vec2 } from '../../model/types';
 import { snapPoint } from '../../geometry/snap';
+import { dist } from '../../geometry/vec';
 import type { EditorState, Tool } from '../../store/editorStore';
 import type { View } from '../viewport';
+import { createSelectTool } from './selectTool';
 import { createWallTool } from './wallTool';
 
 export interface ToolContext {
@@ -36,15 +38,24 @@ export function activeFloor(state: EditorState) {
 }
 
 /** Snaps to wall endpoints of the active floor (and `extra` points), else to the grid; Alt or the toggle disables it. */
-export function snapForTool(p: Vec2, ctx: ToolContext, extra: Vec2[] = []): { point: Vec2; kind: 'endpoint' | 'grid' | 'none' } {
+export function snapForTool(
+  p: Vec2,
+  ctx: ToolContext,
+  extra: Vec2[] = [],
+  exclude?: Vec2,
+): { point: Vec2; kind: 'endpoint' | 'grid' | 'none' } {
   if (!ctx.state.snapping || ctx.altKey) return { point: p, kind: 'none' };
-  const endpoints = activeFloor(ctx.state).walls.flatMap((w) => [w.a, w.b]).concat(extra);
+  const endpoints = activeFloor(ctx.state)
+    .walls.flatMap((w) => [w.a, w.b])
+    .concat(extra)
+    .filter((e) => !exclude || dist(e, exclude) > DEFAULTS.joinTolerance);
   return snapPoint(p, { gridStep: DEFAULTS.gridStep, endpoints, radius: SNAP_RADIUS_PX / ctx.view.pxPerMetre });
 }
 
 const noopTool: ToolHandler = { preview: () => null, reset: () => {} };
 const cache = new Map<Tool, ToolHandler>();
 const factories: Partial<Record<Tool, () => ToolHandler>> = {
+  select: createSelectTool,
   wall: createWallTool,
 };
 

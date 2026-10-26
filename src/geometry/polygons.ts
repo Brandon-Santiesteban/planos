@@ -14,6 +14,16 @@ export function polygonArea(pts: Vec2[]): number {
   return Math.abs(signedArea(pts));
 }
 
+export function pointInPolygon(p: Vec2, pts: Vec2[]): boolean {
+  let inside = false;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const a = pts[i];
+    const b = pts[j];
+    if (a.y > p.y !== b.y > p.y && p.x < ((b.x - a.x) * (p.y - a.y)) / (b.y - a.y) + a.x) inside = !inside;
+  }
+  return inside;
+}
+
 export function polygonCentroid(pts: Vec2[]): Vec2 {
   const area = signedArea(pts);
   if (Math.abs(area) < 1e-12) {
