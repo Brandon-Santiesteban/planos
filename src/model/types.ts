@@ -23,13 +23,16 @@ export interface Opening {
   sill: number;
 }
 
-export type RoomKind = 'room' | 'balcony';
+/** room = interior; balcony = exterior with railing; roof = a covering slab only (e.g. a patio roof). */
+export type RoomKind = 'room' | 'balcony' | 'roof';
 
 export interface Room {
   id: string;
   name: string;
   kind: RoomKind;
   points: Vec2[];
+  /** roof only: height of the slab above this floor (default: the floor height). */
+  height?: number;
 }
 
 export interface Background {

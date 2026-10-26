@@ -27,8 +27,13 @@ export default function RoomsLayer({ floor, selection, pxPerMetre }: { floor: Fl
               points={r.points.map((p) => `${p.x},${p.y}`).join(' ')}
               data-id={r.id}
             />
-            <text className="room-name" x={c.x} y={c.y - font * 0.2} fontSize={font} textAnchor="middle">{r.name}</text>
-            <text className="room-area" x={c.x} y={c.y + font} fontSize={font * 0.85} textAnchor="middle">{areaLabel(r.points, showArea)}</text>
+            {/* A roof is only outlined: its label would sit on top of the room underneath. */}
+            {r.kind !== 'roof' && (
+              <>
+                <text className="room-name" x={c.x} y={c.y - font * 0.2} fontSize={font} textAnchor="middle">{r.name}</text>
+                <text className="room-area" x={c.x} y={c.y + font} fontSize={font * 0.85} textAnchor="middle">{areaLabel(r.points, showArea)}</text>
+              </>
+            )}
           </g>
         );
       })}

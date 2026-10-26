@@ -235,6 +235,11 @@ export function setRoomKind(p: Project, floorId: string, roomId: string, kind: R
   if (r) r.kind = kind;
 }
 
+export function setRoofHeight(p: Project, floorId: string, roomId: string, height: number): void {
+  const r = getFloor(p, floorId).rooms.find((x) => x.id === roomId);
+  if (r && height > 0) r.height = height;
+}
+
 export function deleteRoom(p: Project, floorId: string, roomId: string): void {
   const f = getFloor(p, floorId);
   f.rooms = f.rooms.filter((r) => r.id !== roomId);

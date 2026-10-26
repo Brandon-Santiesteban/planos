@@ -85,3 +85,14 @@ test('a room can be renamed and turned into a balcony', () => {
   expect(room().kind).toBe('balcony');
   expect(screen.getByText('6,00 m²')).toBeInTheDocument();
 });
+
+test('a room can become a roof with its own height', () => {
+  s().apply((d) => void addRoom(d, d.floors[0].id, [{ x: 0, y: 0 }, { x: 4, y: 0 }, { x: 4, y: 3 }], 'Techo patio'));
+  const room = () => s().project.floors[0].rooms[0];
+  s().select({ kind: 'room', id: room().id });
+  render(<PropertiesPanel />);
+  fireEvent.click(screen.getByRole('radio', { name: 'Cubierta' }));
+  expect(room().kind).toBe('roof');
+  typeInto('Altura de la cubierta', '3,1');
+  expect(room().height).toBeCloseTo(3.1);
+});

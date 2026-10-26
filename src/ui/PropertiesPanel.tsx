@@ -1,7 +1,7 @@
 import { polygonArea } from '../geometry/polygons';
 import { wallLength } from '../geometry/walls';
 import {
-  deleteOpening, deleteRoom, deleteWall, renameRoom, setRoomKind, setWallLength, updateOpening, updateWall,
+  deleteOpening, deleteRoom, deleteWall, renameRoom, setRoofHeight, setRoomKind, setWallLength, updateOpening, updateWall,
 } from '../model/ops';
 import type { Floor, Project, RoomKind } from '../model/types';
 import { formatArea } from '../model/units';
@@ -79,22 +79,30 @@ function RoomProps({ floor, id }: { floor: Floor; id: string }) {
   if (!r) return null;
   return (
     <>
-      <h2>{r.kind === 'balcony' ? 'Balcón' : 'Habitación'}</h2>
+      <h2>{r.kind === 'balcony' ? 'Balcón' : r.kind === 'roof' ? 'Cubierta' : 'Habitación'}</h2>
       <TextField label="Nombre" value={r.name} onCommit={(v) => edit((d, f) => renameRoom(d, f, id, v))} />
       <div className="field">
         <span className="label">Tipo</span>
         <SegmentedSwitch<RoomKind>
           label="Tipo"
           value={r.kind}
-          options={[{ value: 'room', label: 'Habitación' }, { value: 'balcony', label: 'Balcón' }]}
+          options={[{ value: 'room', label: 'Habitación' }, { value: 'balcony', label: 'Balcón' }, { value: 'roof', label: 'Cubierta' }]}
           onChange={(k) => edit((d, f) => setRoomKind(d, f, id, k))}
         />
       </div>
+      {r.kind === 'roof' && (
+        <LengthField
+          label="Altura de la cubierta"
+          value={r.height ?? floor.height}
+          help="Desde el piso. Si queda por encima de los muros, entre ellos y el techo queda un espacio abierto."
+          onCommit={(v) => edit((d, f) => setRoofHeight(d, f, id, v!))}
+        />
+      )}
       <div className="field">
         <span className="etiqueta-tarjeta" style={{ margin: 0 }}>Área</span>
         <span className="valor-fijo">{formatArea(polygonArea(r.points))}</span>
       </div>
-      <DeleteButton onClick={() => remove(r.kind === 'balcony' ? 'Balcón eliminado' : 'Habitación eliminada', (d, f) => deleteRoom(d, f, id))} />
+      <DeleteButton onClick={() => remove(r.kind === 'balcony' ? 'Balcón eliminado' : r.kind === 'roof' ? 'Cubierta eliminada' : 'Habitación eliminada', (d, f) => deleteRoom(d, f, id))} />
     </>
   );
 }

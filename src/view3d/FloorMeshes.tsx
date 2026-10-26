@@ -82,12 +82,20 @@ function Railing({ a, b }: { a: Vec2; b: Vec2 }) {
   );
 }
 
-function RoomSlab({ room, walls, selected }: { room: Room; walls: Wall[]; selected: boolean }) {
+function RoomSlab({ room, walls, selected, floorHeight }: { room: Room; walls: Wall[]; selected: boolean; floorHeight: number }) {
   const pal = usePalette();
   const geometry = useMemo(() => {
     const shape = new THREE.Shape(room.points.map((p) => new THREE.Vector2(p.x, p.y)));
-    return new THREE.ExtrudeGeometry(shape, { depth: 0.02, bevelEnabled: false });
-  }, [room.points]);
+    return new THREE.ExtrudeGeometry(shape, { depth: room.kind === 'roof' ? 0.06 : 0.02, bevelEnabled: false });
+  }, [room.points, room.kind]);
+  if (room.kind === 'roof') {
+    // A covering only: a thin light sheet at its own height, slightly see-through.
+    return (
+      <mesh geometry={geometry} rotation={[Math.PI / 2, 0, 0]} position={[0, (room.height ?? floorHeight) + 0.06, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color={selected ? pal.selected : '#e8ebef'} roughness={0.6} transparent opacity={0.85} side={THREE.DoubleSide} />
+      </mesh>
+    );
+  }
   const color = selected ? pal.selected : room.kind === 'balcony' ? pal.balcony : pal.room;
   const edges: [Vec2, Vec2][] = room.points.map((p, i) => [p, room.points[(i + 1) % room.points.length]]);
   return (
@@ -105,7 +113,7 @@ function RoomSlab({ room, walls, selected }: { room: Room; walls: Wall[]; select
 export default function FloorMeshes({ floor, elevation, selectedId }: { floor: Floor; elevation: number; selectedId: string | null }) {
   return (
     <group position={[0, elevation, 0]}>
-      {floor.rooms.map((r) => <RoomSlab key={r.id} room={r} walls={floor.walls} selected={r.id === selectedId} />)}
+      {floor.rooms.map((r) => <RoomSlab key={r.id} room={r} walls={floor.walls} selected={r.id === selectedId} floorHeight={floor.height} />)}
       {floor.walls.map((w) => <WallMesh key={w.id} wall={w} floor={floor} selected={w.id === selectedId} />)}
     </group>
   );

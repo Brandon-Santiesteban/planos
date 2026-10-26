@@ -15,7 +15,7 @@ const opening = z.object({
   offset: z.number().finite(), width: positive, height: positive, sill: z.number().finite().min(0),
 });
 const room = z.object({
-  id: z.string(), name: z.string(), kind: z.enum(['room', 'balcony']), points: z.array(vec).min(3),
+  id: z.string(), name: z.string(), kind: z.enum(['room', 'balcony', 'roof']), points: z.array(vec).min(3), height: positive.optional(),
 });
 const background = z.object({
   dataUrl: z.string().startsWith('data:'), origin: vec, metresPerPixel: positive,

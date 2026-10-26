@@ -79,3 +79,10 @@ test('rejects a project without floors', () => {
   const p = { ...sampleProject(), floors: [] };
   expect(parseProject(JSON.stringify(p)).ok).toBe(false);
 });
+
+test('a roof keeps its own height', () => {
+  const p = sampleProject();
+  p.floors[0].rooms[0] = { ...p.floors[0].rooms[0], kind: 'roof', height: 3.1 };
+  const r = parseProject(serializeProject(p));
+  expect(r.ok && r.project.floors[0].rooms[0]).toMatchObject({ kind: 'roof', height: 3.1 });
+});

@@ -7,6 +7,10 @@ import type { Project } from '../model/types';
 import { useEditor } from '../store/editorStore';
 import FloorMeshes from './FloorMeshes';
 import { usePalette } from './palette';
+import { outdoorLights, roomLights } from './roomLights';
+import { type TimeOfDay, useSceneOptions } from './sceneOptions';
+import SegmentedSwitch from '../ui/SegmentedSwitch';
+import { Ground, OutdoorLights, RoomLights, SkyLights, skyColor } from './Surroundings';
 
 function bounds(p: Project) {
   const pts = p.floors.flatMap((f) => [...f.walls.flatMap((w) => [w.a, w.b]), ...f.rooms.flatMap((r) => r.points)]);
@@ -39,6 +43,12 @@ export default function Scene3D() {
   const showUpperFloors = useEditor((s) => s.showUpperFloors);
   const activeIndex = Math.max(0, project.floors.findIndex((f) => f.id === activeFloorId));
   const visible = project.floors.filter((_, i) => i <= activeIndex || showUpperFloors);
+  const { grass, time } = useSceneOptions();
+  const visibleIds = visible.map((f) => f.id).join();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const lights = useMemo(() => roomLights(project, visible.map((f) => f.id)), [project, visibleIds]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const outside = useMemo(() => outdoorLights(project, visible.map((f) => f.id)), [project, visibleIds]);
 
   // Framing is computed once per loaded project so editing doesn't move the camera.
   const loadCount = useEditor((s) => s.loadCount);
@@ -49,23 +59,12 @@ export default function Scene3D() {
   return (
     <div className="scene3d" data-testid="scene3d">
       <Canvas shadows camera={{ fov: 60, near: 0.05, far: 500, position: [frame.cx + frame.size, frame.size, frame.cy + frame.size * 1.2] }}>
-        <color attach="background" args={[pal.sky]} />
-        <hemisphereLight args={['#ffffff', '#b9a98f', 0.9]} />
-        <directionalLight
-          position={[frame.cx + 8, 15, frame.cy + 6]}
-          intensity={1.6}
-          castShadow
-          shadow-mapSize={[2048, 2048]}
-          shadow-camera-left={-20}
-          shadow-camera-right={20}
-          shadow-camera-top={20}
-          shadow-camera-bottom={-20}
-        />
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[frame.cx, -0.03, frame.cy]} receiveShadow>
-          <planeGeometry args={[200, 200]} />
-          <meshStandardMaterial color={pal.floor} />
-        </mesh>
-        <gridHelper key={pal.line} args={[60, 60, pal.line, pal.line]} position={[frame.cx, -0.025, frame.cy]} />
+        <color attach="background" args={[skyColor(time, pal.sky)]} />
+        <SkyLights time={time} north={project.north} cx={frame.cx} cz={frame.cy} />
+        <Ground grass={grass} color={pal.floor} cx={frame.cx} cz={frame.cy} />
+        {!grass && <gridHelper key={pal.line} args={[60, 60, pal.line, pal.line]} position={[frame.cx, -0.025, frame.cy]} />}
+        <RoomLights lights={lights} time={time} />
+        <OutdoorLights lights={outside} time={time} />
         {visible.map((f) => (
           <FloorMeshes key={f.id} floor={f} elevation={floorElevation(project, f.id)} selectedId={selection?.id ?? null} />
         ))}
@@ -79,10 +78,22 @@ export default function Scene3D() {
         />
         <CameraRig frame={frame} />
       </Canvas>
-      <label className="scene-toggle">
-        <input type="checkbox" checked={showUpperFloors} onChange={(e) => useEditor.getState().setShowUpperFloors(e.target.checked)} />
-        Mostrar plantas superiores
-      </label>
+      <div className="scene-toggle">
+        <label>
+          <input type="checkbox" checked={showUpperFloors} onChange={(e) => useEditor.getState().setShowUpperFloors(e.target.checked)} />
+          Plantas superiores
+        </label>
+        <label>
+          <input type="checkbox" checked={grass} onChange={(e) => useSceneOptions.getState().set({ grass: e.target.checked })} />
+          Césped
+        </label>
+        <SegmentedSwitch<TimeOfDay>
+          label="Hora del día"
+          value={time}
+          options={[{ value: 'manana', label: 'Mañana' }, { value: 'tarde', label: 'Tarde' }, { value: 'noche', label: 'Noche' }]}
+          onChange={(t) => useSceneOptions.getState().set({ time: t })}
+        />
+      </div>
     </div>
   );
 }
