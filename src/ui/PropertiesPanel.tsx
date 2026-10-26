@@ -1,5 +1,6 @@
 import { polygonArea } from '../geometry/polygons';
 import { wallLength } from '../geometry/walls';
+import { RoomMaterials, WallFinishes } from '../materials/MaterialPanels';
 import {
   deleteOpening, deleteRoom, deleteWall, renameRoom, setRoofHeight, setRoomKind, setWallLength, updateOpening, updateWall,
 } from '../model/ops';
@@ -52,6 +53,7 @@ function WallProps({ floor, id }: { floor: Floor; id: string }) {
         help="Déjalo vacío para usar la altura de la planta."
         onCommit={(v) => edit((d, f) => void updateWall(d, f, id, { height: v }))}
       />
+      <WallFinishes floor={floor} wall={w} />
       <DeleteButton onClick={() => remove('Muro eliminado', (d, f) => deleteWall(d, f, id))} />
     </>
   );
@@ -98,6 +100,7 @@ function RoomProps({ floor, id }: { floor: Floor; id: string }) {
           onCommit={(v) => edit((d, f) => setRoofHeight(d, f, id, v!))}
         />
       )}
+      <RoomMaterials room={r} />
       <div className="field">
         <span className="etiqueta-tarjeta" style={{ margin: 0 }}>Área</span>
         <span className="valor-fijo">{formatArea(polygonArea(r.points))}</span>

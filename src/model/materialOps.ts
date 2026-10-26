@@ -52,3 +52,12 @@ export function setRailing(p: Project, floorId: string, roomId: string, railing:
   const r = roomOf(p, floorId, roomId);
   if (r) r.railing = railing;
 }
+
+/** Colour of a balcony's celosía slats / parapet / glass railing metal. Refuses (false) an invalid colour. */
+export function setRailingColor(p: Project, floorId: string, roomId: string, color: string): boolean {
+  const r = roomOf(p, floorId, roomId);
+  const c = normalizeHex(color);
+  if (!r || !c) return false;
+  r.railingColor = c;
+  return true;
+}

@@ -1,5 +1,5 @@
 import { createEmptyProject } from './defaults';
-import { applySideToFacade, setFloorMaterial, setRailing, setWallSide } from './materialOps';
+import { applySideToFacade, setFloorMaterial, setRailing, setRailingColor, setWallSide } from './materialOps';
 import { addRoom, addWall } from './ops';
 import type { Project } from './types';
 
@@ -49,4 +49,12 @@ test('applySideToFacade sets every outside face of the floor and leaves inside f
     expect(w.sides?.right).toEqual({ finish: 'piedra', color: '#D8C7A6' });
     expect(w.sides?.left).toBeUndefined();
   }
+});
+
+test('setRailingColor normalises the colour and refuses an invalid one', () => {
+  const r = addRoom(p, f, [{ x: 0, y: 0 }, { x: 3, y: 0 }, { x: 3, y: 3 }], 'Balcón')!;
+  expect(setRailingColor(p, f, r, '1e1e1e')).toBe(true);
+  expect(floor().rooms[0].railingColor).toBe('#1E1E1E');
+  expect(setRailingColor(p, f, r, 'negro')).toBe(false);
+  expect(floor().rooms[0].railingColor).toBe('#1E1E1E');
 });

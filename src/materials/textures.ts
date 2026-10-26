@@ -56,7 +56,7 @@ function stones(g: Ctx, W: number, H: number, rnd: () => number, wrap: (d: () =>
       const k = 6 + Math.floor(rnd() * 3);
       const pts = Array.from({ length: k }, (_, m) => {
         const a = (m / k) * Math.PI * 2 + rnd() * 0.4;
-        const r = 0.44 + rnd() * 0.1;
+        const r = 0.5 + rnd() * 0.12;
         return [cx + Math.cos(a) * cw * r, cy + Math.sin(a) * ch * r] as const;
       });
       const tone = pick(rnd, tones);
@@ -127,7 +127,7 @@ const WALL: Record<Exclude<WallFinish, 'pintura'>, Painter> = {
 const FLOOR: Record<FloorMaterial, Painter> = {
   ceramica: (g, W, H, rnd) => tiles(g, W, H, rnd, 2, 2, '#B9AE9F', 0.004, ['#D9CFC1', '#D4C9BA', '#DDD3C6'], 5000),
   // Matte 60 × 60 cm tiles: almost uniform with a soft mottle and thin joints.
-  porcelanato: (g, W, H, rnd) => tiles(g, W, H, rnd, 2, 2, '#BDB7AD', 0.0025, ['#E2DDD4', '#E0DBD1', '#E4DFD7'], 6000),
+  porcelanato: (g, W, H, rnd) => tiles(g, W, H, rnd, 2, 2, '#BDB7AD', 0.0025, ['#E2DDD4', '#E1DCD3'], 6000),
   madera: (g, W, _H, rnd, wrap) => {
     const tones = ['#A87A4F', '#9C6E45', '#B38459', '#A0734A', '#AE7F51'];
     const ph = 0.15;
