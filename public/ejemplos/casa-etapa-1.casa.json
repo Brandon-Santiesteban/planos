@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "id": "67f775cf-8a1b-4e43-8c02-7dec6c3d2cbd",
+  "id": "6fb07d53-d72a-499d-86cd-1f96f53bceb6",
   "name": "Casa etapa 1",
   "north": 0,
   "floors": [
@@ -16,11 +16,43 @@
             "y": 9
           },
           "b": {
+            "x": 3.3,
+            "y": 9
+          },
+          "thickness": 0.2,
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "madera"
+            }
+          }
+        },
+        {
+          "id": "d4abccd2-2dc6-4970-8f8c-9a820ff8e28d",
+          "a": {
+            "x": 3.3,
+            "y": 9
+          },
+          "b": {
             "x": 0,
             "y": 9
           },
           "thickness": 0.2,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#E4D9C6"
+            }
+          }
         },
         {
           "id": "fecbcdd5-4416-4d51-855e-65e39b338db3",
@@ -33,7 +65,17 @@
             "y": 9
           },
           "thickness": 0.2,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#C8CBCE"
+            }
+          }
         },
         {
           "id": "a909a0dc-1f4d-4d9a-9f4c-1eb1a212becf",
@@ -46,7 +88,17 @@
             "y": 0
           },
           "thickness": 0.2,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#E4D9C6"
+            }
+          }
         },
         {
           "id": "54e02a15-e1db-4dbe-8515-d6b3ead2b1c8",
@@ -59,7 +111,17 @@
             "y": 0
           },
           "thickness": 0.2,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#C8CBCE"
+            }
+          }
         },
         {
           "id": "1f171d96-62e8-4a90-a91e-038108d182f2",
@@ -72,7 +134,17 @@
             "y": 9
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         },
         {
           "id": "fd4a9433-b51a-4b6b-be0e-54688e3bd12a",
@@ -85,7 +157,17 @@
             "y": 4
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         },
         {
           "id": "a1fa1ecb-94af-47ea-8506-8581de32c096",
@@ -98,7 +180,17 @@
             "y": 0
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#C8CBCE"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         },
         {
           "id": "351f0f83-c115-4b71-a49d-f94a61794df9",
@@ -111,7 +203,17 @@
             "y": 0
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#C8CBCE"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#C8CBCE"
+            }
+          }
         },
         {
           "id": "5137e1ef-4bdb-4fda-8483-bfb33be04b5c",
@@ -124,7 +226,17 @@
             "y": 0
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#E4D9C6"
+            }
+          }
         },
         {
           "id": "70f668cd-5327-4250-bcac-9c362673797a",
@@ -137,7 +249,17 @@
             "y": -3
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         },
         {
           "id": "37a5fff0-01ee-4f95-9632-3db64f650b31",
@@ -150,7 +272,17 @@
             "y": -3
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#E4D9C6"
+            }
+          }
         },
         {
           "id": "47502119-31f3-46d3-a96e-9b775da9a9cb",
@@ -163,7 +295,17 @@
             "y": -3
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#E4D9C6"
+            }
+          }
         },
         {
           "id": "431ce661-dd36-492d-acee-2830958bcd0a",
@@ -176,7 +318,17 @@
             "y": -6
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         },
         {
           "id": "15ff0be4-b142-43d0-a572-3cf71fc2dcf7",
@@ -189,7 +341,17 @@
             "y": -6
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#C8CBCE"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         },
         {
           "id": "649b15ee-746e-4c78-8b56-05f56001fd2e",
@@ -202,7 +364,17 @@
             "y": -6
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#C8CBCE"
+            }
+          }
         },
         {
           "id": "325c09b4-bfe8-44c2-9f13-abd5147a908e",
@@ -215,7 +387,17 @@
             "y": -11
           },
           "thickness": 0.2,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#E4D9C6"
+            }
+          }
         },
         {
           "id": "85918677-8246-4cb6-9cbe-ab899aa5112e",
@@ -228,7 +410,17 @@
             "y": -7
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         },
         {
           "id": "7baaa0a2-bf06-486b-917c-64973cacd9db",
@@ -241,16 +433,26 @@
             "y": -9
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         }
       ],
       "furniture": [],
       "openings": [
         {
           "id": "bd9322e7-0c2d-4d9b-82c7-a4b776495559",
-          "wallId": "fdeecc6d-3f50-462b-bce0-ac5ebb42b57b",
+          "wallId": "d4abccd2-2dc6-4970-8f8c-9a820ff8e28d",
           "kind": "door",
-          "offset": 3.85,
+          "offset": 1.65,
           "width": 2.6,
           "height": 2.1,
           "sill": 0
@@ -341,7 +543,8 @@
               "x": 0,
               "y": 4
             }
-          ]
+          ],
+          "floorMaterial": "concreto"
         },
         {
           "id": "6a4e92a8-bd9e-43cf-aeda-923f83d6f493",
@@ -389,7 +592,8 @@
               "x": 3.3,
               "y": 4
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "bf385bec-979f-4a12-a9fb-8e0051a24618",
@@ -412,7 +616,8 @@
               "x": 0,
               "y": 0
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "e4846943-4b5b-4f74-bbab-de095a8f2da6",
@@ -435,7 +640,8 @@
               "x": 2,
               "y": 2
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "e4d29e52-3584-444f-8a02-25f1fcf741d6",
@@ -458,7 +664,8 @@
               "x": 2,
               "y": 0
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "1ead07cc-e8cb-40b1-8150-754946a14c0d",
@@ -482,7 +689,9 @@
               "y": 9
             }
           ],
-          "railing": "celosia"
+          "railing": "celosia",
+          "floorMaterial": "cesped",
+          "railingColor": "#1E1E1E"
         },
         {
           "id": "36ad0c1e-4091-4f95-94bc-bd504c212cd2",
@@ -506,7 +715,9 @@
               "y": 9
             }
           ],
-          "railing": "celosia"
+          "railing": "celosia",
+          "floorMaterial": "concreto",
+          "railingColor": "#1E1E1E"
         },
         {
           "id": "034635fb-9865-4aa8-b199-b31bf3110e24",
@@ -529,7 +740,8 @@
               "x": 0,
               "y": -3
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "1fc34445-4728-43e5-abb1-e3855b00e5ff",
@@ -552,7 +764,8 @@
               "x": 0,
               "y": -6
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "b22ffda8-8d16-4e0b-965a-12a34e6dc5d0",
@@ -583,7 +796,8 @@
               "x": 3,
               "y": -3
             }
-          ]
+          ],
+          "floorMaterial": "piedra"
         },
         {
           "id": "9489d65b-ee4c-4bca-88ae-7f2e8d74540f",
@@ -710,7 +924,8 @@
               "x": 0,
               "y": -7
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "97c98006-02a0-4ea6-a3e3-b1fa9e52397e",
@@ -733,7 +948,8 @@
               "x": 0,
               "y": -9
             }
-          ]
+          ],
+          "floorMaterial": "ceramica"
         },
         {
           "id": "af463fde-5084-4dea-a3ab-862ce346b49f",
@@ -756,7 +972,8 @@
               "x": 0,
               "y": -11
             }
-          ]
+          ],
+          "floorMaterial": "ceramica"
         },
         {
           "id": "6b6ee476-e798-4c91-9183-bdf804460590",
@@ -779,7 +996,8 @@
               "x": 2,
               "y": -11
             }
-          ]
+          ],
+          "floorMaterial": "concreto"
         },
         {
           "id": "ad96194b-6870-43f3-85e5-983ec9b688e9",
@@ -802,7 +1020,8 @@
               "x": 4.5,
               "y": -11
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         }
       ],
       "background": null
@@ -819,11 +1038,43 @@
             "y": 9
           },
           "b": {
+            "x": 3.3,
+            "y": 9
+          },
+          "thickness": 0.2,
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "madera"
+            }
+          }
+        },
+        {
+          "id": "17a017ca-6070-4d1d-a6d1-d7205ece4401",
+          "a": {
+            "x": 3.3,
+            "y": 9
+          },
+          "b": {
             "x": 0,
             "y": 9
           },
           "thickness": 0.2,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#E4D9C6"
+            }
+          }
         },
         {
           "id": "c958df27-3ee8-469e-9ada-d9b2ed1604ec",
@@ -836,7 +1087,17 @@
             "y": 9
           },
           "thickness": 0.2,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#C8CBCE"
+            }
+          }
         },
         {
           "id": "dcaf7e0f-8301-437d-ad55-267932f1b371",
@@ -849,7 +1110,17 @@
             "y": 0
           },
           "thickness": 0.2,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#E4D9C6"
+            }
+          }
         },
         {
           "id": "36e9278e-8ff3-4ab8-91c4-fcb2805a0482",
@@ -862,7 +1133,17 @@
             "y": 0
           },
           "thickness": 0.2,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#C8CBCE"
+            }
+          }
         },
         {
           "id": "f6cfb557-e20a-4db7-90ab-164b0a9a78da",
@@ -875,7 +1156,17 @@
             "y": 9
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         },
         {
           "id": "34730f7e-53af-4234-8ab8-7e44c3ca1309",
@@ -888,7 +1179,17 @@
             "y": 4.8
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         },
         {
           "id": "68468fe7-730e-4a7e-b1ff-18df199e4953",
@@ -901,7 +1202,17 @@
             "y": 4.8
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         },
         {
           "id": "4311f9e6-e30b-4dc4-865c-cbcc7582f2ce",
@@ -914,7 +1225,17 @@
             "y": 2.8
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         },
         {
           "id": "6e50c658-836a-46ac-92d6-9e4367782e66",
@@ -927,7 +1248,17 @@
             "y": 2.6
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         },
         {
           "id": "c5054e47-b164-4967-afbb-8dafc7ccce36",
@@ -940,7 +1271,17 @@
             "y": -7
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#E4D9C6"
+            }
+          }
         },
         {
           "id": "df09d55c-b417-46a3-b7e1-74b0ed684d86",
@@ -953,7 +1294,17 @@
             "y": -7
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#C8CBCE"
+            }
+          }
         },
         {
           "id": "f84ba9cf-3d18-4f9e-b474-38c8f4556dd7",
@@ -966,7 +1317,17 @@
             "y": -11
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#E4D9C6"
+            }
+          }
         },
         {
           "id": "f9643853-3788-4e37-a296-73640f31402d",
@@ -979,16 +1340,26 @@
             "y": -11
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#C8CBCE"
+            }
+          }
         }
       ],
       "furniture": [],
       "openings": [
         {
           "id": "1a8183b3-28fe-4469-a16e-ffbd5565ae2c",
-          "wallId": "41867aeb-fdcb-4372-ad46-99f6bc773738",
+          "wallId": "17a017ca-6070-4d1d-a6d1-d7205ece4401",
           "kind": "door",
-          "offset": 3.85,
+          "offset": 1.65,
           "width": 1.6,
           "height": 2.1,
           "sill": 0
@@ -1088,7 +1459,8 @@
               "x": 0,
               "y": 4.8
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "02bae7c3-705d-486d-8203-1065ba811239",
@@ -1136,7 +1508,8 @@
               "x": 3.3,
               "y": 4.8
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "462b538e-1eb4-45f9-9fd8-82751bcb8514",
@@ -1159,7 +1532,8 @@
               "x": 0,
               "y": 2.8
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "bfb6fceb-254a-43de-aa1c-8770f860f9f4",
@@ -1182,7 +1556,8 @@
               "x": 0,
               "y": 0
             }
-          ]
+          ],
+          "floorMaterial": "ceramica"
         },
         {
           "id": "22356c8d-082a-47e4-9b71-d9f14ee80c1a",
@@ -1205,7 +1580,8 @@
               "x": 2.6,
               "y": 2.6
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "746c02c7-09d5-4691-ba68-51b7425d5f6d",
@@ -1228,7 +1604,8 @@
               "x": 2.6,
               "y": 0
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "6aaaab42-94a6-4701-9e47-d60e43397ace",
@@ -1251,7 +1628,8 @@
               "x": 0,
               "y": -11
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "910b419c-76c1-4a82-9b25-36581d48206a",
@@ -1274,7 +1652,8 @@
               "x": 4.5,
               "y": -11
             }
-          ]
+          ],
+          "floorMaterial": "porcelanato"
         },
         {
           "id": "9857d091-42aa-40b2-94bf-97bc4b30a2ca",
@@ -1297,7 +1676,9 @@
               "x": 0.2,
               "y": 9
             }
-          ]
+          ],
+          "railing": "muro",
+          "railingColor": "#E4D9C6"
         }
       ],
       "background": null
@@ -1318,7 +1699,17 @@
             "y": 9
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#E4D9C6"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         },
         {
           "id": "a79ed999-38d8-4b06-be15-d9892d8d1da2",
@@ -1331,7 +1722,17 @@
             "y": 6
           },
           "thickness": 0.15,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#E4D9C6"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            }
+          }
         },
         {
           "id": "3af7edfd-3571-4bc4-8347-64e598dbd9df",
@@ -1344,7 +1745,16 @@
             "y": 9
           },
           "thickness": 0.2,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "madera"
+            }
+          }
         },
         {
           "id": "50111647-4296-4f7b-99c0-ea8f9cdde5f8",
@@ -1357,7 +1767,17 @@
             "y": 9
           },
           "thickness": 0.2,
-          "height": null
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#EDE4D3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#C8CBCE"
+            }
+          }
         }
       ],
       "furniture": [],
@@ -1394,7 +1814,9 @@
               "x": 0,
               "y": 0
             }
-          ]
+          ],
+          "railing": "muro",
+          "railingColor": "#E4D9C6"
         },
         {
           "id": "73182538-0415-40b0-aa5e-df4bf027f64b",
