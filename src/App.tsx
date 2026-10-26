@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import Plan2D from './editor2d/Plan2D';
+import { loadAutosave, startAutosave } from './persistence/autosave';
 import { useEditor } from './store/editorStore';
 import FloorsPanel from './ui/FloorsPanel';
 import PropertiesPanel from './ui/PropertiesPanel';
@@ -19,6 +20,21 @@ function isTyping(e: KeyboardEvent): boolean {
 export default function App() {
   const [layout, setLayout] = useState<Layout>('split');
   const { save, open } = useProjectFile();
+
+  // Restore the last autosaved project, then keep autosaving.
+  useEffect(() => {
+    let stop: (() => void) | undefined;
+    let cancelled = false;
+    void loadAutosave().then((p) => {
+      if (cancelled) return;
+      if (p) useEditor.getState().loadProject(p);
+      stop = startAutosave();
+    });
+    return () => {
+      cancelled = true;
+      stop?.();
+    };
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
