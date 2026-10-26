@@ -175,9 +175,10 @@ describe('COTAS', () => {
   });
 
   test('labels stay upright on walls drawn right-to-left or bottom-to-top', () => {
-    const d = buildDrawing(floor({ walls: [w('1', 4, 0, 0, 0), w('2', 0, 3, 0, 0)] }));
-    const angles = of(d.prims, 'COTAS', 'text').map((t) => t.angle);
-    for (const a of angles) expect(a > -90 - 1e-9 && a <= 90 + 1e-9).toBe(true);
+    const d = buildDrawing(floor({ walls: [w('1', 4, 0, 0, 0), w('2', 0, 3, 0, 0), w('3', 5, 0, 5, 3)] }));
+    const angles = of(d.prims, 'COTAS', 'text').map((t) => Math.round(t.angle));
+    // horizontal reads left to right; vertical reads bottom to top (from the right of the sheet), as in architecture
+    expect(angles).toEqual([0, -90, -90]);
   });
 });
 

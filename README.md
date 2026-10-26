@@ -22,6 +22,14 @@ Haz doble clic en **`iniciar.bat`**. La primera vez instala lo necesario (tarda 
 - **Guardar**: crea un archivo `.casa.json` en tu PC. Después de guardarlo (o abrirlo) una vez, ese archivo se actualiza solo con cada cambio.
 - **Modo oscuro**: botón de la luna arriba a la derecha.
 
+## Exportar planos
+
+Botón **Exportar** en la barra de arriba. Eliges la planta (la actual o todas) y el formato, y pulsas **Descargar**. El archivo se llama `<proyecto> - <planta>` (o `Todas las plantas`).
+
+- **PDF a escala**: una hoja A3 por planta, a 1:50; si la planta no cabe, a 1:100 (o 1:200). La hoja se pone horizontal o vertical según lo que quepa mejor. Lleva muros rellenos, puertas con su barrido, ventanas, habitaciones con su nombre y área, muebles, la cota de cada muro, la flecha del norte, una escala gráfica en metros y un cajetín con proyecto, planta, escala y fecha. Imprime en A3 al 100 % (sin «ajustar a la página») para que la escala sea real.
+- **DXF para arquitecto**: un archivo DXF (R12, se abre en AutoCAD, BricsCAD, LibreCAD…) en metros, con una capa por tipo: MUROS, HUECOS, HABITACIONES, MUEBLES, COTAS y TEXTOS. Con *Todas*, las plantas van una al lado de otra con su nombre encima, en un solo archivo.
+- Las plantas vacías no se exportan.
+
 ## Ejemplos
 
 Abre un ejemplo directamente con su enlace (la primera vez se carga el ejemplo; después, tu copia con tus cambios):

@@ -13,7 +13,7 @@ export interface Poly { type: 'poly'; layer: Layer; points: Vec2[]; closed: bool
 export interface Line { type: 'line'; layer: Layer; a: Vec2; b: Vec2 }
 /** Swept from `start` to `end` (degrees, start < end) with angles measured like atan2 in plan coordinates. */
 export interface Arc { type: 'arc'; layer: Layer; center: Vec2; radius: number; start: number; end: number }
-/** Centred on `at`. `angle` in degrees as atan2 in plan coordinates, always kept upright (−90, 90]. */
+/** Centred on `at`. `angle` in degrees as atan2 in plan coordinates, kept readable: [−90, 90). */
 export interface Text { type: 'text'; layer: Layer; at: Vec2; text: string; height: number; angle: number }
 export type Prim = Poly | Line | Arc | Text;
 
@@ -33,10 +33,11 @@ const TREAD = 0.28;
 
 const deg = (v: Vec2) => (Math.atan2(v.y, v.x) * 180) / Math.PI;
 
+/** Keeps text readable from the bottom or the right of the sheet: angle in [−90, 90). */
 function upright(angle: number): number {
   let a = angle;
-  while (a > 90 + 1e-9) a -= 180;
-  while (a <= -90 + 1e-9) a += 180;
+  while (a >= 90 - 1e-9) a -= 180;
+  while (a < -90 - 1e-9) a += 180;
   return a;
 }
 

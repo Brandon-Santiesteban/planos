@@ -1,3 +1,4 @@
+import ExportButton from '../export/ExportDialog';
 import { createEmptyProject } from '../model/defaults';
 import { useEditor } from '../store/editorStore';
 import { useSaveStatus } from '../persistence/autosave';
@@ -33,6 +34,7 @@ export default function TopBar() {
       <span className="marca"><Icon name="layers" size={20} />Diseñador de casa</span>
       <button className="btn btn-sec" onClick={onNew}><Icon name="new" size={16} />Nuevo</button>
       <button className="btn btn-sec" onClick={openProjectsDialog} title="Mis proyectos (Ctrl+O)"><Icon name="open" size={16} />Mis proyectos</button>
+      <ExportButton />
       <span className="sep" />
       <button
         className="btn-icono btn"

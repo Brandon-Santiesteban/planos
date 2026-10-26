@@ -187,7 +187,8 @@ export function exportPdf(project: Project, floors: Floor[], opts: PdfOptions = 
     if (!d.bounds) centredText(doc, 'Esta planta todavía no tiene nada dibujado', { x: l.paper.w / 2, y: l.paper.h / 2 }, 3);
     const bandY = l.paper.h - MARGIN - BAND;
     scaleBar(doc, MARGIN + 4, bandY + 16, l.scale);
-    const arrow = northArrow({ x: MARGIN + 4 + 125, y: bandY + BAND / 2 + 2 }, 16, project.north);
+    // north arrow just left of the title block (the scale bar is 100 mm, so it always fits in between)
+    const arrow = northArrow({ x: l.titleBlock.x - 14, y: bandY + BAND / 2 + 2 }, 16, project.north);
     drawPrims(doc, arrow, (p) => p, 1);
     titleBlock(doc, l, project, floor, i + 1, floors.length, date);
   });
