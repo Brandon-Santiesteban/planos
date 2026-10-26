@@ -43,8 +43,8 @@ const PLACED = [
   ['arbol-guayacan', -5.5, yTrees], ['arbol-guayacan', 2.75, yTrees], ['arbol-guayacan', 11, yTrees],
   ['arbol-pequeno', -1.4, yTrees + 0.3], ['arbol-pequeno', 6.9, yTrees + 0.3],
   ['arbusto', -3.5, yGreen + 0.7], ['arbusto', 0.6, yGreen + 0.7], ['arbusto', 4.9, yGreen + 0.7], ['arbusto', 9, yGreen + 0.7],
-  // The existing power pole on the house side (left of the front, as the user described), arm over the street.
-  ['poste-alumbrado', -0.6, FRONT + 0.4],
+  // The existing power pole on the house-side sidewalk, to the RIGHT of the house (user), arm over the street.
+  ['poste-alumbrado', 6.1, FRONT + 0.4],
 ];
 
 const p = JSON.parse(readFileSync(path, 'utf8'));
