@@ -58,10 +58,8 @@ input.invalid { border-color: var(--danger); background: #fef2f2; }
 .view .maximise { position: absolute; top: 8px; right: 8px; font-size: 12px; opacity: 0.85; }
 .view .placeholder { display: grid; place-items: center; height: 100%; color: var(--muted); }
 
-.properties {
-  grid-area: props; background: var(--panel); border-left: 1px solid var(--border);
-  padding: 12px; overflow-y: auto;
-}
+.sidebar { grid-area: props; background: var(--panel); border-left: 1px solid var(--border); overflow-y: auto; }
+.properties { padding: 12px; }
 .properties h2 { font-size: 15px; margin: 0 0 12px; }
 .properties .hint { color: var(--muted); }
 
@@ -115,3 +113,11 @@ button.danger:hover { background: #fef2f2; border-color: var(--danger); }
 .bg-controls h3 { font-size: 13px; margin: 0; }
 .bg-controls button.active { background: var(--accent-soft); border-color: var(--accent); }
 .plan2d-wrap.tool-moveBackground .plan2d { cursor: move; }
+.floors-panel { padding: 12px; border-bottom: 1px solid var(--border); }
+.floors-panel h3 { font-size: 13px; margin: 0 0 8px; }
+.floors-panel ul { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.floors-panel li { padding: 5px 8px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; }
+.floors-panel li:hover { background: #f3f4f6; }
+.floors-panel li.active { background: var(--accent-soft); border-color: var(--accent); font-weight: 600; }
+.floor-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.floor-buttons button { font-size: 12px; padding: 4px 6px; margin: 0; }

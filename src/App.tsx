@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Plan2D from './editor2d/Plan2D';
 import { useEditor } from './store/editorStore';
+import FloorsPanel from './ui/FloorsPanel';
 import PropertiesPanel from './ui/PropertiesPanel';
 import Toolbar, { TOOLS } from './ui/Toolbar';
 import TopBar from './ui/TopBar';
@@ -61,7 +62,10 @@ export default function App() {
           </section>
         )}
       </main>
-      <PropertiesPanel />
+      <div className="sidebar">
+        <FloorsPanel />
+        <PropertiesPanel />
+      </div>
     </div>
   );
 }
