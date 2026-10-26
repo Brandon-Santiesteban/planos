@@ -16,6 +16,8 @@ export interface EditorState {
   past: Project[];
   future: Project[];
   dirty: boolean;
+  /** Incremented every time a project is loaded (new/open/restore). */
+  loadCount: number;
   apply(recipe: (draft: Project) => void, opts?: { record?: boolean }): void;
   checkpoint(): void;
   undo(): void;
@@ -61,6 +63,7 @@ export const useEditor = create<EditorState>()((set, get) => ({
   past: [],
   future: [],
   dirty: false,
+  loadCount: 0,
 
   apply(recipe, opts) {
     const state = get();
@@ -111,6 +114,8 @@ export const useEditor = create<EditorState>()((set, get) => ({
   setSnapping: (snapping) => set({ snapping }),
   setShowUpperFloors: (showUpperFloors) => set({ showUpperFloors }),
   loadProject: (p) =>
-    set({ project: p, activeFloorId: p.floors[0].id, selection: null, past: [], future: [], dirty: false }),
+    set((s) => ({
+      project: p, activeFloorId: p.floors[0].id, selection: null, past: [], future: [], dirty: false, loadCount: s.loadCount + 1,
+    })),
   markSaved: () => set({ dirty: false }),
 }));

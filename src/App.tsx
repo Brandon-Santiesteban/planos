@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import Plan2D from './editor2d/Plan2D';
 import { useEditor } from './store/editorStore';
 import FloorsPanel from './ui/FloorsPanel';
@@ -6,6 +6,8 @@ import PropertiesPanel from './ui/PropertiesPanel';
 import Toolbar, { TOOLS } from './ui/Toolbar';
 import TopBar from './ui/TopBar';
 import { useProjectFile } from './ui/useProjectFile';
+
+const Scene3D = lazy(() => import('./view3d/Scene3D'));
 
 type Layout = 'split' | '2d' | '3d';
 
@@ -54,8 +56,10 @@ export default function App() {
           </section>
         )}
         {layout !== '2d' && (
-          <section className="view view-3d" data-testid="scene3d-slot">
-            <div className="placeholder">Vista 3D</div>
+          <section className="view view-3d">
+            <Suspense fallback={<div className="placeholder">Cargando 3D…</div>}>
+              <Scene3D />
+            </Suspense>
             <button className="maximise" onClick={() => setLayout(layout === '3d' ? 'split' : '3d')}>
               {layout === '3d' ? 'Dividir' : 'Ampliar 3D'}
             </button>
