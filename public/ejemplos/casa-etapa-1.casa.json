@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "id": "d5502884-cf06-4531-b9b2-e3d1ae3c56d9",
+  "id": "381f62b0-6c34-4fe8-b535-86bc779671f5",
   "name": "Casa etapa 1",
   "north": 0,
   "floors": [
@@ -820,6 +820,126 @@
           "depth": 0.45,
           "height": 0.85,
           "elevation": 0
+        },
+        {
+          "id": "entorno-f5001d1c-806c-4390-ade5-d584ecd8ad25",
+          "type": "arbol-guayacan",
+          "x": -5.5,
+          "y": 20.8,
+          "rotation": 0,
+          "width": 3,
+          "depth": 3,
+          "height": 6,
+          "elevation": 0,
+          "color": "#e3b42b"
+        },
+        {
+          "id": "entorno-0c8d34d3-f758-4efd-be46-f5b1bdf2a2a2",
+          "type": "arbol-guayacan",
+          "x": 2.75,
+          "y": 20.8,
+          "rotation": 0,
+          "width": 3,
+          "depth": 3,
+          "height": 6,
+          "elevation": 0,
+          "color": "#e3b42b"
+        },
+        {
+          "id": "entorno-51a2569d-3876-44d5-9688-fb3d72960699",
+          "type": "arbol-guayacan",
+          "x": 11,
+          "y": 20.8,
+          "rotation": 0,
+          "width": 3,
+          "depth": 3,
+          "height": 6,
+          "elevation": 0,
+          "color": "#e3b42b"
+        },
+        {
+          "id": "entorno-400e8d19-d206-4cf6-a8ee-2a4314ff283f",
+          "type": "arbol-pequeno",
+          "x": -1.4,
+          "y": 21.1,
+          "rotation": 0,
+          "width": 2,
+          "depth": 2,
+          "height": 3.5,
+          "elevation": 0,
+          "color": "#5f8a3e"
+        },
+        {
+          "id": "entorno-839a4ab4-b25a-4de0-bdab-511c2e8e4d58",
+          "type": "arbol-pequeno",
+          "x": 6.9,
+          "y": 21.1,
+          "rotation": 0,
+          "width": 2,
+          "depth": 2,
+          "height": 3.5,
+          "elevation": 0,
+          "color": "#5f8a3e"
+        },
+        {
+          "id": "entorno-1681c294-51ed-43aa-ab52-bd37c70fce7a",
+          "type": "arbusto",
+          "x": -3.5,
+          "y": 20,
+          "rotation": 0,
+          "width": 1,
+          "depth": 1,
+          "height": 1,
+          "elevation": 0,
+          "color": "#557a38"
+        },
+        {
+          "id": "entorno-35753a6e-826e-4f7a-a59e-fcebde111796",
+          "type": "arbusto",
+          "x": 0.6,
+          "y": 20,
+          "rotation": 0,
+          "width": 1,
+          "depth": 1,
+          "height": 1,
+          "elevation": 0,
+          "color": "#557a38"
+        },
+        {
+          "id": "entorno-0d793191-9b3e-49d6-bdbf-eefc4c7bbcee",
+          "type": "arbusto",
+          "x": 4.9,
+          "y": 20,
+          "rotation": 0,
+          "width": 1,
+          "depth": 1,
+          "height": 1,
+          "elevation": 0,
+          "color": "#557a38"
+        },
+        {
+          "id": "entorno-84168d14-916a-4042-9334-3366fffd2b3c",
+          "type": "arbusto",
+          "x": 9,
+          "y": 20,
+          "rotation": 0,
+          "width": 1,
+          "depth": 1,
+          "height": 1,
+          "elevation": 0,
+          "color": "#557a38"
+        },
+        {
+          "id": "entorno-e9acc5fb-c0b5-4cbb-bc9a-40d74d8ea77e",
+          "type": "poste-alumbrado",
+          "x": -0.6,
+          "y": 10.6,
+          "rotation": 0,
+          "width": 0.3,
+          "depth": 1.2,
+          "height": 6,
+          "elevation": 0,
+          "color": "#3b3f45"
         }
       ],
       "openings": [
@@ -1397,6 +1517,102 @@
             }
           ],
           "floorMaterial": "porcelanato"
+        },
+        {
+          "id": "bfc51e59-d07a-47c1-b440-45b7aadeb90a",
+          "kind": "exterior",
+          "name": "Andén",
+          "points": [
+            {
+              "x": -8,
+              "y": 10.2
+            },
+            {
+              "x": 13.5,
+              "y": 10.2
+            },
+            {
+              "x": 13.5,
+              "y": 11.7
+            },
+            {
+              "x": -8,
+              "y": 11.7
+            }
+          ],
+          "floorMaterial": "concreto"
+        },
+        {
+          "id": "091072b1-a606-48cd-9fba-a2906005b53e",
+          "kind": "exterior",
+          "name": "Calle (doble sentido)",
+          "points": [
+            {
+              "x": -8,
+              "y": 11.7
+            },
+            {
+              "x": 13.5,
+              "y": 11.7
+            },
+            {
+              "x": 13.5,
+              "y": 18.7
+            },
+            {
+              "x": -8,
+              "y": 18.7
+            }
+          ],
+          "floorMaterial": "asfalto"
+        },
+        {
+          "id": "e7e4afca-314c-47fc-9809-bcf739c691ab",
+          "kind": "exterior",
+          "name": "Sardinel",
+          "points": [
+            {
+              "x": -8,
+              "y": 18.7
+            },
+            {
+              "x": 13.5,
+              "y": 18.7
+            },
+            {
+              "x": 13.5,
+              "y": 19.3
+            },
+            {
+              "x": -8,
+              "y": 19.3
+            }
+          ],
+          "floorMaterial": "concreto"
+        },
+        {
+          "id": "a0198984-063b-4e35-ae71-69c10d582018",
+          "kind": "exterior",
+          "name": "Zona verde (propuesta)",
+          "points": [
+            {
+              "x": -8,
+              "y": 19.3
+            },
+            {
+              "x": 13.5,
+              "y": 19.3
+            },
+            {
+              "x": 13.5,
+              "y": 22.3
+            },
+            {
+              "x": -8,
+              "y": 22.3
+            }
+          ],
+          "floorMaterial": "cesped"
         }
       ],
       "background": null
