@@ -345,4 +345,4 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
   box-shadow: var(--sombra); transition: opacity .2s;
 }
 .ayuda-caminar.mirando { opacity: .6; }
-.scene-toggle .btn-chico .icono { margin-left: -2px; }
+.scene-toggle { flex-wrap: wrap; max-width: calc(100% - 20px); }

@@ -74,6 +74,7 @@ export default function WalkControls() {
     // Long frames (a background tab) shouldn't throw you across the room.
     w = stepWalker(w, { forward, right, run: pressed.current.has('Shift') }, Math.min(delta, 0.1), project, perFloor);
     walker.current = w;
+    if (import.meta.env.DEV) (window as unknown as { __walker?: Walker }).__walker = w;
     camera.position.set(w.pos.x, w.feet + EYE_HEIGHT, w.pos.y);
     camera.rotation.set(w.pitch, w.yaw, 0, 'YXZ');
   });

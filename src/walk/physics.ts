@@ -103,8 +103,10 @@ export function levelAt(project: Project, pos: Vec2, prevFeet: number): Level {
   const elev = project.floors.map((f) => floorElevation(project, f.id));
   let best: Level | null = null;
   let bestGap = STEP_TOLERANCE;
-  for (let i = 0; i < project.floors.length - 1; i++) {
-    const rise = elev[i + 1] - elev[i];
+  const top = project.floors.length - 1;
+  for (let i = 0; i <= top; i++) {
+    // Stairs on the top floor still climb their floor's height (the 3D draws them), towards a future floor.
+    const rise = project.floors[i].height;
     for (const r of project.floors[i].rooms) {
       if (r.kind !== 'stairs') continue;
       const t = stairProgress(r, pos);
@@ -113,7 +115,7 @@ export function levelAt(project: Project, pos: Vec2, prevFeet: number): Level {
       const gap = Math.abs(feet - prevFeet);
       if (gap > bestGap) continue;
       bestGap = gap;
-      best = { floorIndex: t < 0.5 ? i : i + 1, feet };
+      best = { floorIndex: t < 0.5 ? i : Math.min(i + 1, top), feet };
     }
   }
   if (best) return best;

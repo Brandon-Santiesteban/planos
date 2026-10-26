@@ -150,3 +150,8 @@ test('only the walls of floors your body is in block you', () => {
   expect(segmentsAt(p, perFloor, 2.6).map((s) => s.a.y)).toEqual([2]);
   expect(segmentsAt(p, perFloor, 1.3)).toHaveLength(2); // halfway up the stairs
 });
+
+test('stairs on the top floor climb its own height, as drawn', () => {
+  stairs(g);
+  expect(walk({ x: 0.5, y: 3.5 }, { x: 0.5, y: 1.5 }, 0)).toEqual({ floorIndex: 0, feet: expect.closeTo(1.3, 1) });
+});

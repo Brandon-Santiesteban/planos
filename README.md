@@ -22,6 +22,13 @@ Haz doble clic en **`iniciar.bat`**. La primera vez instala lo necesario (tarda 
 - **Guardar**: crea un archivo `.casa.json` en tu PC. Después de guardarlo (o abrirlo) una vez, ese archivo se actualiza solo con cada cambio.
 - **Modo oscuro**: botón de la luna arriba a la derecha.
 
+## Caminar por dentro
+
+- En la vista 3D toca **Caminar** (barra de abajo). Entras a la altura de los ojos en la habitación seleccionada o, si no hay ninguna, en la primera de la planta activa. Se ven todas las plantas.
+- Haz clic en la vista para mirar con el ratón. Muévete con **W A S D** o las flechas; **Shift** para correr. **Esc** suelta el ratón y **Salir de caminar** vuelve a la vista normal.
+- Los muros no se atraviesan; las puertas sí. Para subir o bajar de planta, camina por una **Escalera**: elige *Tipo: Escalera* en las propiedades de la habitación, hacia dónde **sube** y su **forma** (recta o en U, con descanso al fondo y llegada del mismo lado por donde empiezas).
+- En el plano la escalera se dibuja con sus escalones y una flecha que va hacia arriba. En las puertas, **Invertir apertura** cambia hacia qué lado abren.
+
 ## Ejemplos
 
 Abre un ejemplo directamente con su enlace (la primera vez se carga el ejemplo; después, tu copia con tus cambios):
