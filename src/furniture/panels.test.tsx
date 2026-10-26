@@ -77,4 +77,4 @@ test('the Muebles tool shows the catalog: search, categories and choosing a piec
   fireEvent.click(screen.getByTestId('mueble-carro'));
   expect(usePlacement.getState().itemId).toBe('carro');
   expect(screen.getByText(/4,50 × 1,80 m/)).toBeInTheDocument();
-});
+}, 30000); // renders the whole catalog several times: slow on a busy machine

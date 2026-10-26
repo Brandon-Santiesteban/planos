@@ -51,6 +51,18 @@ test('dragging a piece snaps to 5 cm and undoes in one step', () => {
   expect(pieces()[0]).toMatchObject({ x: 1, y: 1.5 });
 });
 
+test('dragging a desk carries the monitor on it', () => {
+  s().apply((d) => void addFurniture(d, d.floors[0].id, furnitureFromCatalog('monitor', { x: 1.3, y: 1.4 })));
+  const t = createSelectTool();
+  t.onPointerDown!({ x: 0.6, y: 1.6 }, ctx());
+  t.onPointerMove!({ x: 1.6, y: 2.1 }, ctx());
+  t.onPointerUp!({ x: 1.6, y: 2.1 }, ctx());
+  expect(pieces()[0]).toMatchObject({ x: 2, y: 2 });
+  expect(pieces()[1].x).toBeCloseTo(2.3);
+  expect(pieces()[1].y).toBeCloseTo(1.9);
+  expect(pieces()[1].elevation).toBeCloseTo(0.75);
+});
+
 test('Alt drags freely', () => {
   const t = createSelectTool();
   t.onPointerDown!({ x: 1, y: 1.5 }, ctx({ altKey: true }));

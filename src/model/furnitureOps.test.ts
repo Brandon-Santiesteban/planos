@@ -1,7 +1,7 @@
 import { createEmptyProject } from './defaults';
 import {
   addFurniture, deleteFurniture, duplicateFurniture, furnitureCorners, furnitureFromCatalog, moveFurniture,
-  pointInFurniture, rotateFurniture, snapFlushToWall, snapToWalls, stackElevation, updateFurniture,
+  dropElevation, isStacked, piecesOnTop, pointInFurniture, rotateFurniture, snapFlushToWall, snapToWalls, stackElevation, updateFurniture,
 } from './furnitureOps';
 import { addWall } from './ops';
 import type { Furniture, Wall } from './types';
@@ -107,6 +107,21 @@ test('snapFlushToWall pushes a parallel piece against a wall without turning it'
   const s = snapFlushToWall([wallN], piece({ x: 2, y: 0.68, rotation: 180 }), 0.15)!;
   expect(s).toEqual({ x: 2, y: expect.closeTo(0.6) });
   expect(snapFlushToWall([wallN], piece({ x: 2, y: 0.68, rotation: 30 }), 0.15)).toBeNull();
+});
+
+test('dropElevation: on top of what is below, else back to the floor if it was stacked, else unchanged', () => {
+  const desk = piece({ id: 'desk', x: 0, y: 0 });
+  const mon = piece({ id: 'mon', x: 0, y: 0, width: 0.6, depth: 0.2, height: 0.45, elevation: 0.75 });
+  const board = piece({ id: 'board', x: 5, y: 5, width: 1.2, depth: 0.03, elevation: 0.9 });
+  const all = [desk, mon, board];
+  expect(dropElevation(all, mon, { x: 0.5, y: 0 }, true)).toBeCloseTo(0.75);
+  expect(dropElevation(all, mon, { x: 9, y: 9 }, true)).toBe(0);
+  expect(dropElevation(all, board, { x: 9, y: 9 }, false)).toBeCloseTo(0.9);
+  expect(isStacked(all, mon)).toBe(true);
+  expect(isStacked(all, board)).toBe(false);
+  // Dragging the desk never lands it on its own monitor.
+  expect(piecesOnTop(all, desk)).toEqual(['mon']);
+  expect(dropElevation(all, desk, { x: 0.1, y: 0 }, false, piecesOnTop(all, desk))).toBe(0);
 });
 
 test('pieces are stored on the floor and survive real walls being present', () => {

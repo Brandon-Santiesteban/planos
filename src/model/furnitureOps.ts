@@ -128,6 +128,38 @@ export function stackElevation(pieces: Furniture[], at: Vec2, selfId: string | n
   return best;
 }
 
+/** True when the piece rests on top of another one. */
+export function isStacked(pieces: Furniture[], f: Furniture): boolean {
+  const below = stackElevation(pieces, f, f.id);
+  return below !== null && f.elevation > 0.005 && Math.abs(below - f.elevation) < 0.01;
+}
+
+/**
+ * Elevation of a piece dropped at `at` (3D editing): on top of the highest piece below it; with nothing below,
+ * back on the floor if it was stacked, else unchanged (a whiteboard keeps its height on the wall).
+ */
+export function dropElevation(pieces: Furniture[], f: Furniture, at: Vec2, wasStacked: boolean, ignore: string[] = []): number {
+  const below = stackElevation(pieces.filter((p) => !ignore.includes(p.id)), at, f.id);
+  if (below !== null) return below;
+  return wasStacked ? 0 : f.elevation;
+}
+
+/** Ids of the pieces resting on `f`, and on those, and so on (they move together with it). */
+export function piecesOnTop(pieces: Furniture[], f: Furniture): string[] {
+  const out: string[] = [];
+  const visit = (base: Furniture) => {
+    for (const p of pieces) {
+      if (p.id === f.id || out.includes(p.id)) continue;
+      if (Math.abs(p.elevation - (base.elevation + base.height)) < 0.01 && pointInFurniture(base, p)) {
+        out.push(p.id);
+        visit(p);
+      }
+    }
+  };
+  visit(f);
+  return out;
+}
+
 /** Pieces in drawing / picking order: lower ones first. */
 export function byElevation(pieces: Furniture[]): Furniture[] {
   return pieces.map((f, i) => ({ f, i })).sort((a, b) => a.f.elevation - b.f.elevation || a.i - b.i).map((x) => x.f);

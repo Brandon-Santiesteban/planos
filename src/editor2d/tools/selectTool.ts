@@ -7,7 +7,7 @@ import {
   deleteOpening, deleteRoom, deleteWall, type Joint, jointsAt, setJoints, translateJoints, updateOpening, wallJoints,
 } from '../../model/ops';
 import type { Vec2 } from '../../model/types';
-import { dragFurnitureTo, rotateSelectedFurniture } from '../../furniture/actions';
+import { beginFurnitureDrag, dragFurnitureTo, type FurnitureDrag, rotateSelectedFurniture } from '../../furniture/actions';
 import { useEditor } from '../../store/editorStore';
 import { useGrid } from '../gridSettings';
 import { hitTest } from '../hitTest';
@@ -21,7 +21,7 @@ type Drag =
   | { kind: 'endpoint'; wallId: string; end: 'a' | 'b'; joints: Joint[] }
   | { kind: 'wall'; wallId: string; applied: Vec2; joints: Joint[] }
   | { kind: 'opening'; openingId: string; wallId: string }
-  | { kind: 'furniture'; id: string; start: Vec2 };
+  | { kind: 'furniture'; drag: FurnitureDrag };
 
 export function createSelectTool(): ToolHandler {
   let drag: Drag | null = null;
@@ -50,8 +50,8 @@ export function createSelectTool(): ToolHandler {
         drag = { kind: 'opening', openingId: hit.id, wallId: o.wallId };
       } else if (hit.kind === 'furniture') {
         select({ kind: 'furniture', id: hit.id });
-        const f = floor.furniture.find((x) => x.id === hit.id)!;
-        drag = { kind: 'furniture', id: hit.id, start: { x: f.x, y: f.y } };
+        const fd = beginFurnitureDrag(hit.id);
+        drag = fd && { kind: 'furniture', drag: fd };
       } else {
         select({ kind: 'room', id: hit.id });
       }
@@ -69,7 +69,8 @@ export function createSelectTool(): ToolHandler {
       const floor = activeFloor(store);
       const d = drag;
       if (d.kind === 'furniture') {
-        dragFurnitureTo(d.id, { x: d.start.x + p.x - downAt.x, y: d.start.y + p.y - downAt.y }, ctx.state.snapping && !ctx.altKey);
+        const s0 = d.drag.start;
+        dragFurnitureTo(d.drag, { x: s0.x + p.x - downAt.x, y: s0.y + p.y - downAt.y }, ctx.state.snapping && !ctx.altKey);
       } else if (d.kind === 'endpoint') {
         const wall = floor.walls.find((w) => w.id === d.wallId);
         if (!wall) return;

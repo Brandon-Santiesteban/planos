@@ -6,6 +6,7 @@ import { floorElevation } from '../model/ops';
 import type { Project } from '../model/types';
 import { useEditor } from '../store/editorStore';
 import FloorMeshes from './FloorMeshes';
+import FurnitureMeshes from '../furniture/meshes';
 import { usePalette } from './palette';
 import { outdoorLights, roomLights } from './roomLights';
 import { type TimeOfDay, useSceneOptions } from './sceneOptions';
@@ -68,6 +69,7 @@ export default function Scene3D() {
         {visible.map((f) => (
           <FloorMeshes key={f.id} floor={f} elevation={floorElevation(project, f.id)} selectedId={selection?.id ?? null} />
         ))}
+        {visible.map((f) => <FurnitureMeshes key={`m${f.id}`} floor={f} elevation={floorElevation(project, f.id)} selectedId={selection?.id ?? null} />)}
         {/* Left: rotate · right: pan · wheel: zoom. Middle-button dragging (dolly) is off: the user found it confusing. */}
         <OrbitControls
           makeDefault
