@@ -43,7 +43,8 @@ test('the first floor sala, comedor and cocina keep their layout (only pictures 
   const after = floorNamed(furnished().p, 'Primer piso');
   for (const room of ['Sala', 'Comedor', 'Cocina']) {
     const added = inRoom(after, room).filter((x) => !x.type.startsWith('cuadro'));
-    expect(layout(added), room).toEqual(layout(inRoom(before, room)));
+    const kept = inRoom(before, room).filter((x) => !x.type.startsWith('cuadro'));
+    expect(layout(added), room).toEqual(layout(kept));
   }
   // Upper cabinets hang at their catalogue height.
   for (const a of ofType(inRoom(after, 'Cocina'), 'alacena')) expect(a.elevation).toBeCloseTo(1.5);

@@ -32,9 +32,9 @@ const ENTORNO = [
 
 // Catalog sizes (src/furniture/catalog.ts).
 const PIECES = {
-  'arbol-guayacan': { w: 3.0, d: 3.0, h: 6.0, color: '#e3b42b' },
-  'arbol-pequeno': { w: 2.0, d: 2.0, h: 3.5, color: '#5f8a3e' },
-  arbusto: { w: 1.0, d: 1.0, h: 1.0, color: '#557a38' },
+  'arbol-guayacan': { w: 3.0, d: 3.0, h: 6.0, color: '#6a8c42' },
+  'arbol-pequeno': { w: 2.0, d: 2.0, h: 3.5, color: '#5d8642' },
+  arbusto: { w: 1.0, d: 1.0, h: 1.0, color: '#557e3c' },
   'poste-alumbrado': { w: 0.3, d: 1.2, h: 6.0, color: '#3b3f45' },
 };
 const yTrees = yGreen + GREEN / 2;

@@ -48,6 +48,8 @@ export default function ProjectsDialog({ onOpenFile }: { onOpenFile: () => void 
       notify({ kind: 'error', text: `No se pudo abrir «${e.name}»` });
       return;
     }
+    // Mark it as the last project before showing it, so a reload right away reopens this one.
+    await library.setLast(p.id).catch(() => {});
     useEditor.getState().loadProject(p);
     close();
     notify({ kind: 'ok', text: `Abierto «${p.name}»` });
