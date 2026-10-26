@@ -4,6 +4,8 @@ import { snapPoint } from '../../geometry/snap';
 import { dist } from '../../geometry/vec';
 import type { EditorState, Tool } from '../../store/editorStore';
 import type { View } from '../viewport';
+import { createOpeningTool } from './openingTool';
+import { createRoomTool } from './roomTool';
 import { createSelectTool } from './selectTool';
 import { createWallTool } from './wallTool';
 
@@ -17,7 +19,7 @@ export interface ToolContext {
 export type ToolPreview =
   | { kind: 'wall'; a: Vec2; b: Vec2; length: number; typed: string; typedValid: boolean }
   | { kind: 'polygon'; points: Vec2[]; cursor: Vec2 }
-  | { kind: 'marker'; at: Vec2; valid?: boolean };
+  | { kind: 'marker'; at: Vec2; valid?: boolean; segment?: [Vec2, Vec2] };
 
 export interface ToolHandler {
   onPointerDown?(p: Vec2, ctx: ToolContext): void;
@@ -57,6 +59,9 @@ const cache = new Map<Tool, ToolHandler>();
 const factories: Partial<Record<Tool, () => ToolHandler>> = {
   select: createSelectTool,
   wall: createWallTool,
+  door: () => createOpeningTool('door'),
+  window: () => createOpeningTool('window'),
+  room: createRoomTool,
 };
 
 /** Registers a tool factory (used by tool modules added later). */

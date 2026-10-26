@@ -109,3 +109,5 @@ input.invalid { border-color: var(--danger); background: #fef2f2; }
 .with-unit .unit { color: var(--muted); }
 button.danger { color: var(--danger); border-color: #fca5a5; margin-top: 6px; }
 button.danger:hover { background: #fef2f2; border-color: var(--danger); }
+.preview-opening { stroke: rgba(37, 99, 235, 0.7); stroke-width: 8px; vector-effect: non-scaling-stroke; stroke-linecap: butt; }
+.preview-opening.invalid { stroke: rgba(220, 38, 38, 0.6); }

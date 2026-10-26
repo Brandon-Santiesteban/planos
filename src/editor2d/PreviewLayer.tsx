@@ -9,7 +9,14 @@ export default function PreviewLayer({ preview, pxPerMetre }: { preview: ToolPre
   if (!preview) return null;
   const r = 5 / pxPerMetre;
   if (preview.kind === 'marker') {
-    return <circle className={`snap-marker${preview.valid === false ? ' invalid' : ''}`} cx={preview.at.x} cy={preview.at.y} r={r} />;
+    const cls = preview.valid === false ? ' invalid' : '';
+    const seg = preview.segment;
+    return (
+      <g className="preview">
+        {seg && <line className={`preview-opening${cls}`} x1={seg[0].x} y1={seg[0].y} x2={seg[1].x} y2={seg[1].y} />}
+        <circle className={`snap-marker${cls}`} cx={preview.at.x} cy={preview.at.y} r={r} />
+      </g>
+    );
   }
   if (preview.kind === 'polygon') {
     const all = [...preview.points, preview.cursor];
