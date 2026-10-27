@@ -5,8 +5,9 @@ import { stairDivider, stairFrame, stairSteps, toPlan } from '../walk/stairs';
 import { usePalette } from './palette';
 
 const SLAB = 0.35; // each step is a block this deep under its tread, so the flight reads as a stepped slab
-const GLASS_TREAD = 0.05; // glass stairs: floating treads instead of a stepped slab
+const FLOATING_TREAD = 0.05; // glass-railing stairs: floating wooden treads instead of a stepped slab
 const GLASS = '#cfe6ee';
+const WOOD = '#9a6f4b';
 const RAIL = 0.9;
 const BALUSTER_GAP = 0.25;
 
@@ -73,20 +74,25 @@ export default function StairsMesh({ room, rise, selected }: { room: Room; rise:
   return (
     <group>
       {steps.map((s, i) => {
-        const bottom = Math.max(0, s.top - (room.glass ? GLASS_TREAD : SLAB));
+        const bottom = Math.max(0, s.top - (room.glass ? FLOATING_TREAD : SLAB));
         const c = at((s.a0 + s.a1) / 2, (s.c0 + s.c1) / 2, (s.top + bottom) / 2);
         return (
           <mesh key={i} position={c} rotation={[0, yawAngle, 0]} castShadow receiveShadow>
             <boxGeometry args={[s.a1 - s.a0, s.top - bottom, s.c1 - s.c0]} />
-            {room.glass && !selected ? (
-              <meshStandardMaterial color={GLASS} transparent opacity={0.45} roughness={0.05} metalness={0.1} depthWrite={false} />
-            ) : (
-              <meshStandardMaterial color={selected ? pal.selected : pal.room} roughness={0.8} />
-            )}
+            <meshStandardMaterial color={selected ? pal.selected : room.glass ? WOOD : pal.room} roughness={room.glass ? 0.6 : 0.8} />
           </mesh>
         );
       })}
-      {rails.map((r, i) => <Bar key={i} from={r.from} to={r.to} radius={room.glass ? r.r * 1.6 : r.r} color={pal.rail} glass={room.glass} />)}
+      {room.glass && !stairDivider(room)
+        ? steps.map((s, i) => (
+            // One glass balustrade pane per step along the open side, the slim handrail on top.
+            <mesh key={`g${i}`} position={at((s.a0 + s.a1) / 2, f.width - 0.04, s.top + RAIL / 2)} rotation={[0, yawAngle, 0]}>
+              <boxGeometry args={[s.a1 - s.a0, RAIL, 0.012]} />
+              <meshStandardMaterial color={GLASS} transparent opacity={0.3} roughness={0.05} depthWrite={false} />
+            </mesh>
+          ))
+        : null}
+      {rails.map((r, i) => <Bar key={i} from={r.from} to={r.to} radius={r.r} color={pal.rail} glass={room.glass && !stairDivider(room) && r.r < 0.025} />)}
     </group>
   );
 }

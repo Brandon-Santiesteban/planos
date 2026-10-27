@@ -1,7 +1,8 @@
 import { OrbitControls } from '@react-three/drei';
-import { Canvas, useThree } from '@react-three/fiber';
-import { useEffect, useMemo } from 'react';
-import { MOUSE } from 'three';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { type RefObject, useEffect, useMemo, useRef } from 'react';
+import { MOUSE, Vector3 } from 'three';
+import Compass from '../editor2d/Compass';
 import { floorElevation } from '../model/ops';
 import type { Project } from '../model/types';
 import { useEditor } from '../store/editorStore';
@@ -41,6 +42,33 @@ function CameraRig({ frame }: { frame: Frame }) {
   return null;
 }
 
+/**
+ * Turns the 3D compass needle so it points to geographic north as seen from the camera: the angle, clockwise from
+ * the top of the screen, of the north direction on the ground.
+ */
+function CompassTracker({ north, needle }: { north: number; needle: RefObject<SVGGElement | null> }) {
+  const v = useMemo(() => new Vector3(), []);
+  useFrame(({ camera }) => {
+    if (!needle.current) return;
+    // Screen "up" laid on the ground; when the camera looks level, the forward direction instead.
+    v.set(0, 1, 0).applyQuaternion(camera.quaternion);
+    let fx = v.x;
+    let fz = v.z;
+    if (Math.hypot(fx, fz) < 0.2) {
+      camera.getWorldDirection(v);
+      fx = v.x;
+      fz = v.z;
+    }
+    // North in plan/world terms: the top of the plan (−z) turned clockwise by `north` degrees.
+    const t = (north * Math.PI) / 180;
+    const nx = Math.sin(t);
+    const nz = -Math.cos(t);
+    const deg = (Math.atan2(nx * -fz + nz * fx, nx * fx + nz * fz) * 180) / Math.PI;
+    needle.current.setAttribute('transform', `rotate(${deg.toFixed(1)})`);
+  });
+  return null;
+}
+
 export default function Scene3D() {
   const pal = usePalette();
   const project = useEditor((s) => s.project);
@@ -64,6 +92,7 @@ export default function Scene3D() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const frame = useMemo(() => bounds(project), [loadCount]);
   const target: [number, number, number] = [frame.cx, floorElevation(project, project.floors[activeIndex].id), frame.cy];
+  const needle = useRef<SVGGElement>(null);
 
   return (
     <div className="scene3d" data-testid="scene3d">
@@ -92,7 +121,11 @@ export default function Scene3D() {
           </>
         )}
         <RenderBridge />
+        <CompassTracker north={project.north} needle={needle} />
       </Canvas>
+      <svg className="brujula-3d" width={76} height={80} aria-hidden="true">
+        <Compass north={project.north} x={38} y={44} needleRef={needle} />
+      </svg>
       <WalkHint />
       <div className="scene-toggle">
         {!walking && (
