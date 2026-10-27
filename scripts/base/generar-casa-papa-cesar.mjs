@@ -95,7 +95,7 @@ const json = await page.evaluate(async (DEPTH) => {
   const backSuite = wall(g, Q(6, 11.6), Q(0, 11.6), 0.2);
   glassDoor(g, backSuite, 3.0, { width: 3.6, height: 2.3 }); // ventanal del cuarto principal al patio trasero
   wall(g, Q(0, 11.6), Q(0, 8), 0.2); // cabecera de la cama: sin ventana
-  opening(g, 'window', wall(g, Q(0, 8), Q(0, 5.6), 0.2), 1.2, { ...high, width: 0.8 }); // baño principal
+  opening(g, 'window', wall(g, Q(0, 8), Q(0, 5.6), 0.2), 1.2, { width: 0.6, sill: 0.9, height: 1.3 }); // baño principal, sobre la tina
   opening(g, 'window', wall(g, Q(0, 5.6), Q(0, 0), 0.2), 3.6, { width: 1.6 }); // comedor
 
   // --- Social zone: the cube is one open space (living, dining, kitchen); the laundry moved to the garage ---
@@ -113,8 +113,17 @@ const json = await page.evaluate(async (DEPTH) => {
   const cubeBack = wall(g, Q(0, 5.6), Q(6, 5.6)); // cubo | suite y baño social
   opening(g, 'door', cubeBack, 5.2, { width: 0.7 }); // cubo → baño social
 
-  // --- Master suite 6 × 6: bedroom, walk-in dressing room and bathroom with no walls between them; the open walnut
-  // dressing modules are the partitions (see the furniture). The social bathroom beside it keeps its walls. ---
+  // --- Master suite 6 × 6 (user's reference photo): from the bedroom an open doorway leads into one long space that
+  // is dressing room and bathroom at once: open walnut shelving along the bedroom wall, a long double vanity along
+  // the cube wall, and at the far end a glass-enclosed wet room with the rain shower and a freestanding tub under the
+  // window. The toilet has its own small room by the entrance. The social bathroom beside it keeps its walls. ---
+  const suiteWall = wall(g, Q(0, 8), Q(4.4, 8));
+  opening(g, 'door', suiteWall, 3.95, { width: 0.75 }); // dormitorio → vestier y baño
+  const wetGlass = wall(g, Q(1.8, 5.6), Q(1.8, 8), 0.06); // mampara de vidrio de la zona húmeda
+  glassDoor(g, wetGlass, 0.7, { width: 0.7 });
+  opening(g, 'window', wetGlass, 1.75, { width: 1.0, sill: 0.02, height: 2.1 });
+  opening(g, 'door', wall(g, Q(3.4, 5.6), Q(3.4, 6.8), 0.1), 0.75, { width: 0.6 }); // cuarto del sanitario, abre hacia el vestier
+  wall(g, Q(3.4, 6.8), Q(4.4, 6.8), 0.1);
   wall(g, Q(4.4, 5.6), Q(4.4, 8)); // vestier | baño social
   wall(g, Q(4.4, 8), Q(6, 8)); // baño social | dormitorio
   opening(g, 'window', wall(g, Q(6, 5.6), Q(6, 8)), 1.2, high); // baño social, ventana alta al patio
@@ -139,8 +148,9 @@ const json = await page.evaluate(async (DEPTH) => {
   room(g, rect(6, 0, 7.4, 1.5), 'Porche de entrada', 'balcony', { openEdges: [0, 1, 2, 3] });
   room(g, rect(6, 1.5, 7.4, 3.6), 'Hall');
   room(g, rect(7.4, 0, 13, 5.4), 'Garaje y lavandería');
-  room(g, rect(0, 5.6, 2, 8), 'Baño principal');
-  room(g, rect(2, 5.6, 4.4, 8), 'Vestier');
+  room(g, rect(0, 5.6, 1.8, 8), 'Ducha y tina');
+  room(g, poly([1.8, 5.6], [3.4, 5.6], [3.4, 6.8], [4.4, 6.8], [4.4, 8], [1.8, 8]), 'Vestier y baño principal');
+  room(g, rect(3.4, 5.6, 4.4, 6.8), 'Sanitario');
   room(g, rect(4.4, 5.6, 6, 8), 'Baño social');
   room(g, rect(0, 8, 6, 11.6), 'Cuarto principal');
   room(g, poly([8.6, 5.4], [11.4, 5.4], [11.4, 7.2], [13, 7.2], [13, 8.5], [8.6, 8.5]), 'Cuarto 3');
@@ -317,7 +327,6 @@ onWall(r, 'w', 'lavamanos', 4.8);
 // Master suite: bed against the left wall (where the window was), the 70" TV facing it on the patio wall, big glass
 // door to the back patio.
 r = R('Cuarto principal');
-const SPLIT = r.y1; // plan y 3,6: bedroom | bathroom + dressing room (no wall: the dressing modules divide them)
 piece('alfombra', 1.9, 1.6, 90, { width: 2.8, depth: 2.2, color: taupe });
 onWall(r, 'w', 'cama-king', 1.6, { color: arena });
 onWall(r, 'w', 'mesa-noche', 0.375, { color: caramelo });
@@ -328,31 +337,22 @@ onWall(r, 'e', 'televisor-70', 1.6, { gap: 0.02 });
 piece('sillon', 4.5, 0.75, 30, { color: pizarra });
 onWall(r, 'n', 'cortina', 0.75, { color: arena });
 onWall(r, 'n', 'cortina', 5.25, { color: arena });
-// Towards the bedroom: open modules facing it in front of the bathroom, then a chest of drawers backing onto the
-// dressing room's hanging module, then the 1,1 m way into the dressing room.
-onWall(r, 's', 'vestier-repisas', 0.4);
-onWall(r, 's', 'vestier-cajones', 1.35);
-onWall(r, 's', 'comoda', 2.55, { color: caramelo });
+onWall(r, 's', 'comoda', 3.0, { color: caramelo });
 
-// Walk-in dressing room (user's reference photo) as the suite's lobby, with no walls: the open walnut modules are
-// the partitions. Towards the bathroom (x 2) a shoe module facing the dressing room, then the 1 m way into the
-// bathroom by the cube wall.
-r = R('Vestier');
-piece('vestier-colgar', 2.55, SPLIT + 0.275, 0);
-piece('vestier-zapatos', 2.275, SPLIT + 0.9, 270);
-onWall(r, 'e', 'vestier-repisas', 4.75);
-onWall(r, 'e', 'vestier-zapatos', 5.5);
-onWall(r, 's', 'vestier-cajones', 3.2, { width: 1.15 });
-onWall(r, 's', 'espejo-cuerpo', 2.3, { width: 0.5 });
-piece('alfombra', 3.2, 4.85, 0, { width: 1.2, depth: 1.0, color: taupe });
-piece('puf', 3.2, 4.85, 0, { color: caramelo });
-
-// Compact master bathroom: the same rain shower, toilet and a single basin; reached through the dressing room.
-r = R('Baño principal');
-piece('ducha', 0.5, SPLIT + 0.45, 0);
-onWall(r, 'w', 'sanitario', 5.0);
-onWall(r, 's', 'lavamanos', 1.3);
-onWall(r, 's', 'espejo', 1.3, { width: 0.6 });
+// Dressing room and master bathroom in one (plan x 1,8–4,4, y 3,6 → 6): walnut shelving on the bedroom wall, the
+// long vanity on the cube wall, the aisle between them leads to the glass wet room at the far end.
+const GAL = { y0: 3.65, y1: 5.95 };
+piece('vestier-colgar', 2.35, GAL.y0 + 0.275, 0);
+piece('vestier-repisas', 3.2, GAL.y0 + 0.275, 0);
+piece('lavamanos-doble', 2.5, GAL.y1 - 0.25, 180, { color: caramelo });
+piece('espejo', 2.25, GAL.y1 - 0.02, 180, { width: 0.6, height: 0.8 });
+piece('espejo', 2.95, GAL.y1 - 0.02, 180, { width: 0.6, height: 0.8 });
+piece('alfombra', 2.65, 4.8, 0, { width: 1.0, depth: 0.6, color: arena });
+// Wet room behind the glass: freestanding tub under the window, the same rain shower in the corner.
+piece('banera', 0.45, 4.8, 90);
+piece('ducha', 1.3, GAL.y0 + 0.45, 0);
+piece('toallero', 1.3, GAL.y1 - 0.06, 180);
+piece('sanitario', 3.9, GAL.y1 - 0.35, 180);
 
 r = R('Cuarto 3');
 onWall(r, 'n', 'cama-doble', 10.3, { color: arena });
