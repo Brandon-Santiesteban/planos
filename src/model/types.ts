@@ -66,6 +66,8 @@ export interface Room {
   up?: StairUp;
   /** stairs only: straight flight or U-shaped (default 'recta'). */
   stairShape?: StairShape;
+  /** stairs only: glass treads and a glass railing (e.g. a floating stair in a patio). */
+  glass?: boolean;
   /** floor finish (rooms and balconies) */
   floorMaterial?: FloorMaterial;
   /** balconies only: edges (index i = points[i] → points[i+1]) left without railing, e.g. towards a driveway. */

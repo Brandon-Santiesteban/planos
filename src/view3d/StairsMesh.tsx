@@ -5,13 +5,15 @@ import { stairDivider, stairFrame, stairSteps, toPlan } from '../walk/stairs';
 import { usePalette } from './palette';
 
 const SLAB = 0.35; // each step is a block this deep under its tread, so the flight reads as a stepped slab
+const GLASS_TREAD = 0.05; // glass stairs: floating treads instead of a stepped slab
+const GLASS = '#cfe6ee';
 const RAIL = 0.9;
 const BALUSTER_GAP = 0.25;
 
 const UP = new Vector3(0, 1, 0);
 
 /** A round bar between two world points. */
-function Bar({ from, to, radius, color }: { from: Vector3; to: Vector3; radius: number; color: string }) {
+function Bar({ from, to, radius, color, glass }: { from: Vector3; to: Vector3; radius: number; color: string; glass?: boolean }) {
   const { mid, length, quat } = useMemo(() => {
     const dir = to.clone().sub(from);
     return {
@@ -23,7 +25,11 @@ function Bar({ from, to, radius, color }: { from: Vector3; to: Vector3; radius: 
   return (
     <mesh position={mid} quaternion={quat} castShadow>
       <cylinderGeometry args={[radius, radius, length, 8]} />
-      <meshStandardMaterial color={color} metalness={0.6} roughness={0.4} />
+      {glass ? (
+        <meshStandardMaterial color={GLASS} transparent opacity={0.35} roughness={0.05} depthWrite={false} />
+      ) : (
+        <meshStandardMaterial color={color} metalness={0.6} roughness={0.4} />
+      )}
     </mesh>
   );
 }
@@ -67,16 +73,20 @@ export default function StairsMesh({ room, rise, selected }: { room: Room; rise:
   return (
     <group>
       {steps.map((s, i) => {
-        const bottom = Math.max(0, s.top - SLAB);
+        const bottom = Math.max(0, s.top - (room.glass ? GLASS_TREAD : SLAB));
         const c = at((s.a0 + s.a1) / 2, (s.c0 + s.c1) / 2, (s.top + bottom) / 2);
         return (
           <mesh key={i} position={c} rotation={[0, yawAngle, 0]} castShadow receiveShadow>
             <boxGeometry args={[s.a1 - s.a0, s.top - bottom, s.c1 - s.c0]} />
-            <meshStandardMaterial color={selected ? pal.selected : pal.room} roughness={0.8} />
+            {room.glass && !selected ? (
+              <meshStandardMaterial color={GLASS} transparent opacity={0.45} roughness={0.05} metalness={0.1} depthWrite={false} />
+            ) : (
+              <meshStandardMaterial color={selected ? pal.selected : pal.room} roughness={0.8} />
+            )}
           </mesh>
         );
       })}
-      {rails.map((r, i) => <Bar key={i} from={r.from} to={r.to} radius={r.r} color={pal.rail} />)}
+      {rails.map((r, i) => <Bar key={i} from={r.from} to={r.to} radius={room.glass ? r.r * 1.6 : r.r} color={pal.rail} glass={room.glass} />)}
     </group>
   );
 }
