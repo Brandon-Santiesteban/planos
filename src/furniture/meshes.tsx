@@ -201,6 +201,114 @@ const shelves: Builder = ({ w, d, h, c }) => {
   );
 };
 
+/** Open walk-in dressing module (wood carcass, LED strip under the top) holding clothes, shelves, shoes or drawers. */
+const CLOTHES = ['#E8DBD3', '#2b2d31', '#C6B1A0', '#495762', '#f2efe9', '#8C8A7D', '#1f2124', '#B77E53'];
+const dressing: Builder = ({ w, d, h, c, item }) => {
+  const kind = item?.dressing ?? 'repisas';
+  const t = 0.025;
+  const iw = w - 2 * t;
+  const front = d / 2;
+  const shelf = (y: number, key: string) => <B key={key} p={[0, y, 0]} s={[iw, 0.022, d - 0.02]} c={c} />;
+  const led = (y: number, key: string) => <B key={key} p={[0, y, front - 0.04]} s={[iw, 0.01, 0.02]} c="#fff3dd" e="#ffd9a0" />;
+  const drawers = (n: number, top: number) => {
+    const hh = (top - 0.08) / n;
+    return (
+      <>
+        <B p={[0, (top + 0.08) / 2, -0.01]} s={[iw, top - 0.08, d - 0.04]} c={c} />
+        {Array.from({ length: n }, (_, i) => {
+          const y = 0.08 + hh * (i + 0.5);
+          return (
+            <group key={i}>
+              <B p={[0, y, front - 0.012]} s={[iw - 0.012, hh - 0.012, 0.02]} c={shade(c, 1.08)} />
+              <B p={[0, y + hh * 0.2, front + 0.004]} s={[iw * 0.45, 0.012, 0.012]} c={DARK} m={0.5} />
+            </group>
+          );
+        })}
+        <B p={[0, top + 0.012, 0]} s={[iw, 0.025, d]} c={shade(c, 1.1)} />
+      </>
+    );
+  };
+  const folded = (y: number, n: number, key: string) => (
+    <group key={key}>
+      {Array.from({ length: n }, (_, i) => {
+        const x = -iw / 2 + (iw / n) * (i + 0.5);
+        const sh = 0.1 + ((i * 7 + Math.round(y * 10)) % 3) * 0.03;
+        return <B key={i} p={[x, y + sh / 2, 0.02]} s={[Math.max(0.1, Math.min(0.3, iw / n - 0.05)), sh, d * 0.6]} c={CLOTHES[(i * 3 + Math.round(y * 10)) % CLOTHES.length]} r={0.95} />;
+      })}
+    </group>
+  );
+  let inside: ReactElement;
+  if (kind === 'colgar') {
+    const rod = h - 0.42;
+    const n = Math.max(3, Math.floor(iw / 0.075));
+    inside = (
+      <>
+        {drawers(2, 0.62)}
+        {shelf(h - 0.32, 'top')}
+        {led(h - 0.34, 'led2')}
+        <C p={[0, rod, 0]} r={0.012} h={iw} c={METAL} m={0.7} rot={[0, 0, Math.PI / 2]} />
+        {Array.from({ length: n }, (_, i) => {
+          const x = -iw / 2 + 0.05 + (i * (iw - 0.1)) / (n - 1);
+          const len = Math.min(rod - 0.75, 0.75 + ((i * 37) % 5) * 0.07);
+          return <B key={i} p={[x, rod - 0.04 - len / 2, 0.01]} s={[0.035, len, d * 0.72]} c={CLOTHES[(i * 3) % CLOTHES.length]} r={0.95} />;
+        })}
+        {folded(h - 0.31, 2, 'boxes')}
+      </>
+    );
+  } else if (kind === 'zapatos') {
+    const levels = [0.14, 0.38, 0.62, 0.86];
+    const pairs = Math.max(1, Math.floor(iw / 0.22));
+    const shoe = ['#3b2a20', '#f1efea', '#1f2124', '#7a5233'];
+    inside = (
+      <>
+        {levels.map((y, l) => (
+          <group key={l} position={[0, y, 0]} rotation={[0.28, 0, 0]}>
+            <B p={[0, 0, 0]} s={[iw, 0.02, d - 0.06]} c={c} />
+            {Array.from({ length: pairs }, (_, i) => [-0.05, 0.05].map((dx) => (
+              <B key={`${i}${dx}`} p={[-iw / 2 + (iw / pairs) * (i + 0.5) + dx, 0.045, 0.02]} s={[0.08, 0.07, Math.min(0.27, d - 0.1)]} c={shoe[(l + i) % shoe.length]} r={0.6} />
+            )))}
+          </group>
+        ))}
+        {[1.15, 1.6, 2.0].map((y, i) => shelf(y, `s${i}`))}
+        {[1.15, 1.6].map((y, i) => (
+          <B key={`b${i}`} p={[(i ? 0.12 : -0.12) * iw, y + 0.13, 0.03]} s={[Math.min(0.28, iw * 0.4), 0.24, 0.12]} c={i ? '#1f2124' : '#a07a55'} r={0.5} />
+        ))}
+        {led(2.0 - 0.02, 'led2')}
+      </>
+    );
+  } else if (kind === 'cajones') {
+    inside = (
+      <>
+        {drawers(3, 0.9)}
+        {[0, 1, 2].map((i) => <C key={i} p={[-iw * 0.3 + i * 0.09, 0.98, 0.05]} r={0.025} h={0.13 - i * 0.02} c={['#2b2d31', '#c9b28a', '#e8dbd3'][i]} m={0.3} />)}
+        {[1.4, 1.85].map((y, i) => shelf(y, `s${i}`))}
+        {folded(1.42, 3, 'f1')}
+        {folded(1.87, 2, 'f2')}
+        {led(1.38, 'led2')}
+      </>
+    );
+  } else {
+    const ys = [0.45, 0.85, 1.25, 1.65, 2.05];
+    inside = (
+      <>
+        {ys.map((y, i) => shelf(y, `s${i}`))}
+        {ys.slice(0, 4).map((y, i) => folded(y + 0.012, 2, `f${i}`))}
+        {led(ys[3] - 0.02, 'led2')}
+      </>
+    );
+  }
+  return (
+    <>
+      {[-1, 1].map((sx) => <B key={sx} p={[sx * (w / 2 - t / 2), h / 2, 0]} s={[t, h, d]} c={shade(c, 0.9)} />)}
+      <B p={[0, h - t / 2, 0]} s={[w, t, d]} c={c} />
+      <B p={[0, 0.04, -0.02]} s={[w, 0.08, d - 0.04]} c={shade(c, 0.6)} />
+      <B p={[0, h / 2, -d / 2 + 0.005]} s={[iw, h, 0.01]} c={shade(c, 0.8)} />
+      {led(h - t - 0.01, 'led')}
+      {inside}
+    </>
+  );
+};
+
 const lamp: Builder = ({ w, h, c }) => (
   <>
     <C p={[0, 0.015, 0]} r={w * 0.4} h={0.03} c={DARK} />
@@ -1266,6 +1374,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   asoleadora: lounger, sombrilla: umbrella, pergola, bar, parrilla: grill, jardinera: planter,
   centroEntretenimiento: entertainment, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
   repisa: collectiblesShelf, jacuzzi, toallero: towelRail, brasero: firePit, puf: pouf, jardinVertical: verticalGarden,
+  vestier: dressing,
 };
 
 /** The model of one piece in its local frame (no position or rotation). */

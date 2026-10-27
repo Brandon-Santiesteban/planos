@@ -316,7 +316,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   sanitario: toilet, lavamanos: sink, ducha: shower, banera: tub, espejo: flat, lavadero: washtub, lavadora: washer,
   matera: plant, arbol: plant, poste: plant, banca: bench, carro: car, moto,
   centroEntretenimiento: entertainment, cortina: curtain, tiraLed: flat, cuadro: flat, repisa: shelfDots, consola: box(0.03),
-  jacuzzi, toallero: flat, brasero: firePit, puf: pouf, jardinVertical: shelfDots,
+  jacuzzi, toallero: flat, brasero: firePit, puf: pouf, jardinVertical: shelfDots, vestier: shelfDots,
   porton: ({ w, d, open }) => (
     <>
       {gatePanels(w, open === true).map((pn, i) => rect(pn.x0, (pn.track === 0 ? -d / 2 : 0), pn.x1 - pn.x0, d / 2, 0, i))}

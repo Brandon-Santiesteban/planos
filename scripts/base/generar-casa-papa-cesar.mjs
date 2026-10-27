@@ -81,7 +81,7 @@ const json = await page.evaluate(async (DEPTH) => {
 
   // --- Outside walls (the garage front stays open to the street, the patio open to the back patio) ---
   const frontSala = wall(g, Q(0, 0), Q(6, 0), 0.2);
-  opening(g, 'window', frontSala, 3.0, { width: 2.8, sill: 0.9, height: 1.4 });
+  opening(g, 'window', frontSala, 3.0, { width: 2.8, sill: 0.3, height: 2.3 }); // lower half of the cube's tall window
   const frontHall = wall(g, Q(6, 0), Q(7.4, 0), 0.2);
   opening(g, 'door', frontHall, 0.7, { width: 1.0 }); // puerta principal
   wall(g, Q(13, 0), Q(13, 5.4), 0.2); // costado del garaje
@@ -149,17 +149,29 @@ const json = await page.evaluate(async (DEPTH) => {
   // Central patio, open to the sky, to the garage (x 7,4–8,6) and to the back patio; the glass stair rises in it.
   room(g, poly([6, 3.6], [7.4, 3.6], [7.4, 5.4], [8.6, 5.4], [8.6, 11.6], [6, 11.6], [6, 9], [7.2, 9], [7.2, 5], [6, 5]),
     'Patio central', 'balcony', { openEdges: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] });
-  room(g, rect(6, 5, 7.2, 9), 'Escalera de vidrio', 'stairs', { up: 's', glass: true });
+  // Rises towards the back, from beside the hall door up to the landing at y 9 next to the rooftop.
+  room(g, rect(6, 5, 7.2, 9), 'Escalera de vidrio', 'stairs', { up: 'n', glass: true });
+  // Social bathroom and laundry keep a normal ceiling inside the double-height cube.
+  ops.setRoofHeight(p, g, room(g, rect(3.2, 3.6, 6, 5.6), 'Techo baño social y lavandería', 'roof'), 2.6);
 
   // ======================= Rooftop =======================
+  // The living-dining-kitchen block (x 0–6, y 0–5,6) is a double-height cube: its walls carry on up this level and
+  // close it with a roof, with no slab in between. Behind it, over the master suite, the rooftop: the cube's back
+  // wall screens it from the street.
   const t = ops.addFloor(p);
   ops.renameFloor(p, t, 'Rooftop');
-  // ~5 × 5 deck over the living-dining room plus the landing of the stair (x 6–7,4 y 3,6–5); open where the stair
-  // arrives (edge 5), glass railing everywhere else.
-  room(t, poly([1, 0], [6, 0], [6, 3.6], [7.4, 3.6], [7.4, 5], [7.2, 5], [6, 5], [1, 5]), 'Rooftop', 'balcony',
-    { openEdges: [5], railing: 'vidrio', floorMaterial: 'madera' });
-  // Roof slabs over everything else that is built (the patio and the stairwell stay open).
-  const roofs = [[0, 0, 1, 5], [0, 5, 6, 5.6], [0, 5.6, 6, 11.6], [6, 0, 7.4, 3.6], [7.4, 0, 13, 5.4], [8.6, 5.4, 13, 11.6]];
+  const cubeFront = wall(t, Q(0, 0), Q(6, 0), 0.2);
+  opening(t, 'window', cubeFront, 3.0, { width: 2.8, sill: 0, height: 2.2 }); // upper half of the tall window
+  opening(t, 'window', wall(t, Q(0, 5.6), Q(0, 0), 0.2), 2.6, { width: 0.6, sill: 0.4, height: 1.8 }); // ranura lateral
+  wall(t, Q(6, 0), Q(6, 5.6), 0.2);
+  wall(t, Q(0, 5.6), Q(6, 5.6), 0.2); // privacy wall of the rooftop
+  ops.setRoofHeight(p, t, room(t, rect(0, 0, 6, 5.6), 'Techo del cubo', 'roof'), 2.6);
+  // Deck over the suite plus the stair landing (x 6–7,2 y 9–10,2); open against the cube wall (edge 0) and where
+  // the stair arrives (edge 2), glass railing everywhere else.
+  room(t, poly([0, 5.6], [6, 5.6], [6, 9], [7.2, 9], [7.2, 10.2], [6, 10.2], [6, 11.6], [0, 11.6]), 'Rooftop', 'balcony',
+    { openEdges: [0, 2], railing: 'vidrio', floorMaterial: 'madera' });
+  // Roof slabs over the rest of the one-storey part (the patio and the stairwell stay open).
+  const roofs = [[6, 0, 7.4, 3.6], [6, 3.6, 7.4, 5], [7.4, 0, 13, 5.4], [8.6, 5.4, 13, 11.6]];
   roofs.forEach(([x0, y0, x1, y1], i) => {
     const id = room(t, rect(x0, y0, x1, y1), `Cubierta ${i + 1}`, 'roof');
     ops.setRoofHeight(p, t, id, 0.001);
@@ -186,6 +198,21 @@ function pointInPolygon(q, pts) {
 }
 const enclosed = ground.rooms.filter((r) => r.kind === 'room');
 const isHallFront = (w) => w.a.y === DEPTH && w.b.y === DEPTH && Math.min(w.a.x, w.b.x) >= 6 - 0.01;
+// The cube (plan x 0–6, y 6 → 11,6) reads as one slate volume from outside, on both levels.
+const CUBE = [{ x: 0, y: DEPTH - 5.6 }, { x: 6, y: DEPTH - 5.6 }, { x: 6, y: DEPTH }, { x: 0, y: DEPTH }];
+const onCube = (w) => [w.a, w.b].every((q) => q.x >= -0.01 && q.x <= 6.01 && q.y >= DEPTH - 5.61 && q.y <= DEPTH + 0.01)
+  && (w.a.x === w.b.x ? w.a.x === 0 : w.a.y === DEPTH);
+for (const w of rooftop.walls) {
+  const dx = w.b.x - w.a.x;
+  const dy = w.b.y - w.a.y;
+  const l = Math.hypot(dx, dy);
+  const face = (s) => {
+    const off = w.thickness / 2 + 0.05;
+    const q = { x: (w.a.x + w.b.x) / 2 + (-dy / l) * s * off, y: (w.a.y + w.b.y) / 2 + (dx / l) * s * off };
+    return pointInPolygon(q, CUBE) ? { finish: 'pintura', color: PALETA.arena } : { finish: 'pintura', color: PALETA.pizarra };
+  };
+  w.sides = { left: face(1), right: face(-1) };
+}
 for (const w of ground.walls) {
   const dx = w.b.x - w.a.x;
   const dy = w.b.y - w.a.y;
@@ -194,6 +221,7 @@ for (const w of ground.walls) {
     const off = w.thickness / 2 + 0.05;
     const q = { x: (w.a.x + w.b.x) / 2 + (-dy / l) * s * off, y: (w.a.y + w.b.y) / 2 + (dx / l) * s * off };
     if (enclosed.some((r) => pointInPolygon(q, r.points))) return { finish: 'pintura', color: PALETA.arena };
+    if (onCube(w)) return { finish: 'pintura', color: PALETA.pizarra };
     return isHallFront(w) ? { finish: 'madera' } : { finish: 'pintura', color: PALETA.arena };
   };
   w.sides = { left: face(1), right: face(-1) };
@@ -289,11 +317,17 @@ piece('sillon', 5.2, 0.8, 45, { color: pizarra });
 onWall(r, 'n', 'cortina', 0.75, { color: arena });
 onWall(r, 'n', 'cortina', 5.25, { color: arena });
 
+// Walk-in dressing room (user's reference photo): open walnut modules in a U along the back and right walls, with
+// LED strips, a rug and a pouf in the middle; the left side stays free for the doors (bedroom and bathroom).
 r = R('Vestier');
-onWall(r, 's', 'closet', 3.95, { color: arena });
-onWall(r, 's', 'closet', 5.2, { color: arena });
-onWall(r, 'e', 'closet', 4.4, { color: arena });
+onWall(r, 's', 'vestier-repisas', 3.6, { depth: 0.55 });
+onWall(r, 's', 'vestier-colgar', 4.45);
+onWall(r, 's', 'vestier-cajones', 5.45);
+onWall(r, 'e', 'vestier-colgar', 4.2);
+onWall(r, 'e', 'vestier-zapatos', 5.05);
 onWall(r, 'w', 'espejo-cuerpo', 3.9);
+piece('alfombra', 4.45, 4.45, 0, { width: 1.5, depth: 1.3, color: taupe });
+piece('puf', 4.45, 4.45, 0, { color: caramelo });
 
 r = R('Baño principal');
 onWall(r, 'n', 'ducha', 0.6);
@@ -350,20 +384,23 @@ piece('arbusto', 1.0, DEPTH + 0.5);
 piece('arbusto', 4.6, DEPTH + 0.5);
 piece('porton-telescopico', 10.2, DEPTH + 1 - 0.06, 0, { width: 5.6 });
 
-// Rooftop (plan y 6,6 → 11,6, x 1 → 6): wooden pergola over the lounge, BBQ corner at the back, plants.
+// Rooftop over the master suite (plan x 0 → 6, y 0 → 6): lounge under a wooden pergola against the cube's privacy
+// wall, BBQ and dining at the back, plants along the edges.
 target = rooftop;
-piece('pergola', 3.5, 10.0, 0, { width: 5.0, depth: 3.2, color: caramelo });
-piece('sofa-exterior', 3.5, 11.1, 180, { color: taupe });
-piece('sillon-exterior', 1.75, 9.7, 270, { color: pizarra });
-piece('sillon-exterior', 5.25, 9.7, 90, { color: pizarra });
-piece('alfombra', 3.5, 9.9, 0, { width: 2.6, depth: 1.8, color: arena });
-piece('mesa-centro', 3.5, 9.9, 0, { color: caramelo });
-piece('puf', 4.4, 9.0, 0, { color: caramelo });
-piece('parrilla', 2.0, 7.0);
-piece('bar', 4.2, 7.0, 0, { color: caramelo });
-piece('jardinera', 1.3, 8.2, 90, { color: oliva });
-piece('matera-alta', 1.3, 11.3, 0, { color: oliva });
-piece('matera-alta', 5.7, 11.3, 0, { color: oliva });
+piece('pergola', 3.0, 4.3, 0, { width: 5.2, depth: 3.2, color: caramelo });
+piece('sofa-exterior', 2.6, 5.5, 180, { color: taupe });
+piece('sillon-exterior', 0.9, 4.2, 270, { color: pizarra });
+piece('sillon-exterior', 4.3, 4.2, 90, { color: pizarra });
+piece('alfombra', 2.6, 4.3, 0, { width: 2.6, depth: 1.8, color: arena });
+piece('mesa-centro', 2.6, 4.3, 0, { color: caramelo });
+piece('puf', 3.5, 3.4, 0, { color: caramelo });
+piece('jardin-vertical', 5.0, 5.85, 180, { width: 1.4 });
+piece('parrilla', 1.0, 0.45);
+piece('bar', 3.0, 0.45, 0, { color: caramelo });
+piece('mesa-exterior', 3.0, 1.9, 0, { color: caramelo });
+piece('jardinera', 0.35, 2.6, 90, { color: oliva });
+piece('matera-alta', 5.6, 0.4, 0, { color: oliva });
+piece('matera-alta', 0.4, 5.6, 0, { color: oliva });
 
 writeFileSync(OUT, JSON.stringify(project, null, 2) + '\n');
 execFileSync(process.execPath, [join(root, 'scripts/nuevo-id-ejemplo.mjs'), OUT], { stdio: 'inherit' });

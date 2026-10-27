@@ -17,7 +17,10 @@ export type FurnitureModel =
   | 'alacena' | 'sanitario' | 'lavamanos' | 'ducha' | 'banera' | 'espejo' | 'lavadero' | 'lavadora' | 'matera'
   | 'banca' | 'carro' | 'moto' | 'piscina' | 'asoleadora' | 'sombrilla' | 'pergola' | 'bar' | 'parrilla'
   | 'jardinera' | 'arbol' | 'poste' | 'centroEntretenimiento' | 'cortina' | 'tiraLed' | 'cuadro' | 'repisa'
-  | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical' | 'porton';
+  | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical' | 'porton' | 'vestier';
+
+/** Open walk-in dressing modules (model 'vestier'): what each one holds. */
+export type Dressing = 'colgar' | 'repisas' | 'zapatos' | 'cajones';
 
 /** Artwork of a framed picture (model 'cuadro'). */
 export type Art = 'paisaje' | 'abstracto' | 'byn' | 'gamer';
@@ -45,6 +48,8 @@ export interface CatalogItem {
   art?: Art;
   /** trees: colour of the (sparse) flowers in the crown */
   flowers?: string;
+  /** walk-in dressing modules: hanging rail, shelves, shoe rack or drawers */
+  dressing?: Dressing;
 }
 
 const item = (
@@ -55,6 +60,7 @@ const item = (
 // Warm, neutral colours: wood, linen, greys.
 const ROBLE = '#b08a63';
 const NOGAL = '#7a5a3f';
+const NOGAL_CLARO = '#9a6f4b';
 const LINO = '#d9cfc0';
 const GRIS = '#8d939b';
 const GRAFITO = '#3b3f45';
@@ -70,6 +76,10 @@ export const CATALOG: CatalogItem[] = [
   item('cama-sencilla', 'Cama sencilla', 'Dormitorio', 'cama', [1.0, 1.9, 0.95], LINO),
   item('mesa-noche', 'Mesa de noche', 'Dormitorio', 'mesaNoche', [0.45, 0.4, 0.55], ROBLE),
   item('closet', 'Clóset', 'Dormitorio', 'closet', [1.2, 0.6, 2.2], BLANCO),
+  item('vestier-colgar', 'Vestier: módulo para colgar', 'Dormitorio', 'vestier', [1.0, 0.55, 2.4], NOGAL_CLARO, { dressing: 'colgar' }),
+  item('vestier-repisas', 'Vestier: repisas', 'Dormitorio', 'vestier', [0.7, 0.55, 2.4], NOGAL_CLARO, { dressing: 'repisas' }),
+  item('vestier-zapatos', 'Vestier: zapatero y bolsos', 'Dormitorio', 'vestier', [0.7, 0.55, 2.4], NOGAL_CLARO, { dressing: 'zapatos' }),
+  item('vestier-cajones', 'Vestier: cajonera con repisas', 'Dormitorio', 'vestier', [1.0, 0.55, 2.4], NOGAL_CLARO, { dressing: 'cajones' }),
   item('comoda', 'Cómoda', 'Dormitorio', 'comoda', [1.0, 0.45, 0.85], ROBLE),
   // Sala
   item('sofa-3', 'Sofá 3 puestos', 'Sala', 'sofa', [2.1, 0.9, 0.85], GRIS),
