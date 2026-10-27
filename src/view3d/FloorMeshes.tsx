@@ -121,13 +121,25 @@ function Railing({ a, b, type, color, ground }: { a: Vec2; b: Vec2; type: Railin
   );
 }
 
+/** Thickness of a solid (finished) roof slab. */
+const SOLID_ROOF = 0.3;
+
 function RoomSlab({ room, walls, selected, floorHeight, ground }: { room: Room; walls: Wall[]; selected: boolean; floorHeight: number; ground: boolean }) {
   const pal = usePalette();
   const geometry = useMemo(() => {
     const shape = new THREE.Shape(room.points.map((p) => new THREE.Vector2(p.x, p.y)));
-    return new THREE.ExtrudeGeometry(shape, { depth: room.kind === 'roof' ? 0.06 : 0.02, bevelEnabled: false });
-  }, [room.points, room.kind]);
+    const depth = room.kind !== 'roof' ? 0.02 : room.floorMaterial ? SOLID_ROOF : 0.06;
+    return new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false });
+  }, [room.points, room.kind, room.floorMaterial]);
   if (room.kind === 'stairs') return <StairsMesh room={room} rise={floorHeight} selected={selected} />;
+  if (room.kind === 'roof' && room.floorMaterial && !selected) {
+    // A solid roof: an opaque slab with its finish on top and a fascia of its own colour, hanging down from the
+    // same top level as the light sheet below.
+    const materials = [floorSurfaceMaterial(room.floorMaterial), plainMaterial(room.edgeColor ?? '#e8ebef', 0.8)];
+    return (
+      <mesh geometry={geometry} material={materials} rotation={[Math.PI / 2, 0, 0]} position={[0, (room.height ?? floorHeight) + 0.06, 0]} castShadow receiveShadow />
+    );
+  }
   if (room.kind === 'roof') {
     // A covering only: a thin light sheet at its own height, slightly see-through.
     return (

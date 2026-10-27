@@ -30,6 +30,7 @@ const room = z.object({
   railing: z.enum(['vidrio', 'muro', 'celosia']).optional(),
   openEdges: z.array(z.number().int().min(0)).optional(),
   railingColor: color.optional(),
+  edgeColor: color.optional(),
 });
 const furniture = z.object({
   id: z.string(), type: z.string().min(1), x: z.number().finite(), y: z.number().finite(), rotation: z.number().finite(),

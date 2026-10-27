@@ -80,8 +80,10 @@ const json = await page.evaluate(async (DEPTH) => {
   ops.renameFloor(p, g, 'Primer piso');
 
   // --- Outside walls (the garage front stays open to the street, the patio open to the back patio) ---
-  const frontSala = wall(g, Q(0, 0), Q(6, 0), 0.2);
-  opening(g, 'window', frontSala, 3.0, { width: 2.8, sill: 0.3, height: 2.3 }); // lower half of the cube's tall window
+  // The cube's front in three pieces: the middle one (x 1,2–4,8) frames the tall window in wood on both levels.
+  wall(g, Q(0, 0), Q(1.2, 0), 0.2);
+  opening(g, 'window', wall(g, Q(1.2, 0), Q(4.8, 0), 0.2), 1.8, { width: 2.8, sill: 0.3, height: 2.3 }); // lower half of the tall window
+  wall(g, Q(4.8, 0), Q(6, 0), 0.2);
   wall(g, Q(13, 0), Q(13, 5.4), 0.2); // costado del garaje
   opening(g, 'window', wall(g, Q(13, 5.4), Q(13, 7.2), 0.2), 0.9, high); // baño cuarto 3
   opening(g, 'window', wall(g, Q(13, 7.2), Q(13, 8.5), 0.2), 0.65, { width: 0.9 }); // cuarto 3
@@ -111,15 +113,13 @@ const json = await page.evaluate(async (DEPTH) => {
   const cubeBack = wall(g, Q(0, 5.6), Q(6, 5.6)); // cubo | suite y baño social
   opening(g, 'door', cubeBack, 5.2, { width: 0.7 }); // cubo → baño social
 
-  // --- Master suite 6 × 6: compact bathroom, walk-in dressing room as the lobby, social bathroom beside it ---
-  opening(g, 'door', wall(g, Q(2, 5.6), Q(2, 8)), 1.6, { width: 0.7 }); // vestier → baño principal
+  // --- Master suite 6 × 6: bedroom, walk-in dressing room and bathroom with no walls between them; the open walnut
+  // dressing modules are the partitions (see the furniture). The social bathroom beside it keeps its walls. ---
   wall(g, Q(4.4, 5.6), Q(4.4, 8)); // vestier | baño social
-  const suiteFront = wall(g, Q(0, 8), Q(6, 8));
-  opening(g, 'door', suiteFront, 3.2, { width: 0.9 }); // dormitorio → vestier
+  wall(g, Q(4.4, 8), Q(6, 8)); // baño social | dormitorio
   opening(g, 'window', wall(g, Q(6, 5.6), Q(6, 8)), 1.2, high); // baño social, ventana alta al patio
-  const suitePatio = wall(g, Q(6, 8), Q(6, 11.6));
-  opening(g, 'window', suitePatio, 0.9, { width: 1.2 }); // vista al patio
-  glassDoor(g, suitePatio, 2.3, { width: 1.0 }); // dormitorio ↔ patio
+  // Towards the patio: the 70" TV hangs on this wall facing the bed, the glass door sits by the dressing room.
+  glassDoor(g, wall(g, Q(6, 8), Q(6, 11.6)), 0.6, { width: 1.0 }); // dormitorio ↔ patio
 
   // --- Bedrooms 2 and 3, each with its own bathroom, opening onto the patio ---
   wall(g, Q(8.6, 5.4), Q(13, 5.4), 0.15); // garaje | cuarto 3
@@ -160,8 +160,9 @@ const json = await page.evaluate(async (DEPTH) => {
   // wall screens it from the street.
   const t = ops.addFloor(p);
   ops.renameFloor(p, t, 'Rooftop');
-  const cubeFront = wall(t, Q(0, 0), Q(6, 0), 0.2);
-  opening(t, 'window', cubeFront, 3.0, { width: 2.8, sill: 0, height: 2.2 }); // upper half of the tall window
+  wall(t, Q(0, 0), Q(1.2, 0), 0.2);
+  opening(t, 'window', wall(t, Q(1.2, 0), Q(4.8, 0), 0.2), 1.8, { width: 2.8, sill: 0, height: 2.2 }); // upper half of the tall window
+  wall(t, Q(4.8, 0), Q(6, 0), 0.2);
   opening(t, 'window', wall(t, Q(0, 5.6), Q(0, 0), 0.2), 2.6, { width: 0.6, sill: 0.4, height: 1.8 }); // ranura lateral
   wall(t, Q(6, 0), Q(6, 5.6), 0.2);
   wall(t, Q(0, 5.6), Q(6, 5.6), 0.2); // privacy wall of the rooftop
@@ -170,12 +171,13 @@ const json = await page.evaluate(async (DEPTH) => {
   // the stair arrives (edge 2), glass railing everywhere else.
   room(t, poly([0, 5.6], [6, 5.6], [6, 9], [7.2, 9], [7.2, 10.2], [6, 10.2], [6, 11.6], [0, 11.6]), 'Rooftop', 'balcony',
     { openEdges: [0, 2], railing: 'vidrio', floorMaterial: 'madera' });
-  // Roof slabs over the rest of the one-storey part (the patio and the stairwell stay open).
-  const roofs = [[6, 0, 7.4, 3.6], [6, 3.6, 7.4, 5], [7.4, 0, 13, 5.4], [8.6, 5.4, 13, 11.6]];
-  roofs.forEach(([x0, y0, x1, y1], i) => {
-    const id = room(t, rect(x0, y0, x1, y1), `Cubierta ${i + 1}`, 'roof');
-    ops.setRoofHeight(p, t, id, 0.001);
-  });
+  // Solid roof slabs over the rest of the one-storey part (the patio and the stairwell stay open). Over the porch,
+  // hall and garage it runs 0,9 m past the front as an eave with a wooden fascia; see the finishes below.
+  const roofs = [
+    ['Alero y cubierta del garaje', poly([6, -0.9], [13, -0.9], [13, 5.4], [7.4, 5.4], [7.4, 5], [6, 5])],
+    ['Cubierta de los cuartos', rect(8.6, 5.4, 13, 11.6)],
+  ];
+  for (const [name, pts] of roofs) ops.setRoofHeight(p, t, room(t, pts, name, 'roof'), 0.001);
 
   return serializeProject(p);
 }, DEPTH);
@@ -201,6 +203,8 @@ const enclosed = ground.rooms.filter((r) => r.kind === 'room');
 const PORCH = [{ x: 6, y: DEPTH - 1.5 }, { x: 7.4, y: DEPTH - 1.5 }, { x: 7.4, y: DEPTH }, { x: 6, y: DEPTH }];
 // The cube (plan x 0–6, y 6 → 11,6) reads as one slate volume from outside, on both levels.
 const CUBE = [{ x: 0, y: DEPTH - 5.6 }, { x: 6, y: DEPTH - 5.6 }, { x: 6, y: DEPTH }, { x: 0, y: DEPTH }];
+// The middle of the cube's front (x 1,2–4,8, around the tall window) is lined in wood outside, on both levels.
+const onFrame = (w) => w.a.y === DEPTH && w.b.y === DEPTH && Math.min(w.a.x, w.b.x) > 1.1 && Math.max(w.a.x, w.b.x) < 4.9;
 const onCube = (w) => [w.a, w.b].every((q) => q.x >= -0.01 && q.x <= 6.01 && q.y >= DEPTH - 5.61 && q.y <= DEPTH + 0.01)
   && (w.a.x === w.b.x ? w.a.x === 0 : w.a.y === DEPTH);
 for (const w of rooftop.walls) {
@@ -210,7 +214,8 @@ for (const w of rooftop.walls) {
   const face = (s) => {
     const off = w.thickness / 2 + 0.05;
     const q = { x: (w.a.x + w.b.x) / 2 + (-dy / l) * s * off, y: (w.a.y + w.b.y) / 2 + (dx / l) * s * off };
-    return pointInPolygon(q, CUBE) ? { finish: 'pintura', color: PALETA.arena } : { finish: 'pintura', color: PALETA.pizarra };
+    if (pointInPolygon(q, CUBE)) return { finish: 'pintura', color: PALETA.arena };
+    return onFrame(w) ? { finish: 'madera' } : { finish: 'pintura', color: PALETA.pizarra };
   };
   w.sides = { left: face(1), right: face(-1) };
 }
@@ -222,6 +227,7 @@ for (const w of ground.walls) {
     const off = w.thickness / 2 + 0.05;
     const q = { x: (w.a.x + w.b.x) / 2 + (-dy / l) * s * off, y: (w.a.y + w.b.y) / 2 + (dx / l) * s * off };
     if (enclosed.some((r) => pointInPolygon(q, r.points))) return { finish: 'pintura', color: PALETA.arena };
+    if (onFrame(w)) return { finish: 'madera' };
     if (onCube(w)) return { finish: 'pintura', color: PALETA.pizarra };
     return pointInPolygon(q, PORCH) ? { finish: 'madera' } : { finish: 'pintura', color: PALETA.arena };
   };
@@ -233,6 +239,10 @@ for (const r of ground.rooms) {
   r.floorMaterial = MATERIAL.find(([re]) => re.test(r.name))?.[1] ?? 'porcelanato';
 }
 rooftop.rooms.find((r) => r.name === 'Rooftop').railingColor = PALETA.pizarra;
+// Solid roofs instead of the light sheet: the cube's lid in slate, a caramel wooden band over the porch and garage,
+// sand over the bedrooms.
+const ROOFS = { 'Techo del cubo': PALETA.pizarra, 'Alero y cubierta del garaje': PALETA.caramelo, 'Cubierta de los cuartos': PALETA.arena };
+for (const [name, edgeColor] of Object.entries(ROOFS)) Object.assign(rooftop.rooms.find((r) => r.name === name), { floorMaterial: 'concreto', edgeColor });
 
 // ---------- Lot: lawn, back patio, sidewalk and street (design coordinates, outside the house) ----------
 const D = (x, y) => ({ x, y: DEPTH - y });
@@ -304,31 +314,42 @@ r = R('Baño social');
 onWall(r, 'n', 'sanitario', 5.2);
 onWall(r, 'w', 'lavamanos', 4.8);
 
-// Master suite: bed against the left wall (where the window was), facing the patio; big glass door to the back.
+// Master suite: bed against the left wall (where the window was), the 70" TV facing it on the patio wall, big glass
+// door to the back patio.
 r = R('Cuarto principal');
-piece('alfombra', 1.9, 1.8, 90, { width: 2.8, depth: 2.2, color: taupe });
-onWall(r, 'w', 'cama-king', 1.8, { color: arena });
-onWall(r, 'w', 'mesa-noche', 0.55, { color: caramelo });
-onWall(r, 'w', 'mesa-noche', 3.05, { color: caramelo });
-onWall(r, 's', 'comoda', 5.0, { color: caramelo });
-piece('sillon', 5.2, 0.8, 45, { color: pizarra });
+const SPLIT = r.y1; // plan y 3,6: bedroom | bathroom + dressing room (no wall: the dressing modules divide them)
+piece('alfombra', 1.9, 1.6, 90, { width: 2.8, depth: 2.2, color: taupe });
+onWall(r, 'w', 'cama-king', 1.6, { color: arena });
+onWall(r, 'w', 'mesa-noche', 0.375, { color: caramelo });
+onWall(r, 'w', 'mesa-noche', 2.825, { color: caramelo });
+onWall(r, 'w', 'cuadro-abstracto', 1.6, { width: 1.4, height: 0.7, elevation: 1.3, color: caramelo });
+onWall(r, 'e', 'mueble-tv', 1.6, { color: oliva });
+onWall(r, 'e', 'televisor-70', 1.6, { gap: 0.02 });
+piece('sillon', 4.5, 0.75, 30, { color: pizarra });
 onWall(r, 'n', 'cortina', 0.75, { color: arena });
 onWall(r, 'n', 'cortina', 5.25, { color: arena });
+// Towards the bedroom: open modules facing it in front of the bathroom, then a chest of drawers backing onto the
+// dressing room's hanging module, then the 1,1 m way into the dressing room.
+onWall(r, 's', 'vestier-repisas', 0.4);
+onWall(r, 's', 'vestier-cajones', 1.35);
+onWall(r, 's', 'comoda', 2.55, { color: caramelo });
 
-// Walk-in dressing room (user's reference photo) as the suite's lobby: bedroom → vestier → bathroom. Open walnut
-// modules in an L along the back and right walls with LED strips; the left side stays free for the bathroom door.
+// Walk-in dressing room (user's reference photo) as the suite's lobby, with no walls: the open walnut modules are
+// the partitions. Towards the bathroom (x 2) a shoe module facing the dressing room, then the 1 m way into the
+// bathroom by the cube wall.
 r = R('Vestier');
-onWall(r, 's', 'vestier-colgar', 2.6);
-onWall(r, 's', 'vestier-cajones', 3.73, { width: 1.15 });
-onWall(r, 'e', 'vestier-repisas', 4.05, { depth: 0.55 });
-onWall(r, 'e', 'vestier-zapatos', 5.1);
-onWall(r, 'w', 'espejo-cuerpo', 5.3);
-piece('alfombra', 3.1, 4.6, 0, { width: 1.2, depth: 1.0, color: taupe });
-piece('puf', 3.1, 4.6, 0, { color: caramelo });
+piece('vestier-colgar', 2.55, SPLIT + 0.275, 0);
+piece('vestier-zapatos', 2.275, SPLIT + 0.9, 270);
+onWall(r, 'e', 'vestier-repisas', 4.75);
+onWall(r, 'e', 'vestier-zapatos', 5.5);
+onWall(r, 's', 'vestier-cajones', 3.2, { width: 1.15 });
+onWall(r, 's', 'espejo-cuerpo', 2.3, { width: 0.5 });
+piece('alfombra', 3.2, 4.85, 0, { width: 1.2, depth: 1.0, color: taupe });
+piece('puf', 3.2, 4.85, 0, { color: caramelo });
 
-// Compact master bathroom: the same rain shower, toilet and a single basin.
+// Compact master bathroom: the same rain shower, toilet and a single basin; reached through the dressing room.
 r = R('Baño principal');
-onWall(r, 'n', 'ducha', 0.55);
+piece('ducha', 0.5, SPLIT + 0.45, 0);
 onWall(r, 'w', 'sanitario', 5.0);
 onWall(r, 's', 'lavamanos', 1.3);
 onWall(r, 's', 'espejo', 1.3, { width: 0.6 });
@@ -338,6 +359,9 @@ onWall(r, 'n', 'cama-doble', 10.3, { color: arena });
 onWall(r, 'n', 'mesa-noche', 9.35, { color: caramelo });
 onWall(r, 'n', 'mesa-noche', 11.25, { color: caramelo });
 onWall(r, 's', 'closet', 9.4, { color: taupe });
+onWall(r, 'n', 'cuadro-paisaje', 10.3, { width: 1.1, height: 0.6, elevation: 1.25, color: caramelo });
+piece('alfombra', 10.3, 4.7, 0, { width: 2.0, depth: 1.2, color: taupe });
+piece('matera', 10.95, 5.85, 0, { color: oliva });
 
 r = R('Baño cuarto 3');
 onWall(r, 's', 'ducha', 12.5);
@@ -349,6 +373,10 @@ onWall(r, 's', 'cama-doble', 10.3, { color: arena });
 onWall(r, 's', 'mesa-noche', 9.35, { color: caramelo });
 onWall(r, 's', 'mesa-noche', 11.25, { color: caramelo });
 onWall(r, 'n', 'closet', 9.3, { color: taupe });
+onWall(r, 's', 'cuadro-byn', 9.95, { color: caramelo });
+onWall(r, 's', 'cuadro-byn', 10.65, { color: caramelo });
+piece('alfombra', 10.3, 1.0, 0, { width: 2.0, depth: 1.2, color: arena });
+piece('matera', 11.1, 0.35, 0, { color: oliva });
 
 r = R('Baño cuarto 2');
 onWall(r, 'n', 'ducha', 11.9);
@@ -382,7 +410,9 @@ piece('matera-alta', 5.6, -1.5, 0, { color: oliva });
 
 // Front porch: a wooden portico over the stone path, a bench and tall plants inside the recess; long planters along
 // the cube's tall window give the living room privacy from the street.
-piece('pergola', 6.7, DEPTH + 0.5, 0, { width: 1.6, depth: 1.0, height: 2.6, color: caramelo });
+// Warm LED lines under the eave (over the porch and the driveway) for the night view.
+piece('tira-led', 6.7, DEPTH + 0.5, 0, { width: 1.2, elevation: 2.3, color: '#ffd9a0' });
+piece('tira-led', 10.2, DEPTH + 0.5, 0, { width: 5.2, elevation: 2.3, color: '#ffd9a0' });
 piece('banca', 7.15, DEPTH - 0.75, 90, { width: 1.1, color: caramelo });
 piece('matera-alta', 6.3, DEPTH - 0.3, 0, { color: oliva });
 piece('cuadro-paisaje', 6.7, DEPTH - 1.4, 180, { width: 0.6, height: 0.5, elevation: 2.35 }); // número de la casa
@@ -390,7 +420,11 @@ piece('jardinera', 1.6, DEPTH + 0.5, 0, { color: pizarra });
 piece('jardinera', 3.5, DEPTH + 0.5, 0, { color: pizarra });
 piece('arbusto', 5.3, DEPTH + 0.5);
 piece('arbusto', 0.3, DEPTH + 0.5);
-piece('porton-telescopico', 10.2, DEPTH + 1 - 0.06, 0, { width: 5.6 });
+piece('porton-telescopico', 10.2, DEPTH + 1 - 0.06, 0, { width: 5.6, color: caramelo });
+// Landscaping: a small tree at the corner of the lot by the cube, guayacanes on the sidewalk.
+piece('arbol-pequeno', -0.5, DEPTH + 0.5);
+piece('arbol-guayacan', -1.6, DEPTH + 1.75);
+piece('arbol-guayacan', 14.8, DEPTH + 1.75);
 
 // Rooftop over the master suite (plan x 0 → 6, y 0 → 6): lounge under a wooden pergola against the cube's privacy
 // wall, BBQ and dining at the back, plants along the edges.

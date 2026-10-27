@@ -88,6 +88,7 @@ export const CATALOG: CatalogItem[] = [
   item('mesa-centro', 'Mesa de centro', 'Sala', 'mesaCentro', [1.1, 0.6, 0.42], NOGAL),
   item('mueble-tv', 'Mueble de TV', 'Sala', 'muebleTV', [1.6, 0.4, 0.5], NOGAL),
   item('televisor', 'Televisor 55"', 'Sala', 'televisor', [1.23, 0.08, 0.72], '#1d1f22', { elevation: 0.5, onTop: true }),
+  item('televisor-70', 'Televisor 70" (de pared)', 'Sala', 'televisor', [1.56, 0.06, 0.9], '#1d1f22', { elevation: 0.95 }),
   item('alfombra', 'Alfombra', 'Sala', 'alfombra', [2.0, 1.4, 0.01], '#c9b79c'),
   item('lampara-pie', 'Lámpara de pie', 'Sala', 'lampara', [0.35, 0.35, 1.6], '#e9dcc3'),
   // Wall unit: low cabinet, two shelf towers, a bridge shelf on top and a niche for the TV (a separate piece).
