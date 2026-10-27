@@ -66,6 +66,7 @@ export const CATALOG: CatalogItem[] = [
   // Dormitorio
   item('cama-doble', 'Cama doble', 'Dormitorio', 'cama', [1.4, 1.9, 1.0], LINO, { double: true }),
   item('cama-queen', 'Cama queen', 'Dormitorio', 'cama', [1.6, 2.0, 1.05], LINO, { double: true }),
+  item('cama-king', 'Cama king', 'Dormitorio', 'cama', [2.0, 2.0, 1.05], LINO, { double: true }),
   item('cama-sencilla', 'Cama sencilla', 'Dormitorio', 'cama', [1.0, 1.9, 0.95], LINO),
   item('mesa-noche', 'Mesa de noche', 'Dormitorio', 'mesaNoche', [0.45, 0.4, 0.55], ROBLE),
   item('closet', 'Clóset', 'Dormitorio', 'closet', [1.2, 0.6, 2.2], BLANCO),
