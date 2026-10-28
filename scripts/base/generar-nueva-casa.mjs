@@ -20,8 +20,9 @@
 //   y 11–15   study x 1–4,5 · central patio x 4,5–14 · social bathroom (opening onto the kitchen-dining room) and
 //             laundry x 10,5–14 (y 11–13), the patio's end behind a celosía
 //   y 15–20   master suite x 1–6,6 (bedroom between the patio and the back patio, a private door to the study;
-//             dressing room and bathroom along the outer side) · an open covered passage x 6,6–8 from the patio to
-//             the back patio · bedrooms 2 and 3 x 8–14, each with its bathroom
+//             an L-shaped dressing room and, at the end, the bathroom with the shower, along the outer side)
+//   y 15–21,2 piezas 1 and 2 x 6,6–14, reaching 1,2 m further back: glass door to the patio at the front and to the
+//             back patio at the back, each with its bathroom
 //   y 20–32   back patio: a stone terrace the full width of the house with a fire-pit lounge, lawn and trees
 //   up        a landing inside the cube, a bridge over the patio and the rooftop over bedrooms 2 and 3
 import { execFileSync } from 'node:child_process';
@@ -105,15 +106,16 @@ const json = await page.evaluate(async ([RIGHT, TOTAL]) => {
   opening(g, 'window', wall(g, Q(1, 20), Q(1, 15), 0.2), 2.8, { width: 1.2, sill: 1.6, height: 0.5 }); // vestier y baño, alta
   opening(g, 'window', wall(g, Q(14, 5), Q(14, 11), 0.2), 3.0, { width: 2.0, sill: 1.0, height: 1.2 }); // cocina
   opening(g, 'window', wall(g, Q(14, 11), Q(14, 13), 0.2), 1.0, high); // lavandería
-  opening(g, 'window', wall(g, Q(14, 15), Q(14, 18), 0.2), 1.5, { width: 1.2 }); // cuarto 3
-  opening(g, 'window', wall(g, Q(14, 18), Q(14, 20), 0.2), 1.0, high); // baño cuarto 3
+  opening(g, 'window', wall(g, Q(14, 15), Q(14, 19), 0.2), 0.75, { width: 0.9 }); // pieza 2
+  opening(g, 'window', wall(g, Q(14, 19), Q(14, 21.2), 0.2), 1.1, high); // baño pieza 2
 
-  // --- Back (y 20): every bedroom also opens to the back, opposite its door to the patio ---
+  // --- Back: every bedroom also opens to the back patio, opposite its door to the patio ---
   const backSuite = wall(g, Q(6.6, 20), Q(1, 20), 0.2);
   glassDoor(g, backSuite, 1.7, { width: 2.6, height: 2.4 }); // ventanal del cuarto principal
-  opening(g, 'window', backSuite, 4.5, { width: 1.2, sill: 0.9, height: 1.3 }); // sobre la tina
-  opening(g, 'window', wall(g, Q(11, 20), Q(8, 20), 0.2), 0.6, { width: 1.0 }); // cuarto 2
-  opening(g, 'window', wall(g, Q(14, 20), Q(11, 20), 0.2), 2.4, { width: 0.9 }); // cuarto 3
+  opening(g, 'window', backSuite, 4.5, { ...high, width: 0.8 }); // baño principal, sobre la ducha
+  wall(g, Q(6.6, 20), Q(6.6, 21.2), 0.2); // costado de la pieza 1, que sobresale 1,2 m
+  glassDoor(g, wall(g, Q(10.3, 21.2), Q(6.6, 21.2), 0.2), 0.95, { width: 1.2 }); // pieza 1 → patio trasero
+  glassDoor(g, wall(g, Q(14, 21.2), Q(10.3, 21.2), 0.2), 2.75, { width: 1.2 }); // pieza 2 → patio trasero
 
   // --- Social zone: one open space, no hall. The front door opens straight into it: the double-height cube (living
   // room, the stair rising along its back wall) and the kitchen-dining room beside it with no wall between them. ---
@@ -133,48 +135,40 @@ const json = await page.evaluate(async ([RIGHT, TOTAL]) => {
   opening(g, 'door', wall(g, Q(10.5, 13), Q(14, 13)), 2.6, { width: 0.8 }); // patio → lavandería
 
   // --- Master suite (x 1–6,6, y 15–20), single height: the bedroom (x 3,2–6,6) opens to the patio at the front, to
-  // the back patio through the big glass door, and privately to the study; the dressing room and bathroom (user's
-  // reference photo) run along the outer side: toilet by the entrance, walnut shelving on the bedroom wall, double
-  // vanity on the outer wall, and the glass wet room with shower and freestanding tub under the back window. ---
+  // the back patio through the big glass door, and privately to the study. Along the outer side, from the bedroom:
+  // an L-shaped walk-in dressing room, then the bathroom at the end with the shower (no tub). ---
   opening(g, 'door', wall(g, Q(1, 15), Q(4.5, 15)), 2.9, { width: 0.8 }); // estudio | vestier y cuarto: puerta privada
   glassDoor(g, wall(g, Q(4.5, 15), Q(6.6, 15)), 1.05, { width: 1.8, height: 2.4 }); // cuarto principal ↔ patio
-  opening(g, 'door', wall(g, Q(3.2, 15), Q(3.2, 18.2)), 0.8, { width: 0.75 }); // dormitorio → vestier y baño
-  wall(g, Q(3.2, 18.2), Q(3.2, 20));
-  opening(g, 'door', wall(g, Q(1, 16.4), Q(2.2, 16.4), 0.1), 0.6, { width: 0.6 }); // cuarto del sanitario
-  wall(g, Q(2.2, 15), Q(2.2, 16.4), 0.1);
-  const wetGlass = wall(g, Q(1, 18.2), Q(3.2, 18.2), 0.06); // mampara de vidrio de la zona húmeda
-  glassDoor(g, wetGlass, 0.6, { width: 0.7 });
-  opening(g, 'window', wetGlass, 1.65, { width: 0.9, sill: 0.02, height: 2.1 });
-  wall(g, Q(6.6, 15), Q(6.6, 20)); // cuarto principal | paso (the TV hangs here)
+  opening(g, 'door', wall(g, Q(3.2, 15), Q(3.2, 17.6)), 0.8, { width: 0.75 }); // dormitorio → vestier
+  wall(g, Q(3.2, 17.6), Q(3.2, 20));
+  opening(g, 'door', wall(g, Q(1, 17.6), Q(3.2, 17.6)), 1.65, { width: 0.7 }); // vestier → baño principal
+  wall(g, Q(6.6, 15), Q(6.6, 20)); // cuarto principal | pieza 1 (the TV hangs here)
 
-  // --- Bedrooms 2 and 3: glass door to the patio, windows to the passage or the side and to the back patio,
-  // bathroom in the back corner ---
-  const c2Side = wall(g, Q(8, 15), Q(8, 20)); // paso | cuarto 2
-  opening(g, 'window', c2Side, 2.2, { width: 1.0 });
-  glassDoor(g, wall(g, Q(8, 15), Q(11, 15)), 2.2, { width: 1.0 }); // cuarto 2 ↔ patio
-  const c3Front = wall(g, Q(11, 15), Q(14, 15));
-  glassDoor(g, c3Front, 0.8, { width: 1.0 }); // cuarto 3 ↔ patio
-  opening(g, 'window', c3Front, 2.2, { width: 1.0 });
-  wall(g, Q(11, 15), Q(11, 20)); // cuarto 2 | cuarto 3
-  wall(g, Q(9.8, 18), Q(9.8, 20));
-  opening(g, 'door', wall(g, Q(8, 18), Q(9.8, 18)), 0.9, { width: 0.7 }); // cuarto 2 → su baño
-  wall(g, Q(12.2, 18), Q(12.2, 20));
-  opening(g, 'door', wall(g, Q(12.2, 18), Q(14, 18)), 0.9, { width: 0.7 }); // cuarto 3 → su baño
+  // --- Piezas 1 and 2 (x 6,6–10,3 and 10,3–14, y 15–21,2): glass door to the patio at the front and to the back
+  // patio at the back, closets along the outer wall, bathroom in the back corner ---
+  const p1Front = wall(g, Q(6.6, 15), Q(10.3, 15));
+  glassDoor(g, p1Front, 0.8, { width: 1.0 }); // pieza 1 ↔ patio
+  opening(g, 'window', p1Front, 2.7, { width: 1.2 });
+  const p2Front = wall(g, Q(10.3, 15), Q(14, 15));
+  glassDoor(g, p2Front, 1.0, { width: 1.0 }); // pieza 2 ↔ patio
+  opening(g, 'window', p2Front, 2.7, { width: 1.2 });
+  wall(g, Q(10.3, 15), Q(10.3, 21.2)); // pieza 1 | pieza 2
+  wall(g, Q(8.4, 19), Q(8.4, 21.2));
+  opening(g, 'door', wall(g, Q(6.6, 19), Q(8.4, 19)), 0.9, { width: 0.7 }); // pieza 1 → su baño
+  wall(g, Q(12.2, 19), Q(12.2, 21.2));
+  opening(g, 'door', wall(g, Q(12.2, 19), Q(14, 19)), 0.9, { width: 0.7 }); // pieza 2 → su baño
 
   room(g, rect(1, 5, 14, 11), 'Sala-comedor-cocina');
   room(g, rect(1, 11, 4.5, 15), 'Estudio');
   room(g, rect(10.5, 11, 12.2, 13), 'Baño social');
   room(g, rect(12.2, 11, 14, 13), 'Lavandería');
-  room(g, rect(1, 15, 2.2, 16.4), 'Sanitario');
-  room(g, poly([1, 16.4], [2.2, 16.4], [2.2, 15], [3.2, 15], [3.2, 18.2], [1, 18.2]), 'Vestier y baño principal');
-  room(g, rect(1, 18.2, 3.2, 20), 'Ducha y tina');
+  room(g, rect(1, 15, 3.2, 17.6), 'Vestier');
+  room(g, rect(1, 17.6, 3.2, 20), 'Baño principal');
   room(g, rect(3.2, 15, 6.6, 20), 'Cuarto principal');
-  room(g, poly([8, 15], [11, 15], [11, 20], [9.8, 20], [9.8, 18], [8, 18]), 'Cuarto 2');
-  room(g, rect(8, 18, 9.8, 20), 'Baño cuarto 2');
-  room(g, poly([11, 15], [14, 15], [14, 18], [12.2, 18], [12.2, 20], [11, 20]), 'Cuarto 3');
-  room(g, rect(12.2, 18, 14, 20), 'Baño cuarto 3');
-  // Open covered passage from the patio to the back patio, under the rooftop: the breeze runs through it too.
-  room(g, rect(6.6, 15, 8, 20), 'Paso al patio trasero', 'balcony', { openEdges: [0, 1, 2, 3] });
+  room(g, poly([6.6, 15], [10.3, 15], [10.3, 21.2], [8.4, 21.2], [8.4, 19], [6.6, 19]), 'Pieza 1');
+  room(g, rect(6.6, 19, 8.4, 21.2), 'Baño pieza 1');
+  room(g, poly([10.3, 15], [14, 15], [14, 19], [12.2, 19], [12.2, 21.2], [10.3, 21.2]), 'Pieza 2');
+  room(g, rect(12.2, 19, 14, 21.2), 'Baño pieza 2');
   // Central patio, open to the sky; a wooden-slat screen (celosía) on its end towards the lot's side (edge 3) lets
   // the breeze in and hides the drying corner by the laundry.
   room(g, poly([4.5, 11], [10.5, 11], [10.5, 13], [14, 13], [14, 15], [4.5, 15]),
@@ -185,7 +179,7 @@ const json = await page.evaluate(async ([RIGHT, TOTAL]) => {
   // ======================= Rooftop =======================
   // The double-height social cube carries on up this level; its high windows on opposite sides let the hot air out
   // (stack effect). From the stair's landing inside the cube a glass door leads onto a bridge over the patio and the
-  // rooftop over the passage and bedrooms 2 and 3.
+  // rooftop over piezas 1 and 2.
   const t = ops.addFloor(p);
   ops.renameFloor(p, t, 'Rooftop');
   opening(t, 'window', wall(t, Q(1, 5), Q(8.8, 5), 0.2), 7.1, { width: 0.7, sill: 0, height: 2.2 }); // ranura, mitad alta
@@ -197,9 +191,9 @@ const json = await page.evaluate(async ([RIGHT, TOTAL]) => {
   opening(t, 'window', cubeBackUp, 3.0, { width: 3.0, sill: 0.6, height: 1.4 }); // alta, al patio
   glassDoor(t, cubeBackUp, 6.6, { width: 0.9 }); // descanso → puente
   ops.setRoofHeight(p, t, room(t, rect(1, 4.4, 8.8, 11), 'Techo del cubo', 'roof'), 2.6);
-  // Landing (x 7–8,6, y 9,8–11) + bridge over the patio (x 7–8,2) + deck over the passage and bedrooms 2 and 3.
+  // Landing (x 7–8,6, y 9,8–11) + bridge over the patio (x 7–8,2) + deck over piezas 1 and 2.
   // Open where the stair arrives (edge 10) and at the cube's wall (edge 2); glass railing elsewhere.
-  room(t, poly([7, 9.8], [8.6, 9.8], [8.6, 11], [8.2, 11], [8.2, 15], [14, 15], [14, 20], [6.6, 20], [6.6, 15], [7, 15], [7, 11]),
+  room(t, poly([7, 9.8], [8.6, 9.8], [8.6, 11], [8.2, 11], [8.2, 15], [14, 15], [14, 21.2], [6.6, 21.2], [6.6, 15], [7, 15], [7, 11]),
     'Rooftop', 'balcony', { openEdges: [2, 10], railing: 'vidrio', floorMaterial: 'madera' });
   // Solid roofs over the one-storey parts, and the carport over the entrance and the driveway.
   const roofs = [
@@ -309,7 +303,7 @@ const EXTERIOR = [
   ['Acceso bajo el pórtico', drect(8.8, 3, 15, 5), 'porcelanato'],
   ['Césped lateral derecho', drect(0, 5, 1, 20), 'cesped'],
   ['Césped lateral izquierdo', drect(14, 5, 15, 20), 'cesped'],
-  ['Terraza del patio trasero', drect(1, 20, 14, 24), 'piedra'],
+  ['Terraza del patio trasero', [pt(1, 20), pt(6.6, 20), pt(6.6, 21.2), pt(14, 21.2), pt(14, 24), pt(1, 24)], 'piedra'],
   ['Patio trasero (césped)', drect(0, 24, 15, 32), 'cesped'],
   ['Patio trasero (lado derecho)', drect(0, 20, 1, 24), 'cesped'],
   ['Patio trasero (lado izquierdo)', drect(14, 20, 15, 24), 'cesped'],
@@ -398,44 +392,52 @@ onWall(r, 'e', 'televisor-70', bed, { gap: 0.02 });
 onWall(r, 'n', 'cortina', X(3.75), { width: 0.9, color: arena });
 onWall(r, 'n', 'cortina', X(6.05), { width: 0.9, color: arena });
 
-// Dressing room and bathroom in one (x 1–3,4, y 15–20): walnut shelving on the bedroom wall, the double vanity on
-// the outer wall, the glass wet room at the end; the toilet in its own room by the entrance.
-r = R('Vestier y baño principal');
-onWall(r, 'e', 'vestier-colgar', Y(16.95));
-onWall(r, 'e', 'vestier-repisas', Y(17.8));
-onWall(r, 'w', 'lavamanos-doble', Y(17.25), { color: caramelo });
-onWall(r, 'w', 'espejo', Y(16.95), { width: 0.55, height: 0.8 });
-onWall(r, 'w', 'espejo', Y(17.55), { width: 0.55, height: 0.8 });
-onWall(R('Sanitario'), 's', 'sanitario', X(1.6));
-r = R('Ducha y tina');
-onWall(r, 'n', 'banera', X(1.95));
-onWall(r, 'e', 'ducha', Y(18.7));
-onWall(r, 'w', 'toallero', Y(18.6));
+// L-shaped walk-in dressing room (x 1–3,2, y 15–17,6): walnut modules along the front and the outer wall; the
+// master bathroom beyond it, at the end, with the shower under the high back window.
+r = R('Vestier');
+onWall(r, 's', 'vestier-colgar', X(1.6));
+onWall(r, 'w', 'vestier-cajones', Y(16.15));
+onWall(r, 'w', 'vestier-zapatos', Y(17.0));
+onWall(r, 'e', 'espejo-cuerpo', Y(17.0), { width: 0.5 });
+piece('puf', X(2.4), Y(16.6), 0, { color: caramelo });
+r = R('Baño principal');
+onWall(r, 'n', 'ducha', X(1.5));
+onWall(r, 'w', 'sanitario', Y(18.3));
+onWall(r, 'e', 'lavamanos', Y(19.0), { color: caramelo });
+onWall(r, 'e', 'espejo', Y(19.0), { width: 0.6 });
+onWall(r, 's', 'toallero', X(1.6));
 
-r = R('Cuarto 2');
-onWall(r, 'e', 'cama-doble', Y(17.0), { color: arena });
-onWall(r, 'e', 'mesa-noche', Y(17.0) - 0.925, { color: caramelo });
-onWall(r, 'e', 'mesa-noche', Y(17.0) + 0.925, { color: caramelo });
-onWall(r, 'e', 'cuadro-byn', Y(16.65), { elevation: 1.3, color: caramelo });
-onWall(r, 'e', 'cuadro-byn', Y(17.35), { elevation: 1.3, color: caramelo });
-onWall(r, 'w', 'closet', Y(15.9), { color: taupe });
+// Piezas 1 and 2: bed against the shared wall, two closets on the outer wall, art over the bed; the bathroom in the
+// back corner with shower, toilet and basin.
+r = R('Pieza 1');
+onWall(r, 'e', 'cama-doble', Y(17.2), { color: arena });
+onWall(r, 'e', 'mesa-noche', Y(17.2) - 0.925, { color: caramelo });
+onWall(r, 'e', 'mesa-noche', Y(17.2) + 0.925, { color: caramelo });
+onWall(r, 'e', 'cuadro-byn', Y(16.85), { elevation: 1.3, color: caramelo });
+onWall(r, 'e', 'cuadro-byn', Y(17.55), { elevation: 1.3, color: caramelo });
+onWall(r, 'w', 'closet', Y(16.6), { color: taupe });
+onWall(r, 'w', 'closet', Y(17.8), { color: taupe });
+piece('alfombra', X(8.9), Y(17.2), 90, { width: 2.0, depth: 1.2, color: arena });
 
-r = R('Baño cuarto 2');
-onWall(r, 'n', 'ducha', X(8.5));
-onWall(r, 'e', 'sanitario', Y(19.5));
-onWall(r, 'w', 'lavamanos', Y(18.55));
+r = R('Baño pieza 1');
+onWall(r, 'n', 'ducha', X(7.05));
+onWall(r, 'e', 'sanitario', Y(20.7));
+onWall(r, 'w', 'lavamanos', Y(19.6));
 
-r = R('Cuarto 3');
-onWall(r, 'w', 'cama-doble', Y(17.0), { color: arena });
-onWall(r, 'w', 'mesa-noche', Y(17.0) - 0.925, { color: caramelo });
-onWall(r, 'w', 'mesa-noche', Y(17.0) + 0.925, { color: caramelo });
-onWall(r, 'w', 'cuadro-paisaje', Y(17.0), { width: 1.1, height: 0.6, elevation: 1.25, color: caramelo });
-onWall(r, 'e', 'closet', Y(17.55), { width: 1.0, color: taupe });
+r = R('Pieza 2');
+onWall(r, 'w', 'cama-doble', Y(17.2), { color: arena });
+onWall(r, 'w', 'mesa-noche', Y(17.2) - 0.925, { color: caramelo });
+onWall(r, 'w', 'mesa-noche', Y(17.2) + 0.925, { color: caramelo });
+onWall(r, 'w', 'cuadro-paisaje', Y(17.2), { width: 1.1, height: 0.6, elevation: 1.25, color: caramelo });
+onWall(r, 'e', 'closet', Y(16.9), { color: taupe });
+onWall(r, 'e', 'closet', Y(18.1), { color: taupe });
+piece('alfombra', X(11.7), Y(17.2), 90, { width: 2.0, depth: 1.2, color: taupe });
 
-r = R('Baño cuarto 3');
+r = R('Baño pieza 2');
 onWall(r, 'n', 'ducha', X(13.5));
-onWall(r, 'w', 'sanitario', Y(19.5));
-onWall(r, 'e', 'lavamanos', Y(18.55));
+onWall(r, 'w', 'sanitario', Y(20.7));
+onWall(r, 'e', 'lavamanos', Y(19.6));
+
 
 // Central patio: a tree in the lawn, a bench along the study, plants; the drying corner behind the celosía.
 piece('arbol-pequeno', X(6.6), Y(13.0));
@@ -450,7 +452,7 @@ piece('brasero', X(5.2), Y(21.8));
 piece('sofa-exterior', X(5.2), Y(22.8), 0, { color: taupe });
 piece('sillon-exterior', X(3.6), Y(21.8), 270, { color: pizarra });
 piece('sillon-exterior', X(6.8), Y(21.8), 90, { color: pizarra });
-piece('mesa-exterior', X(9.0), Y(22.2), 0, { color: caramelo });
+piece('mesa-exterior', X(9.0), Y(22.7), 0, { color: caramelo });
 piece('jardinera', X(5.2), Y(23.6), 0, { color: oliva });
 piece('arbol-pequeno', X(2.5), Y(27.0));
 piece('arbol-pequeno', X(7.5), Y(29.5));
