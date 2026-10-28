@@ -1,16 +1,16 @@
 {
   "version": 1,
-  "id": "13f69f4f-df69-4532-953a-c1905ae936e1",
+  "id": "80c5478e-4a23-4587-9f18-646713eafb73",
   "name": "Nueva casa",
   "north": 0,
   "floors": [
     {
-      "id": "27dd3cf7-480d-443f-ab0c-a4e84d3aa326",
+      "id": "db3f0a56-87f8-4700-b8e8-b1869839fd82",
       "name": "Primer piso",
       "height": 2.6,
       "walls": [
         {
-          "id": "68337bf9-edee-414f-a063-190546d8a4f0",
+          "id": "f9d4aa49-32a6-48e3-85ec-4aaee46a1996",
           "a": {
             "x": 21.2,
             "y": 27
@@ -32,7 +32,7 @@
           }
         },
         {
-          "id": "cce5d232-a1c4-46f5-af35-af51cb808736",
+          "id": "5bed6dd5-9924-4388-b352-971b9f933546",
           "a": {
             "x": 29,
             "y": 27
@@ -55,7 +55,7 @@
           }
         },
         {
-          "id": "b3cd6fbd-5be3-47aa-9eba-26ec7a058441",
+          "id": "45ddf33e-add8-4bf2-a62a-cbc97ca20aee",
           "a": {
             "x": 21.2,
             "y": 27
@@ -78,7 +78,7 @@
           }
         },
         {
-          "id": "f4a9dbab-45b2-481f-a22d-aff881e52075",
+          "id": "91d79d84-5d25-47cd-be50-28ccf72ac4ee",
           "a": {
             "x": 19.6,
             "y": 27
@@ -100,7 +100,7 @@
           }
         },
         {
-          "id": "3661e695-e93d-472f-b6bd-ae8027325976",
+          "id": "5df675ef-00d3-4a61-8f8e-c7131c73b8fa",
           "a": {
             "x": 16,
             "y": 27
@@ -123,7 +123,7 @@
           }
         },
         {
-          "id": "349e46af-8937-489f-9140-9593709b4615",
+          "id": "76238bc3-14f8-48f7-acf0-365d55a20e17",
           "a": {
             "x": 29,
             "y": 27
@@ -146,7 +146,7 @@
           }
         },
         {
-          "id": "d4ae5ad2-e7fe-4c03-af6f-3c59f4cb1757",
+          "id": "aaa2c4d1-316f-44c1-b35f-2662e5f82c7e",
           "a": {
             "x": 29,
             "y": 21
@@ -169,7 +169,7 @@
           }
         },
         {
-          "id": "77ad24b7-697d-4491-9c69-d4b89849be4e",
+          "id": "230c2c9a-f515-4f2e-baf8-85ca1380ee66",
           "a": {
             "x": 29,
             "y": 17
@@ -192,7 +192,7 @@
           }
         },
         {
-          "id": "1d59e18c-ac37-4b41-b411-7bc523a48bd0",
+          "id": "b9fbf65f-34bb-415f-9ebc-ebad14f789d3",
           "a": {
             "x": 16,
             "y": 21
@@ -215,7 +215,7 @@
           }
         },
         {
-          "id": "5020302a-86a9-42f7-90a2-3915fa649ed2",
+          "id": "4131df32-cb1f-43cf-a4fb-60d60aa9d41d",
           "a": {
             "x": 16,
             "y": 19
@@ -238,7 +238,7 @@
           }
         },
         {
-          "id": "963d444e-42df-4b21-9da8-a1f24f22a123",
+          "id": "1fcfd387-6952-406c-b4f0-86cf51f72896",
           "a": {
             "x": 16,
             "y": 13
@@ -261,10 +261,10 @@
           }
         },
         {
-          "id": "81097675-7718-481e-9d11-e6e7688d2d01",
+          "id": "9085110f-6857-4176-9389-7bc402230403",
           "a": {
             "x": 16,
-            "y": 10.8
+            "y": 10.2
           },
           "b": {
             "x": 16,
@@ -284,7 +284,30 @@
           }
         },
         {
-          "id": "532945ce-fb59-48d8-bd16-101b9b15fbb9",
+          "id": "fd5c7b7a-a4e3-4483-8b77-80168bd37f57",
+          "a": {
+            "x": 16,
+            "y": 8
+          },
+          "b": {
+            "x": 16,
+            "y": 10.2
+          },
+          "thickness": 0.2,
+          "height": null,
+          "sides": {
+            "left": {
+              "finish": "pintura",
+              "color": "#E8DBD3"
+            },
+            "right": {
+              "finish": "pintura",
+              "color": "#E8DBD3"
+            }
+          }
+        },
+        {
+          "id": "5b3ba325-2a4a-4c52-959a-01fe81ca7e72",
           "a": {
             "x": 29,
             "y": 12
@@ -307,10 +330,10 @@
           }
         },
         {
-          "id": "f3f07b70-5ac5-4d58-8abd-97b6f911a282",
+          "id": "a77fe6ac-9271-42fa-812f-70b2858404b3",
           "a": {
             "x": 23.4,
-            "y": 10.8
+            "y": 8
           },
           "b": {
             "x": 23.4,
@@ -330,14 +353,14 @@
           }
         },
         {
-          "id": "bb3f910a-6414-46d6-beff-3ef1f9ba09a8",
+          "id": "02a4934a-bb59-4f5a-91bc-66257ff17c02",
           "a": {
             "x": 23.4,
-            "y": 10.8
+            "y": 8
           },
           "b": {
             "x": 19.7,
-            "y": 10.8
+            "y": 8
           },
           "thickness": 0.2,
           "height": null,
@@ -353,14 +376,14 @@
           }
         },
         {
-          "id": "9ae3371c-57c7-4f58-83da-8220b9992bb7",
+          "id": "78e32890-4abc-4e95-8fa5-b9e5ee88cbe4",
           "a": {
             "x": 19.7,
-            "y": 10.8
+            "y": 8
           },
           "b": {
             "x": 16,
-            "y": 10.8
+            "y": 8
           },
           "thickness": 0.2,
           "height": null,
@@ -376,7 +399,7 @@
           }
         },
         {
-          "id": "6eb34fb1-83f8-4ae3-9a6f-5ccf783cb022",
+          "id": "f4121841-9361-4e48-a717-794a76425e18",
           "a": {
             "x": 21.2,
             "y": 21
@@ -399,7 +422,7 @@
           }
         },
         {
-          "id": "fe73a986-48c9-4e46-8243-071adc7a60a8",
+          "id": "daea9346-9cd0-4129-9548-8e46f1ca15d6",
           "a": {
             "x": 16,
             "y": 21
@@ -422,7 +445,7 @@
           }
         },
         {
-          "id": "0c590ec4-b8ed-4f03-bcb9-2baf5b304f4a",
+          "id": "c9b0fbbb-c99f-459d-92b0-7464ae3a5cd1",
           "a": {
             "x": 25.5,
             "y": 17
@@ -445,7 +468,7 @@
           }
         },
         {
-          "id": "df03f58a-5de7-457b-9c1f-1158b5b5ee38",
+          "id": "e95b5249-6a74-4c9b-bef2-96864de4b0d1",
           "a": {
             "x": 19.5,
             "y": 19
@@ -468,7 +491,7 @@
           }
         },
         {
-          "id": "c3af9191-6717-4eda-9590-348385ccca7d",
+          "id": "13dd5ef4-5047-4204-86be-3f5a69d2b567",
           "a": {
             "x": 17.8,
             "y": 19
@@ -491,7 +514,7 @@
           }
         },
         {
-          "id": "51173c51-ffdd-4aea-8270-4d0effa6da46",
+          "id": "a06ba0aa-0270-4870-977b-e06ed3098962",
           "a": {
             "x": 16,
             "y": 19
@@ -514,7 +537,7 @@
           }
         },
         {
-          "id": "f6c88687-d942-4cf5-b496-380a1682821f",
+          "id": "e7145dc1-7661-4f18-92f8-5eff7b1f9864",
           "a": {
             "x": 25.5,
             "y": 17
@@ -537,7 +560,7 @@
           }
         },
         {
-          "id": "43799777-1b2b-4f06-b223-3999df6a8685",
+          "id": "41c8287d-88b0-4597-bac1-41278dd93be1",
           "a": {
             "x": 23.4,
             "y": 17
@@ -560,7 +583,7 @@
           }
         },
         {
-          "id": "23a07658-e617-4d15-9194-aad6f5a4f0a4",
+          "id": "b207af13-8cd7-4592-84a0-2ba9c769d496",
           "a": {
             "x": 26.8,
             "y": 14.4
@@ -583,7 +606,7 @@
           }
         },
         {
-          "id": "a333b1de-cd1f-4896-95d2-dde339da11bd",
+          "id": "b157c074-6097-4491-bd01-e74c3308ac74",
           "a": {
             "x": 26.8,
             "y": 12
@@ -606,7 +629,7 @@
           }
         },
         {
-          "id": "a00951a0-a504-4167-9709-004b7771aa6f",
+          "id": "d4a64d74-4aba-49b6-8c64-c4f439d3fedc",
           "a": {
             "x": 26.8,
             "y": 14.4
@@ -629,7 +652,7 @@
           }
         },
         {
-          "id": "0d0cc2b7-a972-41da-85a5-55bfe9d61763",
+          "id": "3261cc5b-459d-4d52-807c-6e8ef6d7ad41",
           "a": {
             "x": 23.4,
             "y": 12
@@ -652,7 +675,7 @@
           }
         },
         {
-          "id": "1d578c86-adae-4dc0-94d3-a3bb2ad5fae5",
+          "id": "7a6dd725-d395-4a98-a534-48d7ef6171d8",
           "a": {
             "x": 19.7,
             "y": 17
@@ -675,7 +698,7 @@
           }
         },
         {
-          "id": "b8208566-4e92-4a03-aeb1-0a74715d0976",
+          "id": "4be5f4d4-4553-44cc-9f83-64b8abdc5e4d",
           "a": {
             "x": 16,
             "y": 17
@@ -698,10 +721,10 @@
           }
         },
         {
-          "id": "1170ceeb-1204-409b-a3a6-094ecab87571",
+          "id": "1249564c-05f6-4a38-a1bd-c1cb5639cc4a",
           "a": {
             "x": 19.7,
-            "y": 10.8
+            "y": 8
           },
           "b": {
             "x": 19.7,
@@ -721,14 +744,14 @@
           }
         },
         {
-          "id": "318cf304-fd6a-45e1-be35-751e5c7fbc1c",
+          "id": "7cdc4fa9-1251-47e5-95cb-acb1fe49dc2e",
           "a": {
             "x": 21.6,
-            "y": 10.8
+            "y": 8
           },
           "b": {
             "x": 21.6,
-            "y": 13
+            "y": 10.2
           },
           "thickness": 0.15,
           "height": null,
@@ -744,14 +767,14 @@
           }
         },
         {
-          "id": "44beb870-e9be-49ae-a934-d81c7c1d20e9",
+          "id": "88df1a4b-17bd-427d-a773-f747d3fb96c9",
           "a": {
             "x": 21.6,
-            "y": 13
+            "y": 10.2
           },
           "b": {
             "x": 23.4,
-            "y": 13
+            "y": 10.2
           },
           "thickness": 0.15,
           "height": null,
@@ -767,14 +790,14 @@
           }
         },
         {
-          "id": "fbbef8fa-f969-4af3-a4a8-fba22ac0bc91",
+          "id": "74c2c148-4c8e-4b57-879a-c2d9dbe6fafa",
           "a": {
             "x": 17.8,
-            "y": 10.8
+            "y": 8
           },
           "b": {
             "x": 17.8,
-            "y": 13
+            "y": 10.2
           },
           "thickness": 0.15,
           "height": null,
@@ -790,14 +813,14 @@
           }
         },
         {
-          "id": "67d93823-1aa8-4ce2-aa68-89368df68f4e",
+          "id": "d0f2722e-7e08-4cd8-b382-047a868ac530",
           "a": {
             "x": 16,
-            "y": 13
+            "y": 10.2
           },
           "b": {
             "x": 17.8,
-            "y": 13
+            "y": 10.2
           },
           "thickness": 0.15,
           "height": null,
@@ -815,7 +838,7 @@
       ],
       "furniture": [
         {
-          "id": "99c6ceac-53da-43dd-8c46-167714366b1c",
+          "id": "e8f23054-53e5-4a06-a5a9-66c8a36d8f86",
           "type": "mueble-tv",
           "x": 28.7,
           "y": 25,
@@ -827,7 +850,7 @@
           "color": "#8C8A7D"
         },
         {
-          "id": "463813c8-a51b-4f45-846d-3dcbf7fff684",
+          "id": "6073020a-3417-4537-902b-3218c472639f",
           "type": "televisor-70",
           "x": 28.85,
           "y": 25,
@@ -838,7 +861,7 @@
           "elevation": 0.95
         },
         {
-          "id": "09c812be-d529-40bd-9507-8e5f499cbb1c",
+          "id": "78cc6429-3995-4556-9671-376640bd70f0",
           "type": "alfombra",
           "x": 27,
           "y": 25,
@@ -850,7 +873,7 @@
           "color": "#E8DBD3"
         },
         {
-          "id": "41429562-b354-4a4a-93cb-523046618759",
+          "id": "88c7c9bf-1e73-4483-a607-020fbced5a0d",
           "type": "mesa-centro",
           "x": 27,
           "y": 25,
@@ -862,7 +885,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "fa759a8d-4f17-4da3-8549-3e8a09d6c86a",
+          "id": "b3b00efc-e609-4ccd-bd71-745e1a4b2253",
           "type": "sofa-l",
           "x": 25.4,
           "y": 25,
@@ -874,7 +897,7 @@
           "color": "#C6B1A0"
         },
         {
-          "id": "aba200f2-3026-4e8c-84de-c2c5760aba45",
+          "id": "01892b0c-bb78-4773-a4d1-1c7da3a796b1",
           "type": "sillon",
           "x": 27.6,
           "y": 26.4,
@@ -886,7 +909,7 @@
           "color": "#495762"
         },
         {
-          "id": "b9bb8924-4611-47b5-bf59-07973c2dae05",
+          "id": "226b4a31-49a7-4fa5-9101-4df18699a25e",
           "type": "lampara-pie",
           "x": 24.3,
           "y": 23.4,
@@ -897,7 +920,7 @@
           "elevation": 0
         },
         {
-          "id": "6c8d3dab-fae1-453f-9691-be7bc7a90303",
+          "id": "494a54a7-1a7f-45c3-b544-5e9edc6ca3be",
           "type": "nevera",
           "x": 16.45,
           "y": 21.5,
@@ -908,7 +931,7 @@
           "elevation": 0
         },
         {
-          "id": "f4962159-5bb3-40ab-bef7-0ebc47635be1",
+          "id": "77a21ad5-b273-4eef-bc03-61f7798dc7d2",
           "type": "meson",
           "x": 16.4,
           "y": 22.5,
@@ -920,7 +943,7 @@
           "color": "#E8DBD3"
         },
         {
-          "id": "35c7986b-fa8a-46a0-a9f6-0a889595ff76",
+          "id": "c125aaec-babf-49ec-94f7-093c9fb3252d",
           "type": "lavaplatos",
           "x": 16.4,
           "y": 23.5,
@@ -932,7 +955,7 @@
           "color": "#E8DBD3"
         },
         {
-          "id": "97e2223e-9a77-4cd1-8f85-cbccd61501c7",
+          "id": "0ead2721-4ee3-41a8-a56b-5d8db7a03b8a",
           "type": "estufa",
           "x": 16.4,
           "y": 24.2,
@@ -943,7 +966,7 @@
           "elevation": 0
         },
         {
-          "id": "d42bd67f-c861-4e17-82a6-35307c1f7b9a",
+          "id": "600c5868-8c09-47d6-9011-92a2f9cb9fd7",
           "type": "meson",
           "x": 16.4,
           "y": 25.1,
@@ -955,7 +978,7 @@
           "color": "#E8DBD3"
         },
         {
-          "id": "5ec1c1ea-b430-4a9e-a764-b8133d2ba924",
+          "id": "c063c65b-654f-430e-af81-d8b65e0dcc23",
           "type": "alacena",
           "x": 16.275,
           "y": 25.1,
@@ -967,7 +990,7 @@
           "color": "#8C8A7D"
         },
         {
-          "id": "330d8b92-5a25-4b58-a856-d8ff66639958",
+          "id": "c0d138b6-a350-4202-bec3-af1e12f82c98",
           "type": "mesa-comedor-6",
           "x": 19,
           "y": 23.1,
@@ -979,7 +1002,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "d542f197-01b4-4fd7-9fe1-8fac9ce5a43d",
+          "id": "e20e6af8-b913-4779-909a-8cd06f8180a2",
           "type": "silla-comedor",
           "x": 19.55,
           "y": 22.25,
@@ -991,7 +1014,7 @@
           "color": "#495762"
         },
         {
-          "id": "3c2528a5-b6f1-4e52-bc7b-c56d522879fc",
+          "id": "2570f7bc-6798-41c6-be9c-77c93452c9be",
           "type": "silla-comedor",
           "x": 19.55,
           "y": 23.95,
@@ -1003,7 +1026,7 @@
           "color": "#495762"
         },
         {
-          "id": "89e2fef6-6af3-4ccc-9a06-3df09c1be2f6",
+          "id": "51cd7ae5-fcd1-48ee-b4c3-671a630263ee",
           "type": "silla-comedor",
           "x": 19,
           "y": 22.25,
@@ -1015,7 +1038,7 @@
           "color": "#495762"
         },
         {
-          "id": "b42045d0-c06b-401f-877f-afaa49765ca0",
+          "id": "8581c892-c0b4-470a-bef6-ae61d528a89a",
           "type": "silla-comedor",
           "x": 19,
           "y": 23.95,
@@ -1027,7 +1050,7 @@
           "color": "#495762"
         },
         {
-          "id": "d01175b8-b1bd-44e4-b95c-83983306dca1",
+          "id": "8665fa48-b0dc-4baa-8d2a-7441b0e14720",
           "type": "silla-comedor",
           "x": 18.45,
           "y": 22.25,
@@ -1039,7 +1062,7 @@
           "color": "#495762"
         },
         {
-          "id": "34e642f6-c380-4051-92e3-8b08426383f5",
+          "id": "19ee70bd-72f6-4c7d-8dc4-f97f3755202c",
           "type": "silla-comedor",
           "x": 18.45,
           "y": 23.95,
@@ -1051,7 +1074,7 @@
           "color": "#495762"
         },
         {
-          "id": "d87cbe5e-2f29-4f6f-8bc6-f0a8dcbd4b98",
+          "id": "555b8fdd-38e6-4a96-9e0d-69c3322be50c",
           "type": "matera-alta",
           "x": 19.2,
           "y": 26.5,
@@ -1063,7 +1086,7 @@
           "color": "#8C8A7D"
         },
         {
-          "id": "433cd65c-fd25-4d9e-9bd8-158f4a0baa11",
+          "id": "4575c9b3-69cc-4712-9647-8ebf8686480a",
           "type": "escritorio",
           "x": 28.55,
           "y": 19,
@@ -1075,7 +1098,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "080c8052-cc8b-40bd-bf9f-734c89f2cb0f",
+          "id": "1958150b-771e-4711-942e-ca0d0cf1a3b0",
           "type": "silla-oficina",
           "x": 27.9,
           "y": 19,
@@ -1086,7 +1109,7 @@
           "elevation": 0
         },
         {
-          "id": "9e178426-885e-4b2e-a44d-321296035b06",
+          "id": "e9689d7d-221d-48cd-8bed-1c10cb032241",
           "type": "estanteria",
           "x": 27.4,
           "y": 17.25,
@@ -1098,7 +1121,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "03f5a7e8-a741-40a9-bff4-6d0cb77e884d",
+          "id": "96071c81-ee47-416f-a347-97a4d6640580",
           "type": "sillon",
           "x": 26.3,
           "y": 20.3,
@@ -1110,7 +1133,7 @@
           "color": "#C6B1A0"
         },
         {
-          "id": "fd6ddfa6-633e-48cb-b032-85e94eeeda1f",
+          "id": "2b7ca646-bf4f-4a40-91f2-a13f8efc4094",
           "type": "sanitario",
           "x": 19,
           "y": 19.425,
@@ -1121,7 +1144,7 @@
           "elevation": 0
         },
         {
-          "id": "ef928fda-5642-456a-b4b3-8a3f842f03ca",
+          "id": "47871f35-0b9e-40ce-a65f-6ab3c8ddf702",
           "type": "lavamanos",
           "x": 19.2,
           "y": 20.4,
@@ -1132,7 +1155,7 @@
           "elevation": 0
         },
         {
-          "id": "8e50cff1-a003-4c12-a18f-35b78b32bfa5",
+          "id": "f6cb389d-b158-4854-bf74-a5a38b007ea4",
           "type": "espejo",
           "x": 19.41,
           "y": 20.4,
@@ -1143,7 +1166,7 @@
           "elevation": 1.1
         },
         {
-          "id": "dc835d45-1bd7-41da-ad20-9b57de31ed0a",
+          "id": "3d591316-c888-43df-abc4-049106e88203",
           "type": "lavadero",
           "x": 16.4,
           "y": 20.5,
@@ -1154,7 +1177,7 @@
           "elevation": 0
         },
         {
-          "id": "c128b15c-11b4-4850-8159-9d1d3fa78f4b",
+          "id": "6119f125-a2b6-43f5-93ab-917d1295ce1a",
           "type": "lavadora",
           "x": 16.425,
           "y": 19.7,
@@ -1165,7 +1188,7 @@
           "elevation": 0
         },
         {
-          "id": "b2fa1ca6-6907-47a5-92a0-0ca4eb31f663",
+          "id": "a04341cd-204a-419c-8f42-5b4d5fa5b508",
           "type": "alfombra",
           "x": 25.3,
           "y": 14.1,
@@ -1177,7 +1200,7 @@
           "color": "#C6B1A0"
         },
         {
-          "id": "06c4d1c8-9cc3-4948-b853-841d1444b2c4",
+          "id": "6f943ddf-43ec-4bd1-86ab-bd2f376070b4",
           "type": "cama-king",
           "x": 25.725,
           "y": 14.1,
@@ -1189,7 +1212,7 @@
           "color": "#E8DBD3"
         },
         {
-          "id": "cc1dbc25-06b6-416e-bca8-164e825d4a50",
+          "id": "f3a3ee1a-41c5-4d59-aafa-18e05e5ec981",
           "type": "mesa-noche",
           "x": 26.525,
           "y": 12.875,
@@ -1201,7 +1224,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "71bd8549-d173-491e-8f77-feface848854",
+          "id": "66dbeced-55b9-426b-8edd-215be2f07565",
           "type": "mesa-noche",
           "x": 26.525,
           "y": 15.325,
@@ -1213,7 +1236,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "e1032922-3ccf-4846-8c2f-f851bc8d5d9b",
+          "id": "3ab317a5-8cb5-47eb-93cb-d1866e1127fa",
           "type": "cuadro-abstracto",
           "x": 26.705,
           "y": 14.1,
@@ -1225,7 +1248,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "b529c412-2456-4960-96bf-2f054c71638f",
+          "id": "30a606d5-45cd-4f15-9700-3fc6bb58ce98",
           "type": "mueble-tv",
           "x": 23.675,
           "y": 14.1,
@@ -1237,7 +1260,7 @@
           "color": "#8C8A7D"
         },
         {
-          "id": "c3b59b88-c36c-4716-a0bb-5f84bd2c9dad",
+          "id": "798265f1-1f29-4379-ad47-71e0c24edd6f",
           "type": "televisor-70",
           "x": 23.525,
           "y": 14.1,
@@ -1248,7 +1271,7 @@
           "elevation": 0.95
         },
         {
-          "id": "73fc8160-a89a-448a-9923-bc12574d920f",
+          "id": "fdad4f69-7d49-4a31-a529-376ebc79b98f",
           "type": "cortina",
           "x": 26.25,
           "y": 12.14,
@@ -1260,7 +1283,7 @@
           "color": "#E8DBD3"
         },
         {
-          "id": "6411b455-7a9d-416c-8348-34310dc4c4d3",
+          "id": "dcbc4d80-f2bd-4834-9c1e-1baa0a3bd77b",
           "type": "cortina",
           "x": 23.95,
           "y": 12.14,
@@ -1272,7 +1295,7 @@
           "color": "#E8DBD3"
         },
         {
-          "id": "d9043d10-b1cd-42f0-a9d0-81b9ce53ea7d",
+          "id": "d98b7eee-65a0-4151-9d4a-6f84b43b1449",
           "type": "vestier-colgar",
           "x": 28.4,
           "y": 16.65,
@@ -1283,7 +1306,7 @@
           "elevation": 0
         },
         {
-          "id": "3aca05d1-1e9e-4824-b315-574f6af42a37",
+          "id": "bcc557de-5465-4b16-8e26-79e8c5163c6d",
           "type": "vestier-cajones",
           "x": 28.625,
           "y": 15.85,
@@ -1294,7 +1317,7 @@
           "elevation": 0
         },
         {
-          "id": "31ff05a3-e739-47bd-b5d0-3280ae0e0b15",
+          "id": "a81423f2-6c21-447f-a351-5907bb312015",
           "type": "vestier-zapatos",
           "x": 28.625,
           "y": 15,
@@ -1305,7 +1328,7 @@
           "elevation": 0
         },
         {
-          "id": "4b797249-1c21-41d3-8284-c845924484e7",
+          "id": "563dcdc4-21b8-46ca-a8d3-20c3fd774e41",
           "type": "espejo-cuerpo",
           "x": 26.9,
           "y": 15,
@@ -1316,7 +1339,7 @@
           "elevation": 0.25
         },
         {
-          "id": "4e3f11c7-291e-4dbf-b78d-51df7d0de6ea",
+          "id": "1615515e-7a22-4d01-b70c-9df71c50bf43",
           "type": "puf",
           "x": 27.6,
           "y": 15.4,
@@ -1328,7 +1351,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "69b7e9aa-ac09-420a-89f1-4849a361916d",
+          "id": "706b736b-ba54-4df7-aef9-227d543a64ce",
           "type": "ducha",
           "x": 28.45,
           "y": 12.55,
@@ -1339,7 +1362,7 @@
           "elevation": 0
         },
         {
-          "id": "f2c1b625-06e0-43ee-a9f4-3f56e7c9588e",
+          "id": "c68269f5-a9e5-4973-a180-b4e10444153c",
           "type": "sanitario",
           "x": 28.55,
           "y": 13.7,
@@ -1350,7 +1373,7 @@
           "elevation": 0
         },
         {
-          "id": "1cdd0fc3-e75e-41da-bad9-2bbd8eb4da16",
+          "id": "a4defd2b-d3fb-4454-85f6-5ed0ecbfcdcd",
           "type": "lavamanos",
           "x": 27.1,
           "y": 13,
@@ -1362,7 +1385,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "518b05dc-04a7-4c01-9cc3-3720897056fd",
+          "id": "912ac9fa-4e97-4615-8846-bbaa8a4dde37",
           "type": "espejo",
           "x": 26.89,
           "y": 13,
@@ -1373,7 +1396,7 @@
           "elevation": 1.1
         },
         {
-          "id": "87d646e5-c884-4b68-9bf8-b2f4947c5ac9",
+          "id": "0d9591ec-1c8c-40b0-bf65-f7516c316d7e",
           "type": "toallero",
           "x": 28.4,
           "y": 14.265,
@@ -1384,7 +1407,7 @@
           "elevation": 0.9
         },
         {
-          "id": "70a3c9fc-53e2-4a94-9680-17cb437d4072",
+          "id": "9639fb13-9758-4f6c-a611-501b8f176393",
           "type": "cama-doble",
           "x": 20.725,
           "y": 14.8,
@@ -1396,7 +1419,7 @@
           "color": "#E8DBD3"
         },
         {
-          "id": "8e0216c5-de31-472f-ba5c-b87d73259471",
+          "id": "20272cdf-5ebe-450f-93f7-0959589c6035",
           "type": "mesa-noche",
           "x": 19.975,
           "y": 13.875,
@@ -1408,7 +1431,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "88eb3b74-45bf-435f-bf33-a0c99ff7e2b6",
+          "id": "a92fc5c2-1f0d-4ae9-95f8-7e492b19ba42",
           "type": "mesa-noche",
           "x": 19.975,
           "y": 15.725,
@@ -1420,7 +1443,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "a4501835-6298-40a0-95e4-09bcfe90ce7d",
+          "id": "63350739-4141-4dc6-b5a0-c93b6d61c38f",
           "type": "cuadro-byn",
           "x": 19.795,
           "y": 15.15,
@@ -1432,7 +1455,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "57f8778d-647d-4522-9d68-715f8dac8c39",
+          "id": "32f27e89-0a0f-4cff-a855-63f440225763",
           "type": "cuadro-byn",
           "x": 19.795,
           "y": 14.45,
@@ -1444,7 +1467,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "6238970c-9b8d-4cc9-bb3a-c624093ef0de",
+          "id": "d942bbaf-62ac-44b2-aa9d-63524e5aa0e8",
           "type": "closet",
           "x": 23,
           "y": 15.4,
@@ -1456,7 +1479,7 @@
           "color": "#C6B1A0"
         },
         {
-          "id": "89be22f6-6bf3-4fdf-bdb6-efcf6088ccf7",
+          "id": "7cda4bc9-abfa-489c-91ed-d2e216e62cba",
           "type": "closet",
           "x": 23,
           "y": 14.2,
@@ -1468,7 +1491,7 @@
           "color": "#C6B1A0"
         },
         {
-          "id": "83b6aaf4-01ca-418e-93c1-ce912db4211b",
+          "id": "c1772185-e828-40fa-a220-5d7d67b47aa8",
           "type": "alfombra",
           "x": 21.1,
           "y": 14.8,
@@ -1480,10 +1503,45 @@
           "color": "#E8DBD3"
         },
         {
-          "id": "4f8bee84-a46f-427a-876a-f3cb906c8ff5",
+          "id": "cc065c55-c9da-4b71-8ee1-14f0573c3ea0",
+          "type": "escritorio",
+          "x": 22.95,
+          "y": 11.7,
+          "rotation": 90,
+          "width": 1.4,
+          "depth": 0.7,
+          "height": 0.75,
+          "elevation": 0,
+          "color": "#B77E53"
+        },
+        {
+          "id": "30c09a8e-3b38-45f1-9632-ddfe1574c992",
+          "type": "silla-oficina",
+          "x": 22.25,
+          "y": 11.7,
+          "rotation": 270,
+          "width": 0.62,
+          "depth": 0.62,
+          "height": 1.1,
+          "elevation": 0
+        },
+        {
+          "id": "ad516ca2-2c02-4c13-b20f-fc8b5fbcb6fc",
+          "type": "sillon",
+          "x": 20.4,
+          "y": 10.7,
+          "rotation": 0,
+          "width": 0.85,
+          "depth": 0.85,
+          "height": 0.85,
+          "elevation": 0,
+          "color": "#495762"
+        },
+        {
+          "id": "2bc5d86c-a7ed-47b8-8e0c-ad07de07510b",
           "type": "ducha",
           "x": 22.85,
-          "y": 11.35,
+          "y": 8.55,
           "rotation": 0,
           "width": 0.9,
           "depth": 0.9,
@@ -1491,10 +1549,10 @@
           "elevation": 0
         },
         {
-          "id": "0c8befc1-0bfb-4646-9a8e-12f7810172a9",
+          "id": "898bf8c5-e314-4ba9-a9a0-df2f2ba422b4",
           "type": "sanitario",
           "x": 22.025,
-          "y": 11.3,
+          "y": 8.5,
           "rotation": 270,
           "width": 0.4,
           "depth": 0.7,
@@ -1502,10 +1560,10 @@
           "elevation": 0
         },
         {
-          "id": "b08b3ad7-6288-4efc-a807-8facd496bbde",
+          "id": "a16926df-8246-4f05-901f-df09872c75ab",
           "type": "lavamanos",
           "x": 23.075,
-          "y": 12.4,
+          "y": 9.6,
           "rotation": 90,
           "width": 0.6,
           "depth": 0.45,
@@ -1513,7 +1571,7 @@
           "elevation": 0
         },
         {
-          "id": "f4740ca7-7c56-495f-b217-37638118ce73",
+          "id": "510c4126-232b-4110-967f-66eb76bd946c",
           "type": "cama-doble",
           "x": 18.675,
           "y": 14.8,
@@ -1525,7 +1583,7 @@
           "color": "#E8DBD3"
         },
         {
-          "id": "d5ab6e57-4e7e-4a5f-916f-252337c1e180",
+          "id": "05aa7ae7-23a7-4332-8377-0e0a0304a8ca",
           "type": "mesa-noche",
           "x": 19.425,
           "y": 13.875,
@@ -1537,7 +1595,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "9cf3d434-c4d1-434c-a612-c68bb6292dd4",
+          "id": "dcffa08e-0168-44f3-8e91-b3f72b373be7",
           "type": "mesa-noche",
           "x": 19.425,
           "y": 15.725,
@@ -1549,7 +1607,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "a187e408-a41e-4450-b444-9c673e131ee0",
+          "id": "d283f9f6-ebd5-4015-badb-a4dfacac3e81",
           "type": "cuadro-paisaje",
           "x": 19.605,
           "y": 14.8,
@@ -1561,7 +1619,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "90f83510-b24a-4a25-b204-3e93a4f46f3a",
+          "id": "030a531b-7d8b-4b47-8fa6-c4ed971f7504",
           "type": "closet",
           "x": 16.4,
           "y": 15.1,
@@ -1573,7 +1631,7 @@
           "color": "#C6B1A0"
         },
         {
-          "id": "ea2a1f3a-23a0-4a76-9583-c1d0c96974ed",
+          "id": "18ece4d1-c32d-45e8-9983-06155c4bb889",
           "type": "closet",
           "x": 16.4,
           "y": 13.9,
@@ -1585,7 +1643,7 @@
           "color": "#C6B1A0"
         },
         {
-          "id": "120a1a2e-4c3a-4ac6-8581-19f31bbf31ff",
+          "id": "068b2fbc-78d4-4e46-aa68-f56f312a1f6d",
           "type": "alfombra",
           "x": 18.3,
           "y": 14.8,
@@ -1597,10 +1655,45 @@
           "color": "#C6B1A0"
         },
         {
-          "id": "2f9dc992-3f11-4d1b-8793-3123aabaa72c",
+          "id": "ac8afa12-175c-4b63-94d2-18a0a2f2b70a",
+          "type": "escritorio",
+          "x": 16.45,
+          "y": 11.7,
+          "rotation": 270,
+          "width": 1.4,
+          "depth": 0.7,
+          "height": 0.75,
+          "elevation": 0,
+          "color": "#B77E53"
+        },
+        {
+          "id": "4b4bfcf3-bae3-491a-bc34-bb58ae30d696",
+          "type": "silla-oficina",
+          "x": 17.15,
+          "y": 11.7,
+          "rotation": 90,
+          "width": 0.62,
+          "depth": 0.62,
+          "height": 1.1,
+          "elevation": 0
+        },
+        {
+          "id": "0abfb4df-5e8e-4238-a6a8-205ddd6debdc",
+          "type": "sillon",
+          "x": 19,
+          "y": 10.7,
+          "rotation": 0,
+          "width": 0.85,
+          "depth": 0.85,
+          "height": 0.85,
+          "elevation": 0,
+          "color": "#495762"
+        },
+        {
+          "id": "c805b2ea-7301-4fe2-b301-29d6074771bf",
           "type": "ducha",
           "x": 16.55,
-          "y": 11.35,
+          "y": 8.55,
           "rotation": 0,
           "width": 0.9,
           "depth": 0.9,
@@ -1608,10 +1701,10 @@
           "elevation": 0
         },
         {
-          "id": "243ea122-a973-42ba-a3d0-65dfd7d5ddd4",
+          "id": "0b9a3368-a62f-492e-b127-0b9a5cd39d1d",
           "type": "sanitario",
           "x": 17.375,
-          "y": 11.3,
+          "y": 8.5,
           "rotation": 90,
           "width": 0.4,
           "depth": 0.7,
@@ -1619,10 +1712,10 @@
           "elevation": 0
         },
         {
-          "id": "e07b8b42-2bf0-4ae6-bef0-c8af0a66db78",
+          "id": "7b8c8dd0-dc89-46e7-822c-e6a7db2a00cb",
           "type": "lavamanos",
           "x": 16.325,
-          "y": 12.4,
+          "y": 9.6,
           "rotation": 270,
           "width": 0.6,
           "depth": 0.45,
@@ -1630,7 +1723,7 @@
           "elevation": 0
         },
         {
-          "id": "a8425518-3d35-4dc0-bd55-691ae3cfa0a9",
+          "id": "403cbc1c-a01f-4cea-9d12-bc75ce5e5522",
           "type": "arbol-pequeno",
           "x": 23.4,
           "y": 19,
@@ -1641,7 +1734,7 @@
           "elevation": 0
         },
         {
-          "id": "da55f663-277b-466c-871e-f86e050f825d",
+          "id": "696664cc-423d-4721-98b7-87f5c64aa15b",
           "type": "banca",
           "x": 25.15,
           "y": 18.8,
@@ -1653,7 +1746,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "aca7da1a-e3b0-4b3d-b1c4-e3d66f5504d8",
+          "id": "c4e95f62-95cb-41a3-b34e-bca5ff73fb0c",
           "type": "jardinera",
           "x": 20.7,
           "y": 20.65,
@@ -1665,7 +1758,7 @@
           "color": "#8C8A7D"
         },
         {
-          "id": "790dd5a3-5b01-4dc9-b858-37c892f55450",
+          "id": "8b2f82ad-dff6-4859-a21c-1f1123d75b5e",
           "type": "sillon-exterior",
           "x": 20.6,
           "y": 18.4,
@@ -1677,7 +1770,7 @@
           "color": "#495762"
         },
         {
-          "id": "37f4dd94-f70a-4cdd-830f-f1c09680537e",
+          "id": "e4858458-75a4-4783-b77a-fafe015c0118",
           "type": "arbusto",
           "x": 16.6,
           "y": 17.6,
@@ -1688,57 +1781,152 @@
           "elevation": 0
         },
         {
-          "id": "9c73aef4-6a8e-4f51-9f30-55435b8bcfb5",
-          "type": "brasero",
-          "x": 24.8,
-          "y": 10.2,
+          "id": "2d277c34-dfae-4c4d-a2af-7b1288aab750",
+          "type": "arbol-pequeno",
+          "x": 27.7,
+          "y": 9.4,
           "rotation": 0,
-          "width": 0.8,
-          "depth": 0.8,
-          "height": 0.4,
+          "width": 2,
+          "depth": 2,
+          "height": 3.5,
           "elevation": 0
         },
         {
-          "id": "56c0c3f0-b1c1-411f-80a6-f96029465ae5",
-          "type": "sofa-exterior",
-          "x": 24.8,
-          "y": 9.2,
+          "id": "2ea2d8ff-3754-4b35-968c-ca8f95548ceb",
+          "type": "arbusto",
+          "x": 24.4,
+          "y": 8.7,
           "rotation": 0,
-          "width": 2,
-          "depth": 0.85,
-          "height": 0.75,
-          "elevation": 0,
-          "color": "#C6B1A0"
+          "width": 1,
+          "depth": 1,
+          "height": 1,
+          "elevation": 0
         },
         {
-          "id": "8433b6fc-95eb-4d97-8fca-c55967338f01",
-          "type": "sillon-exterior",
+          "id": "bc6767c1-d82e-4946-890a-afb6deedfbee",
+          "type": "jardinera",
           "x": 26.4,
-          "y": 10.2,
-          "rotation": 90,
-          "width": 0.75,
-          "depth": 0.75,
-          "height": 0.75,
+          "y": 8.4,
+          "rotation": 0,
+          "width": 2.4,
+          "depth": 0.4,
+          "height": 0.6,
           "elevation": 0,
-          "color": "#495762"
+          "color": "#8C8A7D"
         },
         {
-          "id": "1f937487-cacb-483b-a8d8-960d8179e4fa",
-          "type": "sillon-exterior",
-          "x": 23.2,
-          "y": 10.2,
+          "id": "5b797a6a-4c08-484b-822c-4469afb11dca",
+          "type": "banca",
+          "x": 24.4,
+          "y": 10.7,
+          "rotation": 0,
+          "width": 1.2,
+          "depth": 0.45,
+          "height": 0.45,
+          "elevation": 0,
+          "color": "#B77E53"
+        },
+        {
+          "id": "8d934cc4-8e95-4ad5-8d54-d211fbad2ae2",
+          "type": "matera-alta",
+          "x": 28.6,
+          "y": 11.5,
+          "rotation": 0,
+          "width": 0.45,
+          "depth": 0.45,
+          "height": 1.6,
+          "elevation": 0,
+          "color": "#8C8A7D"
+        },
+        {
+          "id": "09eca507-0760-4152-9382-ae10041debdd",
+          "type": "piscina",
+          "x": 22.5,
+          "y": 5,
+          "rotation": 0,
+          "width": 8,
+          "depth": 3,
+          "height": 0.45,
+          "elevation": 0,
+          "color": "#E8DBD3"
+        },
+        {
+          "id": "34e001cb-7dc9-4bd6-909a-47c95a5ed353",
+          "type": "asoleadora",
+          "x": 28,
+          "y": 7.2,
           "rotation": 270,
-          "width": 0.75,
-          "depth": 0.75,
-          "height": 0.75,
+          "width": 0.7,
+          "depth": 1.95,
+          "height": 0.85,
           "elevation": 0,
-          "color": "#495762"
+          "color": "#E8DBD3"
         },
         {
-          "id": "d423959a-fc71-4d36-bea7-3e849d17c2cb",
+          "id": "d31e3a98-a785-404a-97b7-38873851d498",
+          "type": "asoleadora",
+          "x": 25.8,
+          "y": 7.2,
+          "rotation": 270,
+          "width": 0.7,
+          "depth": 1.95,
+          "height": 0.85,
+          "elevation": 0,
+          "color": "#E8DBD3"
+        },
+        {
+          "id": "00e4180f-aa1d-4c8f-ab01-e4ec47d39415",
+          "type": "sombrilla",
+          "x": 17,
+          "y": 4.4,
+          "rotation": 0,
+          "width": 2.5,
+          "depth": 2.5,
+          "height": 2.4,
+          "elevation": 0,
+          "color": "#E8DBD3"
+        },
+        {
+          "id": "2a93b227-5e3f-4cd0-9286-4f44a2d6d613",
+          "type": "asoleadora",
+          "x": 17,
+          "y": 5.7,
+          "rotation": 90,
+          "width": 0.7,
+          "depth": 1.95,
+          "height": 0.85,
+          "elevation": 0,
+          "color": "#E8DBD3"
+        },
+        {
+          "id": "cc467435-3d42-4d70-ac83-82caef0edbf2",
+          "type": "matera-alta",
+          "x": 28.6,
+          "y": 5.7,
+          "rotation": 0,
+          "width": 0.45,
+          "depth": 0.45,
+          "height": 1.6,
+          "elevation": 0,
+          "color": "#8C8A7D"
+        },
+        {
+          "id": "e5547c89-9d6b-463f-8ee2-cae14423f0f5",
+          "type": "pergola",
+          "x": 17.6,
+          "y": 1.6,
+          "rotation": 0,
+          "width": 3.4,
+          "depth": 2.8,
+          "height": 2.4,
+          "elevation": 0,
+          "color": "#B77E53"
+        },
+        {
+          "id": "1a636b51-b32d-4b39-a56f-9671744d23e2",
           "type": "mesa-exterior",
-          "x": 21,
-          "y": 9.3,
+          "x": 17.6,
+          "y": 1.6,
           "rotation": 0,
           "width": 1.2,
           "depth": 0.8,
@@ -1747,76 +1935,149 @@
           "color": "#B77E53"
         },
         {
-          "id": "2ce3d459-ea22-4db1-ad1a-74857768742e",
+          "id": "ff8daa6e-e9b3-4470-9570-5c9a3ff8594e",
           "type": "jardinera",
-          "x": 24.8,
-          "y": 8.4,
+          "x": 28.4,
+          "y": 2.4,
           "rotation": 0,
           "width": 1.8,
           "depth": 0.4,
           "height": 0.6,
           "elevation": 0,
-          "color": "#8C8A7D"
+          "color": "#B77E53"
         },
         {
-          "id": "9f443dcc-2000-45b8-bcb5-6a08e2c62a3e",
-          "type": "arbol-pequeno",
-          "x": 27.5,
-          "y": 5,
-          "rotation": 0,
-          "width": 2,
-          "depth": 2,
-          "height": 3.5,
-          "elevation": 0
-        },
-        {
-          "id": "5373a738-42e0-422c-b388-308a605128f3",
-          "type": "arbol-pequeno",
-          "x": 22.5,
-          "y": 2.5,
-          "rotation": 0,
-          "width": 2,
-          "depth": 2,
-          "height": 3.5,
-          "elevation": 0
-        },
-        {
-          "id": "83401651-0200-43d2-aa56-fffcc36b863b",
-          "type": "arbol-pequeno",
-          "x": 17.5,
-          "y": 5.5,
-          "rotation": 0,
-          "width": 2,
-          "depth": 2,
-          "height": 3.5,
-          "elevation": 0
-        },
-        {
-          "id": "2372aeeb-f559-4ee1-9de5-8404604926db",
-          "type": "matera-alta",
-          "x": 16.6,
-          "y": 8.6,
-          "rotation": 0,
-          "width": 0.45,
-          "depth": 0.45,
-          "height": 1.6,
-          "elevation": 0,
-          "color": "#8C8A7D"
-        },
-        {
-          "id": "44e675a3-fb67-4d5a-b66f-8d11a8ce775f",
-          "type": "matera-alta",
+          "id": "3d8692e0-81d4-422f-8559-fb635e3b5039",
+          "type": "jardinera",
           "x": 28.4,
-          "y": 8.6,
+          "y": 1.2,
+          "rotation": 0,
+          "width": 1.8,
+          "depth": 0.4,
+          "height": 0.6,
+          "elevation": 0,
+          "color": "#B77E53"
+        },
+        {
+          "id": "fe39bee5-e9f6-4eea-a5a2-4b5a5ec9e508",
+          "type": "jardinera",
+          "x": 26.4,
+          "y": 2.4,
+          "rotation": 0,
+          "width": 1.8,
+          "depth": 0.4,
+          "height": 0.6,
+          "elevation": 0,
+          "color": "#B77E53"
+        },
+        {
+          "id": "86b30820-d64e-480f-883e-c4ce6c2bd9e1",
+          "type": "jardinera",
+          "x": 26.4,
+          "y": 1.2,
+          "rotation": 0,
+          "width": 1.8,
+          "depth": 0.4,
+          "height": 0.6,
+          "elevation": 0,
+          "color": "#B77E53"
+        },
+        {
+          "id": "0367c56b-2967-4d4c-8175-621e90e52e90",
+          "type": "jardinera",
+          "x": 24.4,
+          "y": 2.4,
+          "rotation": 0,
+          "width": 1.8,
+          "depth": 0.4,
+          "height": 0.6,
+          "elevation": 0,
+          "color": "#B77E53"
+        },
+        {
+          "id": "539752fe-f66a-4a3b-81c9-d128228a5f26",
+          "type": "jardinera",
+          "x": 24.4,
+          "y": 1.2,
+          "rotation": 0,
+          "width": 1.8,
+          "depth": 0.4,
+          "height": 0.6,
+          "elevation": 0,
+          "color": "#B77E53"
+        },
+        {
+          "id": "fcfec8e7-df57-4df8-b937-6047c0ea8f9a",
+          "type": "jardinera",
+          "x": 22.4,
+          "y": 2.4,
+          "rotation": 0,
+          "width": 1.8,
+          "depth": 0.4,
+          "height": 0.6,
+          "elevation": 0,
+          "color": "#B77E53"
+        },
+        {
+          "id": "3138f087-68ad-429c-bcd4-9ee8f7737ca2",
+          "type": "jardinera",
+          "x": 22.4,
+          "y": 1.2,
+          "rotation": 0,
+          "width": 1.8,
+          "depth": 0.4,
+          "height": 0.6,
+          "elevation": 0,
+          "color": "#B77E53"
+        },
+        {
+          "id": "d774f61a-31ba-44e5-88a6-d30cc1408012",
+          "type": "arbol-pequeno",
+          "x": 28.5,
+          "y": 0.8,
+          "rotation": 0,
+          "width": 2,
+          "depth": 2,
+          "height": 3.5,
+          "elevation": 0
+        },
+        {
+          "id": "0014d4b3-fae3-4f68-a6a0-58e9a987a7dc",
+          "type": "arbol-pequeno",
+          "x": 20.4,
+          "y": 1,
+          "rotation": 0,
+          "width": 2,
+          "depth": 2,
+          "height": 3.5,
+          "elevation": 0
+        },
+        {
+          "id": "8aaa54d3-f922-42f7-acaa-ae36e32a4d28",
+          "type": "banca",
+          "x": 20.4,
+          "y": 2.7,
+          "rotation": 0,
+          "width": 1.4,
+          "depth": 0.45,
+          "height": 0.45,
+          "elevation": 0,
+          "color": "#B77E53"
+        },
+        {
+          "id": "f22339cd-107e-4f15-a79f-e9e6fd64f132",
+          "type": "matera",
+          "x": 19.4,
+          "y": 2.7,
           "rotation": 0,
           "width": 0.45,
           "depth": 0.45,
-          "height": 1.6,
+          "height": 1,
           "elevation": 0,
           "color": "#8C8A7D"
         },
         {
-          "id": "4da7b09a-ce09-4883-a60d-e5ede1f3d63a",
+          "id": "9e3e8fea-ca6b-45dd-9245-9ad891a615c6",
           "type": "jardinera",
           "x": 27.8,
           "y": 28.25,
@@ -1828,7 +2089,7 @@
           "color": "#495762"
         },
         {
-          "id": "d1196f25-1cd0-416f-ad6e-2f9b6b4f9351",
+          "id": "61be9b43-28d3-4eb3-96cc-a597e657d039",
           "type": "jardinera",
           "x": 25.9,
           "y": 28.25,
@@ -1840,7 +2101,7 @@
           "color": "#495762"
         },
         {
-          "id": "f1180128-de3c-4cf1-ad4c-4493fcf6e252",
+          "id": "ed6470cf-0be4-42d5-9a46-81a7b0f3a878",
           "type": "jardinera",
           "x": 24,
           "y": 28.25,
@@ -1852,7 +2113,7 @@
           "color": "#495762"
         },
         {
-          "id": "eee90681-e332-4832-aede-c09bda27dfb0",
+          "id": "3c201fe8-6a91-421a-a457-557457366d0a",
           "type": "arbusto",
           "x": 22.4,
           "y": 28.2,
@@ -1863,7 +2124,7 @@
           "elevation": 0
         },
         {
-          "id": "ff7aa85c-0236-4ed4-b346-46112ae8587c",
+          "id": "13998e34-b30f-47cf-b7f4-ab973763bdc2",
           "type": "arbusto",
           "x": 29.45,
           "y": 28.4,
@@ -1874,7 +2135,7 @@
           "elevation": 0
         },
         {
-          "id": "892bb907-9fe0-4a0c-8e04-9e48b5740d52",
+          "id": "d02d307b-214b-48c4-897c-aec20b7a896d",
           "type": "tira-led",
           "x": 22.4,
           "y": 27.11,
@@ -1886,7 +2147,7 @@
           "color": "#ffd9a0"
         },
         {
-          "id": "ebdbe451-88a1-4074-8366-f40b9381f076",
+          "id": "7507f50e-b85a-4949-9903-83060a3b325a",
           "type": "tira-led",
           "x": 18.15,
           "y": 30.8,
@@ -1898,7 +2159,7 @@
           "color": "#ffd9a0"
         },
         {
-          "id": "7197cdc7-40ec-48b5-907c-77da31015d05",
+          "id": "1919ec3a-4e53-430c-af25-f8028e9d2adb",
           "type": "tira-led",
           "x": 18.15,
           "y": 28.2,
@@ -1910,7 +2171,7 @@
           "color": "#ffd9a0"
         },
         {
-          "id": "ea1c27d7-4dbd-4abd-bc9c-50b34a96cf91",
+          "id": "07f17c80-ee5b-4a8e-ae2d-fbbc315ab61f",
           "type": "arbol-guayacan",
           "x": 31,
           "y": 32.75,
@@ -1921,7 +2182,7 @@
           "elevation": 0
         },
         {
-          "id": "b55f319c-c5a1-4e20-808a-ae5ba4b5979d",
+          "id": "f36eb9e7-6cc3-4133-9e08-be69c9e8959b",
           "type": "arbol-guayacan",
           "x": 14,
           "y": 32.75,
@@ -1932,7 +2193,7 @@
           "elevation": 0
         },
         {
-          "id": "abc7a518-3b08-4565-95b0-78c441c80284",
+          "id": "a174bfff-b55c-42cd-b17a-a2a795b0f3a8",
           "type": "carro",
           "x": 26.6,
           "y": 30.5,
@@ -1943,7 +2204,7 @@
           "elevation": 0
         },
         {
-          "id": "e3dc5c4b-5f93-438e-9be5-8f5526092125",
+          "id": "4c06f883-7165-4ab8-a0d1-33dad567f1d2",
           "type": "moto",
           "x": 22.8,
           "y": 30.5,
@@ -1954,7 +2215,7 @@
           "elevation": 0
         },
         {
-          "id": "ccd401f1-15d8-46a6-a276-6ece6b85bc8c",
+          "id": "be8bd976-36a5-4529-86a7-341b00b7a917",
           "type": "carro",
           "x": 18,
           "y": 29.4,
@@ -1968,8 +2229,8 @@
       ],
       "openings": [
         {
-          "id": "e5e44bec-81e4-4982-9621-d1af38c08ea0",
-          "wallId": "68337bf9-edee-414f-a063-190546d8a4f0",
+          "id": "b4f3de96-329d-45ba-b625-798d57af75aa",
+          "wallId": "f9d4aa49-32a6-48e3-85ec-4aaee46a1996",
           "kind": "window",
           "offset": 0.7000000000000011,
           "width": 0.7,
@@ -1977,8 +2238,8 @@
           "sill": 0.3
         },
         {
-          "id": "3b47c3fc-a488-4385-8b1b-f8fc104fb7cb",
-          "wallId": "f4a9dbab-45b2-481f-a22d-aff881e52075",
+          "id": "7efd77af-8227-4e3c-9541-32f7b1a1dd42",
+          "wallId": "91d79d84-5d25-47cd-be50-28ccf72ac4ee",
           "kind": "door",
           "offset": 0.7999999999999996,
           "width": 1.1,
@@ -1986,8 +2247,8 @@
           "sill": 0
         },
         {
-          "id": "69410bea-ae56-45a7-a30e-ff6d182eb775",
-          "wallId": "3661e695-e93d-472f-b6bd-ae8027325976",
+          "id": "1c601128-e45e-44fe-b353-fb8003d17cbd",
+          "wallId": "5df675ef-00d3-4a61-8f8e-c7131c73b8fa",
           "kind": "window",
           "offset": 1.7999999999999996,
           "width": 2.4,
@@ -1995,8 +2256,8 @@
           "sill": 0.9
         },
         {
-          "id": "b65f4507-b2dd-42d0-9cba-9346f910b951",
-          "wallId": "349e46af-8937-489f-9140-9593709b4615",
+          "id": "8fd1d464-2563-4280-866e-6a445386fa72",
+          "wallId": "76238bc3-14f8-48f7-acf0-365d55a20e17",
           "kind": "window",
           "offset": 4.4,
           "width": 1.2,
@@ -2004,8 +2265,8 @@
           "sill": 0.9
         },
         {
-          "id": "9fc3b76a-ccf8-4aa3-a975-48a4512476ad",
-          "wallId": "d4ae5ad2-e7fe-4c03-af6f-3c59f4cb1757",
+          "id": "4879b4f9-b72e-492b-bdb8-298cfd72070d",
+          "wallId": "aaa2c4d1-316f-44c1-b35f-2662e5f82c7e",
           "kind": "window",
           "offset": 2,
           "width": 1.6,
@@ -2013,8 +2274,8 @@
           "sill": 0.9
         },
         {
-          "id": "63ac953e-70b0-464c-9b61-a422335a3086",
-          "wallId": "77ad24b7-697d-4491-9c69-d4b89849be4e",
+          "id": "226498b9-417c-451e-9d7e-18b27699df79",
+          "wallId": "230c2c9a-f515-4f2e-baf8-85ca1380ee66",
           "kind": "window",
           "offset": 2.2,
           "width": 1.2,
@@ -2022,8 +2283,8 @@
           "sill": 1.6
         },
         {
-          "id": "b5caad46-ded7-47a1-a08d-49d3f85e4dd6",
-          "wallId": "1d59e18c-ac37-4b41-b411-7bc523a48bd0",
+          "id": "fbf19146-2a65-4497-a3a0-37efab4d208f",
+          "wallId": "b9fbf65f-34bb-415f-9ebc-ebad14f789d3",
           "kind": "window",
           "offset": 3,
           "width": 2,
@@ -2031,8 +2292,8 @@
           "sill": 1
         },
         {
-          "id": "8163691d-7230-4548-be57-1a466f820704",
-          "wallId": "5020302a-86a9-42f7-90a2-3915fa649ed2",
+          "id": "e5561049-1ff7-4ef5-b9ef-0b7806d13e78",
+          "wallId": "4131df32-cb1f-43cf-a4fb-60d60aa9d41d",
           "kind": "window",
           "offset": 1,
           "width": 0.6,
@@ -2040,8 +2301,8 @@
           "sill": 1.5
         },
         {
-          "id": "ad84172e-323f-4cd4-981d-392684c7d2c5",
-          "wallId": "963d444e-42df-4b21-9da8-a1f24f22a123",
+          "id": "8a4c6ad3-a05e-431e-8859-362e5732d1ed",
+          "wallId": "1fcfd387-6952-406c-b4f0-86cf51f72896",
           "kind": "window",
           "offset": 3.25,
           "width": 0.9,
@@ -2049,8 +2310,17 @@
           "sill": 0.9
         },
         {
-          "id": "62c87fa3-0e3c-49bd-b7ce-62c6b973bec8",
-          "wallId": "81097675-7718-481e-9d11-e6e7688d2d01",
+          "id": "e9245229-b05a-4354-ba08-c485d70631cb",
+          "wallId": "9085110f-6857-4176-9389-7bc402230403",
+          "kind": "window",
+          "offset": 1.5000000000000007,
+          "width": 1.2,
+          "height": 1.2,
+          "sill": 0.9
+        },
+        {
+          "id": "a6e3666f-1c0e-4445-8b57-076850915c20",
+          "wallId": "fd5c7b7a-a4e3-4483-8b77-80168bd37f57",
           "kind": "window",
           "offset": 1.0999999999999992,
           "width": 0.6,
@@ -2058,8 +2328,8 @@
           "sill": 1.5
         },
         {
-          "id": "a9eb33ba-f0ea-481a-a118-9c65209ae508",
-          "wallId": "532945ce-fb59-48d8-bd16-101b9b15fbb9",
+          "id": "4e0b8b09-f499-4c40-b176-0d30eda8febd",
+          "wallId": "5b3ba325-2a4a-4c52-959a-01fe81ca7e72",
           "kind": "door",
           "offset": 3.8999999999999995,
           "width": 2.6,
@@ -2068,8 +2338,8 @@
           "glass": true
         },
         {
-          "id": "929bdc8c-298c-4c23-adac-aea9334ca04a",
-          "wallId": "532945ce-fb59-48d8-bd16-101b9b15fbb9",
+          "id": "081f762a-ffc4-4819-80f2-687af1a997c0",
+          "wallId": "5b3ba325-2a4a-4c52-959a-01fe81ca7e72",
           "kind": "window",
           "offset": 1.0999999999999996,
           "width": 0.8,
@@ -2077,8 +2347,8 @@
           "sill": 1.5
         },
         {
-          "id": "d79bc8ab-2844-446f-a413-53dd2eec1a24",
-          "wallId": "bb3f910a-6414-46d6-beff-3ef1f9ba09a8",
+          "id": "f85f88e5-64cf-41b5-94cf-50a7f064d717",
+          "wallId": "02a4934a-bb59-4f5a-91bc-66257ff17c02",
           "kind": "door",
           "offset": 2.750000000000001,
           "width": 1.2,
@@ -2087,8 +2357,8 @@
           "glass": true
         },
         {
-          "id": "b311f265-e7a3-4986-b15c-e19f107a7d4c",
-          "wallId": "9ae3371c-57c7-4f58-83da-8220b9992bb7",
+          "id": "a8b91ecc-2baa-4ad7-8903-997002c70aac",
+          "wallId": "78e32890-4abc-4e95-8fa5-b9e5ee88cbe4",
           "kind": "door",
           "offset": 0.9499999999999993,
           "width": 1.2,
@@ -2097,8 +2367,8 @@
           "glass": true
         },
         {
-          "id": "b4acde6b-2972-45b7-a31d-12fd80057101",
-          "wallId": "6eb34fb1-83f8-4ae3-9a6f-5ccf783cb022",
+          "id": "711e668d-bd0f-4bfb-89d2-ace3f32f30b2",
+          "wallId": "f4121841-9361-4e48-a717-794a76425e18",
           "kind": "door",
           "offset": 7.000000000000001,
           "width": 1,
@@ -2106,8 +2376,8 @@
           "sill": 0
         },
         {
-          "id": "f7c917e5-a333-4bdf-ae06-76367ca7981e",
-          "wallId": "6eb34fb1-83f8-4ae3-9a6f-5ccf783cb022",
+          "id": "7b7ab241-86a7-40ca-9dd8-e1dfa18c45e3",
+          "wallId": "f4121841-9361-4e48-a717-794a76425e18",
           "kind": "door",
           "offset": 1.0000000000000009,
           "width": 1.4,
@@ -2116,8 +2386,8 @@
           "glass": true
         },
         {
-          "id": "d1e88cd9-99cb-44bc-b6f5-e9ca49271f09",
-          "wallId": "fe73a986-48c9-4e46-8243-071adc7a60a8",
+          "id": "be6dd163-3774-4d4e-8d76-3c5bbee2ff75",
+          "wallId": "daea9346-9cd0-4129-9548-8e46f1ca15d6",
           "kind": "door",
           "offset": 4.35,
           "width": 1,
@@ -2126,8 +2396,8 @@
           "glass": true
         },
         {
-          "id": "e5fcf0c7-a533-4b48-a0b2-dfab13989e14",
-          "wallId": "fe73a986-48c9-4e46-8243-071adc7a60a8",
+          "id": "e94b09b5-038a-41c1-ae39-4bb983225c33",
+          "wallId": "daea9346-9cd0-4129-9548-8e46f1ca15d6",
           "kind": "door",
           "offset": 2.6499999999999995,
           "width": 0.7,
@@ -2135,8 +2405,8 @@
           "sill": 0
         },
         {
-          "id": "f130ecd0-08ec-4f75-a61c-6da3be2990be",
-          "wallId": "0c590ec4-b8ed-4f03-bcb9-2baf5b304f4a",
+          "id": "709a0be1-eb97-4e6d-af75-8eb65820090b",
+          "wallId": "c9b0fbbb-c99f-459d-92b0-7464ae3a5cd1",
           "kind": "door",
           "offset": 2.5,
           "width": 1,
@@ -2145,8 +2415,8 @@
           "glass": true
         },
         {
-          "id": "82155fb3-ce2e-4cce-b41c-ae9f2af9105f",
-          "wallId": "0c590ec4-b8ed-4f03-bcb9-2baf5b304f4a",
+          "id": "34d73984-4cb2-4dbd-8dbd-74cf7dbfdd5d",
+          "wallId": "c9b0fbbb-c99f-459d-92b0-7464ae3a5cd1",
           "kind": "window",
           "offset": 0.7999999999999998,
           "width": 1,
@@ -2154,8 +2424,8 @@
           "sill": 0.9
         },
         {
-          "id": "c7092e62-b8c5-4e55-ac93-0d50b51383e1",
-          "wallId": "51173c51-ffdd-4aea-8270-4d0effa6da46",
+          "id": "0b75f378-d37f-4cd5-ac12-3356c9aeb7c6",
+          "wallId": "a06ba0aa-0270-4870-977b-e06ed3098962",
           "kind": "door",
           "offset": 0.8999999999999999,
           "width": 0.8,
@@ -2163,8 +2433,8 @@
           "sill": 0
         },
         {
-          "id": "ef484688-2a94-497a-b430-42fdac25421c",
-          "wallId": "f6c88687-d942-4cf5-b496-380a1682821f",
+          "id": "acdbd09e-e71f-4aab-ad27-c54f2a315f1f",
+          "wallId": "e7145dc1-7661-4f18-92f8-5eff7b1f9864",
           "kind": "door",
           "offset": 0.6000000000000001,
           "width": 0.8,
@@ -2172,8 +2442,8 @@
           "sill": 0
         },
         {
-          "id": "a0971aec-6107-45c5-a328-7c63d6c630da",
-          "wallId": "43799777-1b2b-4f06-b223-3999df6a8685",
+          "id": "6ba59142-a79b-4f1c-b881-bda938eb4136",
+          "wallId": "41c8287d-88b0-4597-bac1-41278dd93be1",
           "kind": "door",
           "offset": 1.0499999999999996,
           "width": 1.8,
@@ -2182,8 +2452,8 @@
           "glass": true
         },
         {
-          "id": "b5c9fa12-8419-4e87-9630-3ce5497dd097",
-          "wallId": "23a07658-e617-4d15-9194-aad6f5a4f0a4",
+          "id": "6d87ee94-0861-4516-9514-d22ceb47a188",
+          "wallId": "b207af13-8cd7-4592-84a0-2ba9c769d496",
           "kind": "door",
           "offset": 1.8000000000000014,
           "width": 0.75,
@@ -2191,8 +2461,8 @@
           "sill": 0
         },
         {
-          "id": "bceaaeba-f371-4439-a9bd-3e8fb067ce39",
-          "wallId": "a00951a0-a504-4167-9709-004b7771aa6f",
+          "id": "4e24f856-2247-4ce0-ac4e-04c65625430c",
+          "wallId": "d4a64d74-4aba-49b6-8c64-c4f439d3fedc",
           "kind": "door",
           "offset": 0.5500000000000003,
           "width": 0.7,
@@ -2200,8 +2470,8 @@
           "sill": 0
         },
         {
-          "id": "e5222922-8d4c-48a3-8452-e4f393e20954",
-          "wallId": "1d578c86-adae-4dc0-94d3-a3bb2ad5fae5",
+          "id": "59f8e520-79e7-434e-9f33-b664e38c11ce",
+          "wallId": "7a6dd725-d395-4a98-a534-48d7ef6171d8",
           "kind": "door",
           "offset": 2.9000000000000012,
           "width": 1,
@@ -2210,8 +2480,8 @@
           "glass": true
         },
         {
-          "id": "9c6fee30-7aa6-4b9c-81aa-34fc3319ff8d",
-          "wallId": "1d578c86-adae-4dc0-94d3-a3bb2ad5fae5",
+          "id": "3e1161be-028b-4d03-bce1-65ac6bd1d2fa",
+          "wallId": "7a6dd725-d395-4a98-a534-48d7ef6171d8",
           "kind": "window",
           "offset": 1.0000000000000009,
           "width": 1.2,
@@ -2219,8 +2489,8 @@
           "sill": 0.9
         },
         {
-          "id": "d6e65e31-bde2-4328-8799-bb6eb72e8796",
-          "wallId": "b8208566-4e92-4a03-aeb1-0a74715d0976",
+          "id": "1d4152af-de14-4213-92bb-59a55f516fbb",
+          "wallId": "4be5f4d4-4553-44cc-9f83-64b8abdc5e4d",
           "kind": "door",
           "offset": 2.6999999999999993,
           "width": 1,
@@ -2229,8 +2499,8 @@
           "glass": true
         },
         {
-          "id": "71acb05f-c4ff-457e-9208-3db3512fc305",
-          "wallId": "b8208566-4e92-4a03-aeb1-0a74715d0976",
+          "id": "b098eef2-48c1-4a93-948f-65b8d70c33a3",
+          "wallId": "4be5f4d4-4553-44cc-9f83-64b8abdc5e4d",
           "kind": "window",
           "offset": 0.9999999999999991,
           "width": 1.2,
@@ -2238,8 +2508,8 @@
           "sill": 0.9
         },
         {
-          "id": "e284ccd7-a4c2-43b8-96c8-78af3fd4ddd1",
-          "wallId": "44beb870-e9be-49ae-a934-d81c7c1d20e9",
+          "id": "b0322b12-7b6c-4577-a2d3-2356609ddb0d",
+          "wallId": "88df1a4b-17bd-427d-a773-f747d3fb96c9",
           "kind": "door",
           "offset": 0.9000000000000007,
           "width": 0.7,
@@ -2247,8 +2517,8 @@
           "sill": 0
         },
         {
-          "id": "1a889898-e22f-4be4-ac03-cd9a35483b43",
-          "wallId": "67d93823-1aa8-4ce2-aa68-89368df68f4e",
+          "id": "b46ea1fb-3d59-42bb-b99d-4533a842e727",
+          "wallId": "d0f2722e-7e08-4cd8-b382-047a868ac530",
           "kind": "door",
           "offset": 0.9000000000000007,
           "width": 0.7,
@@ -2258,7 +2528,7 @@
       ],
       "rooms": [
         {
-          "id": "dff93c69-3be4-4f65-a588-706a178fb468",
+          "id": "a463a965-ba4a-4de6-bb5b-bcc22defa64b",
           "name": "Sala-comedor-cocina",
           "kind": "room",
           "points": [
@@ -2282,7 +2552,7 @@
           "floorMaterial": "porcelanato"
         },
         {
-          "id": "3cf3df12-69d9-453f-8fab-107e3ef795e3",
+          "id": "8f04a777-a2c0-4077-b55d-f3044bfcc33e",
           "name": "Estudio",
           "kind": "room",
           "points": [
@@ -2306,7 +2576,7 @@
           "floorMaterial": "porcelanato"
         },
         {
-          "id": "beb1b492-5962-4083-b55c-85b0bb3b3b3d",
+          "id": "1fffc403-9a78-4220-80d4-02d42e8cba3b",
           "name": "Baño social",
           "kind": "room",
           "points": [
@@ -2330,7 +2600,7 @@
           "floorMaterial": "ceramica"
         },
         {
-          "id": "e42c961d-c94a-401e-87f9-8cab6551c6a6",
+          "id": "769db06a-c563-420c-b662-98a89cd65ea2",
           "name": "Lavandería",
           "kind": "room",
           "points": [
@@ -2354,7 +2624,7 @@
           "floorMaterial": "ceramica"
         },
         {
-          "id": "a10208f7-e3e2-424a-b49d-5c7c7389c158",
+          "id": "de783236-adc9-4012-a013-81a229b5b746",
           "name": "Vestier",
           "kind": "room",
           "points": [
@@ -2378,7 +2648,7 @@
           "floorMaterial": "porcelanato"
         },
         {
-          "id": "51684ee6-dcc9-4f71-93a8-89e51b704ec9",
+          "id": "9c0c5be3-0263-48b0-980f-e9c8a40c2820",
           "name": "Baño principal",
           "kind": "room",
           "points": [
@@ -2402,7 +2672,7 @@
           "floorMaterial": "ceramica"
         },
         {
-          "id": "11611fca-8019-4d5b-9d56-285dad29a8e0",
+          "id": "cf6fe5ce-20e3-4735-b894-bad6b56561cc",
           "name": "Cuarto principal",
           "kind": "room",
           "points": [
@@ -2426,7 +2696,7 @@
           "floorMaterial": "porcelanato"
         },
         {
-          "id": "34af6425-6968-4d60-af57-f44b3f1602f6",
+          "id": "74599429-57a2-410a-b345-36548222565e",
           "name": "Pieza 1",
           "kind": "room",
           "points": [
@@ -2440,49 +2710,49 @@
             },
             {
               "x": 19.7,
-              "y": 10.8
+              "y": 8
             },
             {
               "x": 21.6,
-              "y": 10.8
+              "y": 8
             },
             {
               "x": 21.6,
-              "y": 13
+              "y": 10.2
             },
             {
               "x": 23.4,
-              "y": 13
+              "y": 10.2
             }
           ],
           "floorMaterial": "porcelanato"
         },
         {
-          "id": "c720821b-52a0-4be8-b1e8-a312673f7f37",
+          "id": "bd0433e3-101c-4f93-9719-bc64cee143c1",
           "name": "Baño pieza 1",
           "kind": "room",
           "points": [
             {
               "x": 23.4,
-              "y": 13
+              "y": 10.2
             },
             {
               "x": 21.6,
-              "y": 13
+              "y": 10.2
             },
             {
               "x": 21.6,
-              "y": 10.8
+              "y": 8
             },
             {
               "x": 23.4,
-              "y": 10.8
+              "y": 8
             }
           ],
           "floorMaterial": "ceramica"
         },
         {
-          "id": "defcfb5c-51bf-4cf7-a7aa-53dbb57b9f61",
+          "id": "4b202b00-9542-4086-b795-61b2e8ab199e",
           "name": "Pieza 2",
           "kind": "room",
           "points": [
@@ -2496,49 +2766,79 @@
             },
             {
               "x": 16,
-              "y": 13
+              "y": 10.2
             },
             {
               "x": 17.8,
-              "y": 13
+              "y": 10.2
             },
             {
               "x": 17.8,
-              "y": 10.8
+              "y": 8
             },
             {
               "x": 19.7,
-              "y": 10.8
+              "y": 8
             }
           ],
           "floorMaterial": "porcelanato"
         },
         {
-          "id": "a1fdd348-3ebb-4ab7-a300-7bfe697f99c2",
+          "id": "7c0828b9-822a-4fa3-a8bb-eaddbed7549f",
           "name": "Baño pieza 2",
           "kind": "room",
           "points": [
             {
               "x": 17.8,
-              "y": 13
+              "y": 10.2
             },
             {
               "x": 16,
-              "y": 13
+              "y": 10.2
             },
             {
               "x": 16,
-              "y": 10.8
+              "y": 8
             },
             {
               "x": 17.8,
-              "y": 10.8
+              "y": 8
             }
           ],
           "floorMaterial": "ceramica"
         },
         {
-          "id": "178aeef7-6d0d-461d-a423-6fab378c31e7",
+          "id": "c0080fd5-48fc-49c3-b7d2-13c06880fcee",
+          "name": "Jardín privado de la suite",
+          "kind": "balcony",
+          "points": [
+            {
+              "x": 29,
+              "y": 12
+            },
+            {
+              "x": 23.4,
+              "y": 12
+            },
+            {
+              "x": 23.4,
+              "y": 8
+            },
+            {
+              "x": 29,
+              "y": 8
+            }
+          ],
+          "openEdges": [
+            0,
+            1
+          ],
+          "railing": "celosia",
+          "floorMaterial": "cesped",
+          "railingColor": "#B77E53"
+        },
+        {
+          "id": "2b3ffc64-3a30-4cb7-8e32-d9d9b9a9de0f",
           "name": "Patio central",
           "kind": "balcony",
           "points": [
@@ -2560,6 +2860,10 @@
             },
             {
               "x": 16,
+              "y": 18
+            },
+            {
+              "x": 16,
               "y": 17
             },
             {
@@ -2572,14 +2876,15 @@
             1,
             2,
             4,
-            5
+            5,
+            6
           ],
           "railing": "celosia",
           "floorMaterial": "cesped",
           "railingColor": "#B77E53"
         },
         {
-          "id": "b7d25263-6a16-4c44-8216-8f7849e29725",
+          "id": "900d8e36-8449-415f-b91c-199045154f0a",
           "name": "Escalera (madera y vidrio)",
           "kind": "stairs",
           "points": [
@@ -2604,7 +2909,7 @@
           "glass": true
         },
         {
-          "id": "863a8ef1-2e62-4417-8e92-b4129cc3292e",
+          "id": "2e924edd-a28d-41cd-abae-0dbd479a6ddd",
           "name": "Parqueadero lote 1",
           "kind": "exterior",
           "points": [
@@ -2628,7 +2933,7 @@
           "floorMaterial": "porcelanato"
         },
         {
-          "id": "8757a159-9d8c-47b3-af63-c80de236b683",
+          "id": "dedf0126-d908-4461-94ce-e53f19ff7fee",
           "name": "Parqueadero lote 2",
           "kind": "exterior",
           "points": [
@@ -2652,7 +2957,7 @@
           "floorMaterial": "porcelanato"
         },
         {
-          "id": "e6028266-4183-4527-b3ba-e354511dfd16",
+          "id": "6786825b-7038-4001-a64a-b54fc6ad3b7e",
           "name": "Lote 2 (por diseñar)",
           "kind": "exterior",
           "points": [
@@ -2676,7 +2981,7 @@
           "floorMaterial": "tierra"
         },
         {
-          "id": "9713359d-45ef-4d80-afff-b362102c197d",
+          "id": "f7ccae51-2f1f-4974-8178-b786eb79f124",
           "name": "Jardín del frente",
           "kind": "exterior",
           "points": [
@@ -2700,7 +3005,7 @@
           "floorMaterial": "cesped"
         },
         {
-          "id": "0e0563c9-b401-4a05-8263-5636aca9edad",
+          "id": "13c315b2-40c4-40ad-ab9a-b1bf61339150",
           "name": "Acceso bajo el pórtico",
           "kind": "exterior",
           "points": [
@@ -2724,7 +3029,7 @@
           "floorMaterial": "porcelanato"
         },
         {
-          "id": "6711a7cc-ae62-4809-83ae-8be96811ecef",
+          "id": "ac16741f-a0ee-467e-9985-7b7c2d625a3b",
           "name": "Césped lateral derecho",
           "kind": "exterior",
           "points": [
@@ -2748,7 +3053,7 @@
           "floorMaterial": "cesped"
         },
         {
-          "id": "7ef387ae-2f6f-4cbf-95f0-ced4572d6dff",
+          "id": "f3f988ab-90cb-4ab3-b45a-54356c40e9f6",
           "name": "Césped lateral izquierdo",
           "kind": "exterior",
           "points": [
@@ -2762,73 +3067,41 @@
             },
             {
               "x": 15,
-              "y": 12
+              "y": 19
             },
             {
               "x": 16,
-              "y": 12
+              "y": 19
             }
           ],
           "floorMaterial": "cesped"
         },
         {
-          "id": "8c4ba7fa-8828-407e-bebf-8e39b23b0548",
-          "name": "Terraza del patio trasero",
+          "id": "4a86a2df-fb1c-4f6d-ab18-509669d01a1d",
+          "name": "Sendero lateral al patio trasero",
           "kind": "exterior",
           "points": [
             {
-              "x": 29,
-              "y": 12
-            },
-            {
-              "x": 23.4,
-              "y": 12
-            },
-            {
-              "x": 23.4,
-              "y": 10.8
-            },
-            {
               "x": 16,
-              "y": 10.8
+              "y": 19
             },
             {
-              "x": 16,
+              "x": 15,
+              "y": 19
+            },
+            {
+              "x": 15,
               "y": 8
             },
             {
-              "x": 29,
+              "x": 16,
               "y": 8
             }
           ],
           "floorMaterial": "piedra"
         },
         {
-          "id": "b868a298-9ed4-46ad-8a14-c093ad1028e4",
-          "name": "Patio trasero (césped)",
-          "kind": "exterior",
-          "points": [
-            {
-              "x": 30,
-              "y": 8
-            },
-            {
-              "x": 15,
-              "y": 8
-            },
-            {
-              "x": 15,
-              "y": 0
-            },
-            {
-              "x": 30,
-              "y": 0
-            }
-          ],
-          "floorMaterial": "cesped"
-        },
-        {
-          "id": "f901c32d-d39a-4e53-9a1b-ed678f0431cd",
+          "id": "d078352f-3984-4814-8b22-4a38b7f0e348",
           "name": "Patio trasero (lado derecho)",
           "kind": "exterior",
           "points": [
@@ -2852,31 +3125,55 @@
           "floorMaterial": "cesped"
         },
         {
-          "id": "96f50fa5-fe04-45ca-b4ab-dae88320193e",
-          "name": "Patio trasero (lado izquierdo)",
+          "id": "2f6bfbc1-9ffa-4354-9e10-1467a2f03cb2",
+          "name": "Deck de la piscina",
           "kind": "exterior",
           "points": [
             {
-              "x": 16,
-              "y": 12
-            },
-            {
-              "x": 15,
-              "y": 12
+              "x": 30,
+              "y": 8
             },
             {
               "x": 15,
               "y": 8
             },
             {
-              "x": 16,
-              "y": 8
+              "x": 15,
+              "y": 3.3999999999999986
+            },
+            {
+              "x": 30,
+              "y": 3.3999999999999986
+            }
+          ],
+          "floorMaterial": "piedra"
+        },
+        {
+          "id": "e8d9c797-8d0d-45cb-915f-f8030be766e1",
+          "name": "Granjita",
+          "kind": "exterior",
+          "points": [
+            {
+              "x": 30,
+              "y": 3.3999999999999986
+            },
+            {
+              "x": 15,
+              "y": 3.3999999999999986
+            },
+            {
+              "x": 15,
+              "y": 0
+            },
+            {
+              "x": 30,
+              "y": 0
             }
           ],
           "floorMaterial": "cesped"
         },
         {
-          "id": "81f3514b-bbdb-4650-a12c-996f10697e82",
+          "id": "41a40e07-61a5-4920-bdf8-65028adfe449",
           "name": "Andén",
           "kind": "exterior",
           "points": [
@@ -2900,7 +3197,7 @@
           "floorMaterial": "concreto"
         },
         {
-          "id": "6157258c-3d75-4267-926d-f47f710bf055",
+          "id": "5c67b7e2-a0ab-4e2e-87f6-de2826ba8565",
           "name": "Calle",
           "kind": "exterior",
           "points": [
@@ -2927,12 +3224,12 @@
       "background": null
     },
     {
-      "id": "49bdb877-9d51-47e3-91a7-ecab313a8fd6",
+      "id": "f2135fe4-a480-46fd-bd97-49130a38c784",
       "name": "Rooftop",
       "height": 2.6,
       "walls": [
         {
-          "id": "a55f9175-41e9-42b0-ac91-adb0a4f0ee4c",
+          "id": "6d417d31-2b40-4df2-bff8-ff1ac04964aa",
           "a": {
             "x": 21.2,
             "y": 27
@@ -2954,7 +3251,7 @@
           }
         },
         {
-          "id": "efc35792-259e-4985-a849-75952155990e",
+          "id": "ef89b42c-2c7b-45d4-9c36-6d3ab810d3bf",
           "a": {
             "x": 29,
             "y": 27
@@ -2977,7 +3274,7 @@
           }
         },
         {
-          "id": "d8752b48-37b2-45ad-82af-032674b3f35c",
+          "id": "d800f4fb-d05b-4a89-86f4-4fb22f2bd3ba",
           "a": {
             "x": 21.2,
             "y": 27
@@ -3000,7 +3297,7 @@
           }
         },
         {
-          "id": "5ead727b-5adb-4802-9dc1-5a90346dff1c",
+          "id": "7553c4f0-a9c0-4af8-adb9-ac4b0084fbe7",
           "a": {
             "x": 29,
             "y": 27
@@ -3023,7 +3320,7 @@
           }
         },
         {
-          "id": "93102f92-95f7-4c53-87a0-0adb3ea66fc5",
+          "id": "b049ee88-fb64-420c-aba3-7b62b68c28b5",
           "a": {
             "x": 21.2,
             "y": 21
@@ -3046,7 +3343,7 @@
           }
         },
         {
-          "id": "b0f96684-3db0-4f8f-87a5-f3d7c891ef17",
+          "id": "2c964973-d767-47f3-a570-fc9424f22eda",
           "a": {
             "x": 21.2,
             "y": 21
@@ -3071,7 +3368,7 @@
       ],
       "furniture": [
         {
-          "id": "b7956947-60e0-4052-8f62-1a16b7b098d8",
+          "id": "6bb00b1f-2a8a-43c0-99cb-13681bb90e2c",
           "type": "jardinera",
           "x": 19.4,
           "y": 26.4,
@@ -3083,7 +3380,7 @@
           "color": "#495762"
         },
         {
-          "id": "d020318e-54d8-410a-8fd1-e2542c2b5e44",
+          "id": "f12dd182-667d-4bc1-a5fc-75507cfaf616",
           "type": "jardinera",
           "x": 17.3,
           "y": 26.4,
@@ -3095,7 +3392,7 @@
           "color": "#495762"
         },
         {
-          "id": "272825d1-8428-4978-ae48-2280fe9eaf26",
+          "id": "9bbf1070-c1b4-41a3-95c1-95c3d47971ff",
           "type": "tira-led",
           "x": 25.1,
           "y": 27.3,
@@ -3107,7 +3404,7 @@
           "color": "#ffd9a0"
         },
         {
-          "id": "db4b6222-c109-43a3-9d3d-0490b9cb9416",
+          "id": "671313aa-254c-43a1-a417-bc48ebd9663f",
           "type": "pergola",
           "x": 18.8,
           "y": 15.2,
@@ -3119,7 +3416,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "16836da9-6f04-4ce3-bba3-9f3d1c6b8864",
+          "id": "6d82574f-e47a-4c52-9afb-6b407b027e79",
           "type": "sofa-exterior",
           "x": 18.8,
           "y": 16.45,
@@ -3131,7 +3428,7 @@
           "color": "#C6B1A0"
         },
         {
-          "id": "e7dc76b1-62e3-4b23-a688-0c705d33318c",
+          "id": "77b3e8ca-2756-4ecb-86ad-6ea9e7afa7c4",
           "type": "sillon-exterior",
           "x": 20.5,
           "y": 15.2,
@@ -3143,7 +3440,7 @@
           "color": "#495762"
         },
         {
-          "id": "6fc68532-6129-437b-a377-a708f1ff845c",
+          "id": "3d10625c-edc0-4f31-aa07-3b36709d1574",
           "type": "sillon-exterior",
           "x": 17.1,
           "y": 15.2,
@@ -3155,7 +3452,7 @@
           "color": "#495762"
         },
         {
-          "id": "2d449376-b9fe-46b1-a2a3-1e296d4fa9d2",
+          "id": "be734c8e-cd26-4e66-a6e8-7d739a695663",
           "type": "alfombra",
           "x": 18.8,
           "y": 15.2,
@@ -3167,7 +3464,7 @@
           "color": "#E8DBD3"
         },
         {
-          "id": "38a6d30e-3c34-4144-99cd-f57de78792fe",
+          "id": "a721b391-a26a-4449-bed2-6af45268b980",
           "type": "mesa-centro",
           "x": 18.8,
           "y": 15.2,
@@ -3179,7 +3476,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "f5146c9f-de47-444f-86a6-41f2a6f70b6f",
+          "id": "8ec66c73-bb69-479c-9f59-6ff7ef9358fc",
           "type": "parrilla",
           "x": 21,
           "y": 12.45,
@@ -3190,7 +3487,7 @@
           "elevation": 0
         },
         {
-          "id": "c64b5bb6-8b6b-4059-a7cb-745eae82aec8",
+          "id": "9e85be95-864e-4d0a-a2fb-2e0ecc2da6e2",
           "type": "bar",
           "x": 18.8,
           "y": 12.45,
@@ -3202,7 +3499,7 @@
           "color": "#B77E53"
         },
         {
-          "id": "f653f877-a554-4c9e-a198-541d0345be6f",
+          "id": "8c6fe117-f552-4e07-a781-87c1edafd12b",
           "type": "matera-alta",
           "x": 16.4,
           "y": 12.5,
@@ -3214,7 +3511,7 @@
           "color": "#8C8A7D"
         },
         {
-          "id": "0b1dc6e3-ac53-4d4f-90e3-4130c788faba",
+          "id": "ae0d8218-3760-46fe-8ef4-051ab3f815ae",
           "type": "matera-alta",
           "x": 22.5,
           "y": 12.5,
@@ -3228,8 +3525,8 @@
       ],
       "openings": [
         {
-          "id": "5c4d195c-c254-4c27-844d-3cf1f88cc023",
-          "wallId": "a55f9175-41e9-42b0-ac91-adb0a4f0ee4c",
+          "id": "53e79674-8607-4a1a-907e-93579fab79de",
+          "wallId": "6d417d31-2b40-4df2-bff8-ff1ac04964aa",
           "kind": "window",
           "offset": 0.7000000000000011,
           "width": 0.7,
@@ -3237,8 +3534,8 @@
           "sill": 0
         },
         {
-          "id": "38e52db3-1b68-4570-9168-b1c27c8600d2",
-          "wallId": "5ead727b-5adb-4802-9dc1-5a90346dff1c",
+          "id": "a0ab479f-3044-4a56-b0b5-1ae8e207cc1e",
+          "wallId": "7553c4f0-a9c0-4af8-adb9-ac4b0084fbe7",
           "kind": "window",
           "offset": 3,
           "width": 1.6,
@@ -3246,8 +3543,8 @@
           "sill": 0.6
         },
         {
-          "id": "e8914ae2-8380-4ef1-89b5-3ef24a2e7a16",
-          "wallId": "93102f92-95f7-4c53-87a0-0adb3ea66fc5",
+          "id": "adc34d49-4305-4259-af4f-e1b30d300a6e",
+          "wallId": "b049ee88-fb64-420c-aba3-7b62b68c28b5",
           "kind": "window",
           "offset": 3.4,
           "width": 3,
@@ -3255,8 +3552,8 @@
           "sill": 0.6
         },
         {
-          "id": "ad8571f1-ae6e-46aa-b2b4-563fb923c256",
-          "wallId": "b0f96684-3db0-4f8f-87a5-f3d7c891ef17",
+          "id": "6fdc4646-7b21-40ba-8f32-02dabbc9bcbc",
+          "wallId": "2c964973-d767-47f3-a570-fc9424f22eda",
           "kind": "window",
           "offset": 4.800000000000001,
           "width": 3,
@@ -3264,8 +3561,8 @@
           "sill": 0.6
         },
         {
-          "id": "99e5b10a-28d4-43e0-a9c5-508e35ceebe8",
-          "wallId": "b0f96684-3db0-4f8f-87a5-f3d7c891ef17",
+          "id": "94c3df75-4ade-4516-933a-b95f40cbc224",
+          "wallId": "2c964973-d767-47f3-a570-fc9424f22eda",
           "kind": "door",
           "offset": 1.200000000000001,
           "width": 0.9,
@@ -3276,7 +3573,7 @@
       ],
       "rooms": [
         {
-          "id": "89a2ebbb-cf97-45cb-a2b1-7c9849b271d7",
+          "id": "449435c7-dab4-48fe-848e-1ee79f0d80c1",
           "name": "Techo del cubo",
           "kind": "roof",
           "points": [
@@ -3302,7 +3599,7 @@
           "edgeColor": "#495762"
         },
         {
-          "id": "661999ff-aa74-4e6c-b2e8-11fb5b7b827f",
+          "id": "75ba6348-877d-4c7a-a77e-b7c398bf4f92",
           "name": "Rooftop",
           "kind": "balcony",
           "points": [
@@ -3332,11 +3629,11 @@
             },
             {
               "x": 16,
-              "y": 10.8
+              "y": 8
             },
             {
               "x": 23.4,
-              "y": 10.8
+              "y": 8
             },
             {
               "x": 23.4,
@@ -3360,7 +3657,7 @@
           "railingColor": "#495762"
         },
         {
-          "id": "65ee980a-1a49-43fe-980c-97b8c26b54cf",
+          "id": "dfd72c04-673a-456e-a605-c5dc9970d1b8",
           "name": "Pórtico del parqueadero",
           "kind": "roof",
           "points": [
@@ -3386,7 +3683,7 @@
           "edgeColor": "#EEEAE4"
         },
         {
-          "id": "d37327e8-75ae-416b-9199-c4bf524e3f7b",
+          "id": "f3f6fb06-bd02-426a-aac7-d68f5e0d8aa6",
           "name": "Cubierta de la cocina",
           "kind": "roof",
           "points": [
@@ -3412,7 +3709,7 @@
           "edgeColor": "#E8DBD3"
         },
         {
-          "id": "78e213bd-90c4-43f2-881f-06ae0c2431d0",
+          "id": "ca2ca038-687e-4d71-ba9d-a6ad2d65c914",
           "name": "Cubierta del estudio",
           "kind": "roof",
           "points": [
@@ -3438,7 +3735,7 @@
           "edgeColor": "#E8DBD3"
         },
         {
-          "id": "beb5b190-d40b-4475-b1ed-2754653fda6d",
+          "id": "3fab94ac-d44c-42a2-a98f-29cfe13c12f6",
           "name": "Cubierta de servicios",
           "kind": "roof",
           "points": [
@@ -3464,7 +3761,7 @@
           "edgeColor": "#E8DBD3"
         },
         {
-          "id": "f5393a5d-b295-47f0-9cd7-2fdba1e5e04c",
+          "id": "2b363400-a0ee-4c52-90bf-265f3876bf20",
           "name": "Cubierta de la suite",
           "kind": "roof",
           "points": [
@@ -3488,6 +3785,98 @@
           "height": 0.001,
           "floorMaterial": "concreto",
           "edgeColor": "#E8DBD3"
+        },
+        {
+          "id": "53839476-19b2-4a88-990b-b7ca08fa1c7f",
+          "name": "Alero del patio (lado del estudio)",
+          "kind": "roof",
+          "points": [
+            {
+              "x": 25.5,
+              "y": 21
+            },
+            {
+              "x": 23,
+              "y": 21
+            },
+            {
+              "x": 23,
+              "y": 20
+            },
+            {
+              "x": 24.5,
+              "y": 20
+            },
+            {
+              "x": 24.5,
+              "y": 18
+            },
+            {
+              "x": 23,
+              "y": 18
+            },
+            {
+              "x": 23,
+              "y": 17
+            },
+            {
+              "x": 25.5,
+              "y": 17
+            }
+          ],
+          "height": 0.001,
+          "floorMaterial": "madera",
+          "edgeColor": "#B77E53"
+        },
+        {
+          "id": "f2e7deed-cd41-4aa0-a867-1a5ea10288f3",
+          "name": "Alero del patio (lado de la cocina)",
+          "kind": "roof",
+          "points": [
+            {
+              "x": 21.8,
+              "y": 21
+            },
+            {
+              "x": 19.5,
+              "y": 21
+            },
+            {
+              "x": 19.5,
+              "y": 19
+            },
+            {
+              "x": 16,
+              "y": 19
+            },
+            {
+              "x": 16,
+              "y": 17
+            },
+            {
+              "x": 21.8,
+              "y": 17
+            },
+            {
+              "x": 21.8,
+              "y": 18
+            },
+            {
+              "x": 20.5,
+              "y": 18
+            },
+            {
+              "x": 20.5,
+              "y": 20
+            },
+            {
+              "x": 21.8,
+              "y": 20
+            }
+          ],
+          "height": 0.001,
+          "floorMaterial": "madera",
+          "edgeColor": "#B77E53"
         }
       ],
       "background": null
