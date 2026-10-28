@@ -1,21 +1,70 @@
 import { useEffect, useMemo } from 'react';
-import { CanvasTexture, RepeatWrapping, SRGBColorSpace } from 'three';
+import { BackSide, BufferAttribute, BufferGeometry, CanvasTexture, Color, RepeatWrapping, ShaderMaterial, SRGBColorSpace } from 'three';
 import type { OutdoorLight, RoomLight } from './roomLights';
 import type { TimeOfDay } from './sceneOptions';
 import { sunPosition } from './sun';
 
 const WARM = '#FFB46B'; // ~2700 K, warm white bulb
 
-/** Sky, fill light and sun/moon for each time of day. Night keeps enough blue fill to see the green grass. */
+/** Fill light and sun/moon for each time of day. Night keeps enough blue fill to see the green grass. */
 const LOOK: Record<TimeOfDay, {
-  sky: string | null; hemi: [string, string, number]; sun: string; sunIntensity: number; room: number; outdoor: number;
+  hemi: [string, string, number]; sun: string; sunIntensity: number; room: number; outdoor: number;
 }> = {
-  manana: { sky: null, hemi: ['#ffffff', '#9fae8a', 0.85], sun: '#ffffff', sunIntensity: 1.5, room: 1.2, outdoor: 0.4 },
-  tarde: { sky: '#f2d7b6', hemi: ['#ffe0bd', '#5d5a3c', 0.55], sun: '#ffb070', sunIntensity: 1.1, room: 4, outdoor: 3 },
-  noche: { sky: '#0e1626', hemi: ['#5a6f9a', '#3b5a2a', 1.0], sun: '#9fb4e0', sunIntensity: 0.45, room: 9, outdoor: 7 },
+  manana: { hemi: ['#ffffff', '#9fae8a', 0.85], sun: '#ffffff', sunIntensity: 1.5, room: 1.2, outdoor: 0.4 },
+  tarde: { hemi: ['#ffe0bd', '#5d5a3c', 0.55], sun: '#ffb070', sunIntensity: 1.1, room: 4, outdoor: 3 },
+  noche: { hemi: ['#5a6f9a', '#3b5a2a', 1.0], sun: '#9fb4e0', sunIntensity: 0.45, room: 9, outdoor: 7 },
 };
 
-export const skyColor = (time: TimeOfDay, daySky: string) => LOOK[time].sky ?? daySky;
+/** Sky dome colours (zenith, horizon) per time of day: a calm blue morning, a sunset, a deep night. */
+const DOME: Record<TimeOfDay, [string, string]> = {
+  manana: ['#5b93c7', '#d6e6f2'],
+  tarde: ['#4a6290', '#e8b48e'],
+  noche: ['#03060f', '#1a2846'],
+};
+export const horizonColor = (time: TimeOfDay) => DOME[time][1];
+
+const SKY_RADIUS = 240;
+
+/** A gradient sky around the scene (instead of a flat background), with stars at night. */
+export function SkyDome({ time, cx, cz }: { time: TimeOfDay; cx: number; cz: number }) {
+  const material = useMemo(() => new ShaderMaterial({
+    side: BackSide,
+    depthWrite: false,
+    uniforms: { top: { value: new Color() }, bottom: { value: new Color() } },
+    vertexShader: 'varying vec3 vDir; void main() { vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'uniform vec3 top; uniform vec3 bottom; varying vec3 vDir; void main() { float h = clamp(vDir.y, 0.0, 1.0); gl_FragColor = vec4(mix(bottom, top, pow(h, 0.6)), 1.0); }',
+  }), []);
+  useEffect(() => () => material.dispose(), [material]);
+  material.uniforms.top.value.set(DOME[time][0]);
+  material.uniforms.bottom.value.set(DOME[time][1]);
+  const stars = useMemo(() => {
+    const n = 900;
+    const pos = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+      // Upper hemisphere, a little above the horizon.
+      const a = Math.random() * Math.PI * 2;
+      const y = 0.08 + Math.random() * 0.92;
+      const r = Math.sqrt(1 - y * y);
+      pos.set([Math.cos(a) * r * (SKY_RADIUS - 5), y * (SKY_RADIUS - 5), Math.sin(a) * r * (SKY_RADIUS - 5)], i * 3);
+    }
+    const g = new BufferGeometry();
+    g.setAttribute('position', new BufferAttribute(pos, 3));
+    return g;
+  }, []);
+  useEffect(() => () => stars.dispose(), [stars]);
+  return (
+    <group position={[cx, 0, cz]}>
+      <mesh material={material} renderOrder={-1}>
+        <sphereGeometry args={[SKY_RADIUS, 32, 16]} />
+      </mesh>
+      {time === 'noche' && (
+        <points geometry={stars}>
+          <pointsMaterial color="#f4f1e6" size={0.9} sizeAttenuation depthWrite={false} />
+        </points>
+      )}
+    </group>
+  );
+}
 
 /** Procedural grass, soft and slightly desaturated so it doesn't steal attention from the house. */
 function makeGrassTexture(): CanvasTexture {

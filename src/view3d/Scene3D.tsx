@@ -15,7 +15,7 @@ import SegmentedSwitch from '../ui/SegmentedSwitch';
 import WalkControls from '../walk/WalkControls';
 import { WalkButton, WalkHint } from '../walk/WalkOverlay';
 import { useWalk } from '../walk/walkStore';
-import { Ground, OutdoorLights, RoomLights, SkyLights, skyColor } from './Surroundings';
+import { Ground, horizonColor, OutdoorLights, RoomLights, SkyDome, SkyLights } from './Surroundings';
 import RenderBridge from '../render/RenderBridge';
 import RenderButtons from '../render/RenderButtons';
 
@@ -97,7 +97,8 @@ export default function Scene3D() {
   return (
     <div className="scene3d" data-testid="scene3d">
       <Canvas shadows camera={{ fov: 60, near: 0.05, far: 500, position: [frame.cx + frame.size, frame.size, frame.cy + frame.size * 1.2] }}>
-        <color attach="background" args={[skyColor(time, pal.sky)]} />
+        <color attach="background" args={[horizonColor(time)]} />
+        <SkyDome time={time} cx={frame.cx} cz={frame.cy} />
         <SkyLights time={time} north={project.north} cx={frame.cx} cz={frame.cy} />
         <Ground grass={grass} color={pal.floor} cx={frame.cx} cz={frame.cy} />
         {!grass && <gridHelper key={pal.line} args={[60, 60, pal.line, pal.line]} position={[frame.cx, -0.025, frame.cy]} />}
