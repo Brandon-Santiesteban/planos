@@ -15,7 +15,7 @@
 // inside the page) turn them into plan coordinates for the whole site: plan x = 30 − x, plan y = 32 − y (north up).
 // Layout (design metres), 1 m of lawn on both sides, the house from y 5 to y 20 (15 m):
 //   y 0–3     parking; the white carport over its Lote 2 side (one car under it, the front door at its back)
-//   y 5–11    one open social space: double-height cube x 1–8,8 (living room, a tree, the stair up along its back
+//   y 5–11    one open social space: double-height cube x 1–8,8 (living room, the stair up along its back
 //             wall) and the kitchen-dining room x 8,8–14; the front door opens straight into it
 //   y 11–15   study x 1–4,5 · central patio x 4,5–14 · social bathroom (opening onto the kitchen-dining room) and
 //             laundry x 10,5–14 (y 11–13), the patio's end behind a celosía
@@ -347,8 +347,8 @@ const onWall = (r, side, type, at, o = {}) => {
 const R = (name) => interior(ground, ground.rooms.find((r) => r.name === name));
 const { arena, taupe, oliva, pizarra, caramelo } = PALETA;
 
-// Social space: living room under the double height facing a 70" TV on the side wall, a tree growing inside the
-// cube, the wooden stair along its back wall; kitchen along the far wall and the dining table beside it.
+// Social space: living room under the double height facing a 70" TV on the side wall,
+// the wooden stair along the cube's back wall; kitchen along the far wall and the dining table beside it.
 let r = R('Sala-comedor-cocina');
 onWall(r, 'w', 'mueble-tv', Y(7.0), { width: 2.0, color: oliva });
 onWall(r, 'w', 'televisor-70', Y(7.0), { gap: 0.02 });
@@ -357,7 +357,6 @@ piece('mesa-centro', X(3.0), Y(7.0), 90, { color: caramelo });
 piece('sofa-l', X(4.6), Y(7.0), 90, { color: taupe });
 piece('sillon', X(2.4), Y(5.6), 180, { color: pizarra });
 piece('lampara-pie', X(5.7), Y(8.6));
-piece('arbol-pequeno', X(7.0), Y(7.6)); // árbol interior bajo la doble altura
 onWall(r, 'e', 'nevera', Y(10.5));
 onWall(r, 'e', 'meson', Y(9.5), { color: arena });
 onWall(r, 'e', 'lavaplatos', Y(8.5), { color: arena });

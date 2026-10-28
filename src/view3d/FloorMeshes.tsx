@@ -79,6 +79,38 @@ function WallMesh({ wall, floor, selected }: { wall: Wall; floor: Floor; selecte
             </mesh>
           );
         })}
+      {openings
+        .filter((o) => o.kind === 'door' && !o.glass)
+        .map((o) => <DoorLeaf key={o.id} wall={wall} d={d} offset={o.offset} width={o.width} height={o.height} flip={o.flip} />)}
+    </group>
+  );
+}
+
+const DOOR_WOOD = '#8a6446';
+/** How far a solid door stands open, so it reads as a door without closing the way through. */
+const DOOR_OPEN = (70 * Math.PI) / 180;
+
+/** A wooden door leaf with a handle, hinged at the opening's start and swung like its 2D symbol (towards the
+ * wall's +normal, −normal when flipped). */
+function DoorLeaf({ wall, d, offset, width, height, flip }: { wall: Wall; d: Vec2; offset: number; width: number; height: number; flip?: boolean }) {
+  const n = { x: -d.y, y: d.x };
+  const side = flip ? scale(n, -1) : n;
+  const hinge = add(add(wall.a, scale(d, offset - width / 2)), scale(side, wall.thickness / 2));
+  const dir = add(scale(d, Math.cos(DOOR_OPEN)), scale(side, Math.sin(DOOR_OPEN)));
+  const leaf = width - 0.02;
+  const c = add(hinge, scale(dir, leaf / 2));
+  const knob = add(hinge, scale(dir, leaf - 0.08));
+  const h = height - 0.01;
+  return (
+    <group>
+      <mesh position={[c.x, h / 2, c.y]} rotation={[0, yaw(dir), 0]} castShadow receiveShadow>
+        <boxGeometry args={[leaf, h, 0.04]} />
+        <meshStandardMaterial color={DOOR_WOOD} roughness={0.6} />
+      </mesh>
+      <mesh position={[knob.x, 1.0, knob.y]} rotation={[0, yaw(dir), 0]}>
+        <boxGeometry args={[0.03, 0.18, 0.1]} />
+        <meshStandardMaterial color="#c9ccd0" metalness={0.7} roughness={0.3} />
+      </mesh>
     </group>
   );
 }
