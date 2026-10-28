@@ -109,7 +109,9 @@ const json = await page.evaluate(async (DEPTH) => {
   glassDoor(g, wall(g, Q(6, 3.6), Q(6, 5.6)), 0.8, { width: 1.0 }); // cocina-comedor → patio
   glassDoor(g, wall(g, Q(6, 3.6), Q(7.4, 3.6)), 0.7, { width: 1.0 }); // hall → patio
   opening(g, 'door', wall(g, Q(7.4, 1.5), Q(7.4, 3.6), 0.15), 1.2, { width: 0.9 }); // hall → garaje
-  wall(g, Q(7.4, 3.6), Q(7.4, 5.4), 0.15); // the garage's laundry nook backs onto it
+  wall(g, Q(7.4, 3.6), Q(7.4, 5.4), 0.15); // garaje | patio
+  // The garage closes towards the patio; a door by the laundry leads out to dry the clothes.
+  opening(g, 'door', wall(g, Q(7.4, 5.4), Q(8.6, 5.4), 0.15), 0.6, { width: 0.8 });
   const cubeBack = wall(g, Q(0, 5.6), Q(6, 5.6)); // cubo | suite y baño social
   opening(g, 'door', cubeBack, 5.2, { width: 0.7 }); // cubo → baño social
 
@@ -383,21 +385,25 @@ onWall(r, 'n', 'ducha', 11.9);
 onWall(r, 'e', 'lavamanos', 0.5);
 onWall(r, 'e', 'sanitario', 1.3);
 
-// Garage: the two cars on the right, the laundry nook against the left wall by the way out to the patio.
-piece('carro', 9.7, DEPTH - 0.3 - 2.25, 270);
-piece('carro', 11.9, DEPTH - 0.3 - 2.25, 270, { color: pizarra });
-piece('lavadero', 7.775, 6.6, 270);
-piece('lavadora', 7.8, 7.6, 270);
+// Garage (5,6 m wide, 5,4 m deep plus the 0,9 m eave): two cars nose-in with 0,6 m between them and 0,75 m on
+// the hall side for the door, rears under the eave; the laundry against the back wall beside the door to the patio,
+// with 0,8 m to stand in front of it.
+const CAR_Y = DEPTH + 0.6 - 2.25; // rear 0,6 m out under the eave, nose 0,8 m short of the laundry
+piece('carro', 9.125, CAR_Y, 270);
+piece('carro', 11.525, CAR_Y, 270, { color: pizarra });
+const BACK = DEPTH - 5.4 + 0.075; // inside face of the garage's back wall
+piece('lavadero', 8.95, BACK + 0.3);
+piece('lavadora', 9.7, BACK + 0.325);
 
 // Central patio: plants along the strip by the bedrooms, a tree at the back where it opens to the back patio.
 piece('arbol-pequeno', 7.5, 1.0);
 piece('arbusto', 8.05, 3.3);
 piece('matera', 8.15, 5.4, 0, { color: oliva });
-piece('matera', 7.6, 7.3, 0, { color: caramelo });
+piece('matera', 7.9, 4.4, 0, { color: caramelo });
 piece('arbusto', 6.5, 2.0);
 
 // Back patio: stone terrace in front of the master bedroom's glass door, lounge around a fire pit.
-piece('brasero', 3.0, -0.9);
+piece('brasero', 3.0, -0.7);
 piece('sofa-exterior', 3.0, -1.55, 0, { color: taupe });
 piece('sillon-exterior', 1.5, -0.75, 270, { color: pizarra });
 piece('sillon-exterior', 4.5, -0.75, 90, { color: pizarra });
@@ -416,8 +422,8 @@ piece('tira-led', 10.2, DEPTH + 0.5, 0, { width: 5.2, elevation: 2.3, color: '#f
 piece('banca', 7.15, DEPTH - 0.75, 90, { width: 1.1, color: caramelo });
 piece('matera-alta', 6.3, DEPTH - 0.3, 0, { color: oliva });
 piece('cuadro-paisaje', 6.7, DEPTH - 1.4, 180, { width: 0.6, height: 0.5, elevation: 2.35 }); // número de la casa
-piece('jardinera', 1.6, DEPTH + 0.5, 0, { color: pizarra });
-piece('jardinera', 3.5, DEPTH + 0.5, 0, { color: pizarra });
+piece('jardinera', 1.75, DEPTH + 0.5, 0, { color: pizarra });
+piece('jardinera', 3.65, DEPTH + 0.5, 0, { color: pizarra });
 piece('arbusto', 5.3, DEPTH + 0.5);
 piece('arbusto', 0.3, DEPTH + 0.5);
 piece('porton-telescopico', 10.2, DEPTH + 1 - 0.06, 0, { width: 5.6, color: caramelo });
@@ -443,6 +449,29 @@ piece('mesa-exterior', 3.0, 1.9, 0, { color: caramelo });
 piece('jardinera', 0.35, 2.6, 90, { color: oliva });
 piece('matera-alta', 5.6, 0.4, 0, { color: oliva });
 piece('matera-alta', 0.4, 5.6, 0, { color: oliva });
+
+// ---------- Check: nothing may sit inside a wall. A piece placed by hand a few centimetres into one is pushed out
+// to the wall's face (away from the wall's centre line); wall art, rugs, lights and gates are left alone. ----------
+const FREE = /alfombra|cuadro|tira-led|espejo|televisor|cortina|jardin-vertical|arbol|pergola|porton/;
+for (const floor of project.floors) {
+  for (const f of floor.furniture) {
+    if (FREE.test(f.type) || f.rotation % 90) continue;
+    const [w, d] = f.rotation % 180 ? [f.depth, f.width] : [f.width, f.depth];
+    for (let pass = 0; pass < 2; pass++) {
+      for (const wl of floor.walls) {
+        const t = wl.thickness / 2;
+        const horizontal = Math.abs(wl.a.y - wl.b.y) < 1e-6;
+        const [along, across, size, span] = horizontal ? ['x', 'y', d, w] : ['y', 'x', w, d];
+        const lo = Math.min(wl.a[along], wl.b[along]);
+        const hi = Math.max(wl.a[along], wl.b[along]);
+        if (Math.min(hi, f[along] + span / 2) - Math.max(lo, f[along] - span / 2) <= 0.02) continue;
+        const line = wl.a[across];
+        if (f[across] >= line && f[across] - size / 2 < line + t) f[across] = round(line + t + size / 2);
+        else if (f[across] < line && f[across] + size / 2 > line - t) f[across] = round(line - t - size / 2);
+      }
+    }
+  }
+}
 
 writeFileSync(OUT, JSON.stringify(project, null, 2) + '\n');
 execFileSync(process.execPath, [join(root, 'scripts/nuevo-id-ejemplo.mjs'), OUT], { stdio: 'inherit' });
