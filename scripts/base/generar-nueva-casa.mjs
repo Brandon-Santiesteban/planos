@@ -173,9 +173,10 @@ const json = await page.evaluate(async ([RIGHT, TOTAL]) => {
   room(g, rect(6.6, 21.8, 8.4, 24), 'Baño pieza 1');
   room(g, poly([10.3, 15], [14, 15], [14, 21.8], [12.2, 21.8], [12.2, 24], [10.3, 24]), 'Pieza 2');
   room(g, rect(12.2, 21.8, 14, 24), 'Baño pieza 2');
-  // The suite's private garden behind its big glass door, closed by a 2 m celosía (edges 2 and 3); the suite and
-  // pieza 1 walls close the other two sides.
-  room(g, rect(1, 20, 6.6, 24), 'Jardín privado de la suite', 'balcony', { openEdges: [0, 1], railing: 'celosia' });
+  // The suite's private garden behind its big glass door, closed by a 2 m celosía (edges 2, 4 and 5) with a 1 m
+  // opening (edge 3) out to the pool deck; the suite and pieza 1 walls close the other two sides.
+  room(g, poly([1, 20], [6.6, 20], [6.6, 24], [2.6, 24], [1.6, 24], [1, 24]), 'Jardín privado de la suite', 'balcony',
+    { openEdges: [0, 1, 3], railing: 'celosia' });
   // Central patio, open to the sky in the middle; a wooden-slat screen (celosía) on its end towards the lot's side
   // (edge 3) lets the breeze in and hides the drying corner by the laundry; beside it (edge 4) the way out to the
   // side path to the back patio.
@@ -464,17 +465,17 @@ piece('jardinera', X(9.3), Y(11.35), 0, { width: 1.6, color: oliva });
 piece('sillon-exterior', X(9.4), Y(13.6), 270, { color: pizarra });
 piece('arbusto', X(13.4), Y(14.4));
 
-// The suite's private garden: a tree, shrubs and a planter along the celosía, a bench to sit out.
-piece('arbol-pequeno', X(2.3), Y(22.6));
-piece('arbusto', X(5.6), Y(23.3));
-piece('jardinera', X(3.6), Y(23.6), 0, { width: 2.4, color: oliva });
+// The suite's private garden: a tree, shrubs and a planter along the celosía, a bench to sit out; the way out to
+// the pool deck stays clear (x 1,6–2,6).
+piece('arbol-pequeno', X(1.7), Y(21.3));
+piece('arbusto', X(5.8), Y(23.3));
+piece('jardinera', X(4.1), Y(23.6), 0, { width: 2.0, color: oliva });
 piece('banca', X(5.6), Y(21.3), 0, { width: 1.2, color: caramelo });
-piece('matera-alta', X(1.4), Y(20.5), 0, { color: oliva });
 
 // Back patio: the pool on a stone deck with loungers and an umbrella, then the small farm-style garden: vegetable
 // beds, fruit trees, a wooden kiosk with a table, benches and planters.
 piece('piscina', X(7.5), Y(27.0), 0, { width: 8.0, depth: 3.0, height: 0.45, color: arena });
-for (const x of [2.0, 4.2]) piece('asoleadora', X(x), Y(24.8), 90, { color: arena });
+for (const x of [4.7, 6.9]) piece('asoleadora', X(x), Y(24.8), 90, { color: arena });
 piece('sombrilla', X(13.0), Y(27.6), 0, { color: arena });
 piece('asoleadora', X(13.0), Y(26.3), 270, { color: arena });
 piece('matera-alta', X(1.4), Y(26.3), 0, { color: oliva });
