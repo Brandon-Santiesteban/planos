@@ -45,7 +45,15 @@ export function addFurniture(p: Project, floorId: string, init: Omit<Furniture, 
   return id;
 }
 
-export type FurniturePatch = Partial<Pick<Furniture, 'x' | 'y' | 'rotation' | 'width' | 'depth' | 'height' | 'elevation' | 'color'>>;
+/** Depth and height a piece takes up once tipped over about its width axis. */
+export function tiltedSize(f: { depth: number; height: number; tilt?: number }): { depth: number; height: number } {
+  const t = ((f.tilt ?? 0) * Math.PI) / 180;
+  const c = Math.abs(Math.cos(t));
+  const s = Math.abs(Math.sin(t));
+  return { depth: f.depth * c + f.height * s, height: f.height * c + f.depth * s };
+}
+
+export type FurniturePatch = Partial<Pick<Furniture, 'x' | 'y' | 'rotation' | 'tilt' | 'width' | 'depth' | 'height' | 'elevation' | 'color'>>;
 
 /** Applies a patch; refuses (false) sizes that aren't positive, negative elevations or a colour that isn't #rrggbb. */
 export function updateFurniture(p: Project, floorId: string, id: string, patch: FurniturePatch): boolean {
@@ -57,9 +65,14 @@ export function updateFurniture(p: Project, floorId: string, id: string, patch: 
   }
   if (patch.elevation !== undefined && !(patch.elevation >= 0 && Number.isFinite(patch.elevation))) return false;
   if (patch.color !== undefined && !HEX.test(patch.color)) return false;
-  for (const k of ['x', 'y', 'rotation'] as const) if (patch[k] !== undefined && !Number.isFinite(patch[k])) return false;
+  for (const k of ['x', 'y', 'rotation', 'tilt'] as const) if (patch[k] !== undefined && !Number.isFinite(patch[k])) return false;
   Object.assign(f, patch);
   if (patch.rotation !== undefined) f.rotation = normalizeRotation(patch.rotation);
+  if (patch.tilt !== undefined) {
+    const t = normalizeRotation(patch.tilt);
+    if (t) f.tilt = t;
+    else delete f.tilt;
+  }
   return true;
 }
 
@@ -119,7 +132,7 @@ export function pointInFurniture(f: Furniture, pt: Vec2, tolerance = 0): boolean
   const dy = pt.y - f.y;
   const lx = dx * c + dy * s;
   const ly = -dx * s + dy * c;
-  return Math.abs(lx) <= f.width / 2 + tolerance && Math.abs(ly) <= f.depth / 2 + tolerance;
+  return Math.abs(lx) <= f.width / 2 + tolerance && Math.abs(ly) <= tiltedSize(f).depth / 2 + tolerance;
 }
 
 /** Top of the highest piece (other than `selfId`) whose footprint contains `at`; null if there is none. */
@@ -235,7 +248,7 @@ export function snapFlushToWall(walls: Wall[], f: Furniture, maxGap: number): Ve
     if (Math.min(rel, 90 - rel) > 0.5) continue; // not parallel
     const sign = fr.side >= 0 ? 1 : -1;
     const out = { x: fr.n.x * sign, y: fr.n.y * sign };
-    const half = halfExtent(f.width, f.depth, f.rotation, out);
+    const half = halfExtent(f.width, tiltedSize(f).depth, f.rotation, out);
     const gap = Math.abs(fr.side) - w.thickness / 2 - half;
     if (Math.abs(gap) > maxGap || Math.abs(fr.side) < w.thickness / 2) continue;
     if (best && Math.abs(gap) >= Math.abs(best.gap)) continue;

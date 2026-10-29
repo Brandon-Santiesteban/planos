@@ -1,7 +1,7 @@
 import { catalogItem } from '../../furniture/catalog';
 import { usePlacement } from '../../furniture/placeTool';
 import { FurnitureSymbol } from '../../furniture/symbols';
-import { byElevation } from '../../model/furnitureOps';
+import { byElevation, tiltedSize } from '../../model/furnitureOps';
 import type { Floor, Furniture } from '../../model/types';
 import { useEditor, type Selection } from '../../store/editorStore';
 
@@ -17,7 +17,7 @@ function Piece({ f, selected, pxPerMetre, ghost = false }: { f: Furniture; selec
   return (
     <g className={`mueble${selected ? ' selected' : ''}${ghost ? ' fantasma' : ''}${f.elevation > 0.05 ? ' elevado' : ''}`} data-id={ghost ? undefined : f.id}>
       <g transform={`translate(${f.x} ${f.y}) rotate(${f.rotation})`}>
-        <FurnitureSymbol item={item} w={f.width} d={f.depth} open={f.open} />
+        <FurnitureSymbol item={item} w={f.width} d={tiltedSize(f).depth} open={f.open} />
       </g>
       {showName && (
         <text className="mueble-nombre" x={f.x} y={f.y} fontSize={font} textAnchor="middle" dominantBaseline="middle">

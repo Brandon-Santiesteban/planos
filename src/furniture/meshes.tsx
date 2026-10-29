@@ -1,12 +1,12 @@
 // Parametric 3D furniture built from primitives. Local frame: x = width, y = up (0 at the base), z = depth,
 // the front of a piece facing +z (plan +y at rotation 0). Every model scales with width/depth/height.
 import { type ThreeEvent, useThree } from '@react-three/fiber';
-import { type ReactElement, useMemo, useRef } from 'react';
+import { type ReactElement, type ReactNode, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { byElevation } from '../model/furnitureOps';
+import { byElevation, tiltedSize } from '../model/furnitureOps';
 import type { Floor, Furniture } from '../model/types';
 import { useEditor } from '../store/editorStore';
 import { usePalette } from '../view3d/palette';
@@ -1519,9 +1519,10 @@ export function FurnitureModel3D({ f }: { f: Furniture }) {
 }
 
 function SelectionBox({ f, color }: { f: Furniture; color: string }) {
-  const geometry = useMemo(() => new THREE.EdgesGeometry(new THREE.BoxGeometry(f.width + 0.04, f.height + 0.04, f.depth + 0.04)), [f.width, f.height, f.depth]);
+  const { depth, height } = tiltedSize(f);
+  const geometry = useMemo(() => new THREE.EdgesGeometry(new THREE.BoxGeometry(f.width + 0.04, height + 0.04, depth + 0.04)), [f.width, height, depth]);
   return (
-    <lineSegments geometry={geometry} position={[0, f.height / 2, 0]}>
+    <lineSegments geometry={geometry} position={[0, height / 2, 0]}>
       <lineBasicMaterial color={color} />
     </lineSegments>
   );
@@ -1596,10 +1597,20 @@ export default function FurnitureMeshes({ floor, elevation, selectedId }: { floo
           onPointerDown={(e) => onPointerDown(e, f)}
           onClick={(e) => onClick(e, f)}
         >
-          <FurnitureModel3D f={f} />
+          <Tilted f={f}><FurnitureModel3D f={f} /></Tilted>
           {f.id === selectedId && <SelectionBox f={f} color={pal.selected} />}
         </group>
       ))}
+    </group>
+  );
+}
+
+/** Tips a piece over about its own width axis, turning round its centre and keeping its lowest point on its base. */
+function Tilted({ f, children }: { f: Furniture; children: ReactNode }) {
+  if (!f.tilt) return <>{children}</>;
+  return (
+    <group position={[0, tiltedSize(f).height / 2, 0]} rotation={[(f.tilt * Math.PI) / 180, 0, 0]}>
+      <group position={[0, -f.height / 2, 0]}>{children}</group>
     </group>
   );
 }

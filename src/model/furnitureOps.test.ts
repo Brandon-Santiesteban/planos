@@ -1,7 +1,7 @@
 import { createEmptyProject } from './defaults';
 import {
   addFurniture, deleteFurniture, duplicateFurniture, furnitureCorners, furnitureFromCatalog, moveFurniture,
-  dropElevation, isStacked, piecesOnTop, pointInFurniture, rotateFurniture, snapFlushToWall, snapToWalls, stackElevation, updateFurniture,
+  dropElevation, isStacked, piecesOnTop, pointInFurniture, rotateFurniture, snapFlushToWall, snapToWalls, stackElevation, tiltedSize, updateFurniture,
 } from './furnitureOps';
 import { addWall } from './ops';
 import type { Furniture, Wall } from './types';
@@ -129,4 +129,21 @@ test('pieces are stored on the floor and survive real walls being present', () =
   addWall(p, f, { x: 0, y: 0 }, { x: 4, y: 0 });
   const id = addFurniture(p, f, furnitureFromCatalog('nevera', { x: 1, y: 1 }));
   expect(p.floors[0].furniture.find((x) => x.id === id)?.type).toBe('nevera');
+});
+
+test('a piece can be tipped over about its width axis; its footprint grows to what it lies on', () => {
+  expect(tiltedSize({ depth: 0.05, height: 0.8, tilt: 90 }).depth).toBeCloseTo(0.8);
+  expect(tiltedSize({ depth: 0.05, height: 0.8, tilt: 90 }).height).toBeCloseTo(0.05);
+  expect(tiltedSize({ depth: 0.5, height: 1 }).depth).toBeCloseTo(0.5);
+});
+
+test('tilt is kept in 0–360 and dropped at 0', () => {
+  const p = createEmptyProject();
+  const f = p.floors[0].id;
+  const id = addFurniture(p, f, furnitureFromCatalog('cuadro-paisaje', { x: 0, y: 0 }))!;
+  const piece = () => p.floors[0].furniture.find((x) => x.id === id)!;
+  expect(updateFurniture(p, f, id, { tilt: -90 })).toBe(true);
+  expect(piece().tilt).toBe(270);
+  updateFurniture(p, f, id, { tilt: 360 });
+  expect(piece().tilt).toBeUndefined();
 });

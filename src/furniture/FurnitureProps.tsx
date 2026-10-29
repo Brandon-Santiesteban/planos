@@ -171,6 +171,22 @@ export default function FurnitureProps({ floor, id }: { floor: Floor; id: string
           <Icon name="rotate" size={16} />+90°
         </button>
       </div>
+      <div className="fila-rotacion">
+        <ZeroField
+          label="Inclinación (eje X)"
+          value={f.tilt ?? 0}
+          unit="°"
+          parse={parseDegrees}
+          format={(v) => String(Math.round(v * 100) / 100).replace('.', ',')}
+          error="Escribe los grados, por ejemplo 90."
+          help="Lo voltea sobre su eje de ancho: 90° lo acuesta de espaldas, 180° lo pone de cabeza."
+          onCommit={(v) => set(id, { tilt: v })}
+        />
+        <button className="btn btn-chico" title="Inclinar −90° en el eje X" onClick={() => set(id, { tilt: (f.tilt ?? 0) - 90 })}>−90° X</button>
+        <button className="btn btn-chico" title="Inclinar +90° en el eje X" onClick={() => set(id, { tilt: (f.tilt ?? 0) + 90 })}>
+          <Icon name="rotate" size={16} />+90° X
+        </button>
+      </div>
       <ColorField value={color} onCommit={(c) => set(id, { color: c })} />
       <div className="acciones">
         <button className="btn btn-sec" title="Ctrl+D" onClick={() => duplicateSelectedFurniture()}><Icon name="copy" size={16} />Duplicar</button>

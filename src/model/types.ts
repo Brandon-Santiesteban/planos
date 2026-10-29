@@ -90,6 +90,8 @@ export interface Furniture {
   y: number;
   /** degrees, clockwise in plan */
   rotation: number;
+  /** degrees tipped over about its own width axis (x): 90 lays it on its back, e.g. a picture lying flat */
+  tilt?: number;
   width: number;
   depth: number;
   height: number;
