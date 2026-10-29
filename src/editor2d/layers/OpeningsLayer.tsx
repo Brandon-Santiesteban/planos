@@ -36,13 +36,13 @@ function OpeningSymbol({ wall, o, selected }: { wall: Wall; o: Opening; selected
   );
 }
 
-export default function OpeningsLayer({ floor, selection }: { floor: Floor; selection: Selection }) {
+export default function OpeningsLayer({ floor, selection, group }: { floor: Floor; selection: Selection; group?: Set<string> }) {
   return (
     <g className="openings">
       {floor.openings.map((o) => {
         const wall = floor.walls.find((w) => w.id === o.wallId);
         if (!wall) return null;
-        return <OpeningSymbol key={o.id} wall={wall} o={o} selected={selection?.kind === 'opening' && selection.id === o.id} />;
+        return <OpeningSymbol key={o.id} wall={wall} o={o} selected={(selection?.kind === 'opening' && selection.id === o.id) || !!group?.has(o.id)} />;
       })}
     </g>
   );

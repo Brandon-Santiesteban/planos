@@ -4,11 +4,12 @@ import { projectOntoWall } from '../../geometry/walls';
 import { DEFAULTS } from '../../model/defaults';
 import { deleteFurniture } from '../../model/furnitureOps';
 import {
-  deleteOpening, deleteRoom, deleteWall, type Joint, jointsAt, setJoints, translateJoints, updateOpening, wallJoints,
+  deleteItems, deleteOpening, deleteRoom, deleteWall, type Joint, jointsAt, setJoints, translateJoints, updateOpening, wallJoints,
 } from '../../model/ops';
-import type { Vec2 } from '../../model/types';
+import type { Floor, Vec2 } from '../../model/types';
 import { beginFurnitureDrag, dragFurnitureTo, type FurnitureDrag, rotateSelectedFurniture } from '../../furniture/actions';
-import { useEditor } from '../../store/editorStore';
+import { type Item, useEditor } from '../../store/editorStore';
+import { notify } from '../../ui/toasts';
 import { useGrid } from '../gridSettings';
 import { hitTest } from '../hitTest';
 import type { ToolContext, ToolHandler } from './index';
@@ -21,7 +22,26 @@ type Drag =
   | { kind: 'endpoint'; wallId: string; end: 'a' | 'b'; joints: Joint[] }
   | { kind: 'wall'; wallId: string; applied: Vec2; joints: Joint[] }
   | { kind: 'opening'; openingId: string; wallId: string }
-  | { kind: 'furniture'; drag: FurnitureDrag };
+  | { kind: 'furniture'; drag: FurnitureDrag }
+  | { kind: 'box'; roomId: string | null; to: Vec2 };
+
+/** Everything of the floor lying wholly inside the box a–b. */
+export function itemsInBox(floor: Floor, a: Vec2, b: Vec2): Item[] {
+  const [x0, x1, y0, y1] = [Math.min(a.x, b.x), Math.max(a.x, b.x), Math.min(a.y, b.y), Math.max(a.y, b.y)];
+  const inside = (q: Vec2) => q.x >= x0 && q.x <= x1 && q.y >= y0 && q.y <= y1;
+  const items: Item[] = [];
+  for (const w of floor.walls) if (inside(w.a) && inside(w.b)) items.push({ kind: 'wall', id: w.id });
+  for (const o of floor.openings) {
+    const w = floor.walls.find((x) => x.id === o.wallId);
+    if (!w) continue;
+    const len = dist(w.a, w.b) || 1;
+    const t = o.offset / len;
+    if (inside({ x: w.a.x + (w.b.x - w.a.x) * t, y: w.a.y + (w.b.y - w.a.y) * t })) items.push({ kind: 'opening', id: o.id });
+  }
+  for (const r of floor.rooms) if (r.points.every(inside)) items.push({ kind: 'room', id: r.id });
+  for (const f of floor.furniture) if (inside(f)) items.push({ kind: 'furniture', id: f.id });
+  return items;
+}
 
 export function createSelectTool(): ToolHandler {
   let drag: Drag | null = null;
@@ -36,7 +56,11 @@ export function createSelectTool(): ToolHandler {
       downAt = p;
       started = false;
       drag = null;
-      if (!hit) return select(null);
+      // On empty ground or inside a room, dragging draws a selection box; a plain click selects the room.
+      if (!hit || hit.kind === 'room') {
+        drag = { kind: 'box', roomId: hit ? hit.id : null, to: p };
+        return;
+      }
       if (hit.kind === 'endpoint') {
         select({ kind: 'wall', id: hit.wallId });
         const w = floor.walls.find((x) => x.id === hit.wallId)!;
@@ -52,14 +76,17 @@ export function createSelectTool(): ToolHandler {
         select({ kind: 'furniture', id: hit.id });
         const fd = beginFurnitureDrag(hit.id);
         drag = fd && { kind: 'furniture', drag: fd };
-      } else {
-        select({ kind: 'room', id: hit.id });
       }
     },
 
     onPointerMove(p, ctx: ToolContext) {
       if (!drag || !downAt) return;
       const store = useEditor.getState();
+      if (drag.kind === 'box') {
+        drag.to = p;
+        started ||= dist(p, downAt) * ctx.view.pxPerMetre >= DRAG_START_PX;
+        return;
+      }
       if (!started) {
         if (dist(p, downAt) * ctx.view.pxPerMetre < DRAG_START_PX) return;
         store.checkpoint();
@@ -96,7 +123,12 @@ export function createSelectTool(): ToolHandler {
       }
     },
 
-    onPointerUp() {
+    onPointerUp(p, ctx) {
+      if (drag?.kind === 'box' && downAt) {
+        const { select, selectGroup } = useEditor.getState();
+        if (started) selectGroup(itemsInBox(activeFloor(ctx.state), downAt, p));
+        else select(drag.roomId ? { kind: 'room', id: drag.roomId } : null);
+      }
       drag = null;
       downAt = null;
       started = false;
@@ -105,7 +137,13 @@ export function createSelectTool(): ToolHandler {
     onKey(key, ctx) {
       if (key.toLowerCase() === 'r') return rotateSelectedFurniture(ctx.shiftKey ? -90 : 90);
       if (key !== 'Delete' && key !== 'Backspace') return false;
-      const { selection, activeFloorId, apply, select } = useEditor.getState();
+      const { selection, group, activeFloorId, apply, select } = useEditor.getState();
+      if (group.length) {
+        apply((d) => deleteItems(d, activeFloorId, group));
+        select(null);
+        notify({ kind: 'info', text: `${group.length} elementos eliminados`, action: { label: 'Deshacer', run: () => useEditor.getState().undo() } });
+        return true;
+      }
       if (!selection) return false;
       apply((d) => {
         if (selection.kind === 'wall') deleteWall(d, activeFloorId, selection.id);
@@ -117,7 +155,8 @@ export function createSelectTool(): ToolHandler {
       return true;
     },
 
-    preview: () => null,
+    preview: () =>
+      drag?.kind === 'box' && started && downAt ? { kind: 'box', a: downAt, b: drag.to } : null,
     reset() {
       drag = null;
       downAt = null;

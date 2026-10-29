@@ -34,6 +34,8 @@ export default function Plan2D() {
   const project = useEditor((s) => s.project);
   const activeFloorId = useEditor((s) => s.activeFloorId);
   const selection = useEditor((s) => s.selection);
+  const groupItems = useEditor((s) => s.group);
+  const group = new Set(groupItems.map((g) => g.id));
   const toolName = useEditor((s) => s.tool);
   const floorIndex = Math.max(0, project.floors.findIndex((f) => f.id === activeFloorId));
   const floor = project.floors[floorIndex];
@@ -180,10 +182,10 @@ export default function Plan2D() {
           <BackgroundLayer bg={floor.background} />
           <GridLayer view={view} size={size} />
           {below && <WallsLayer floor={below} ghost />}
-          <RoomsLayer floor={floor} selection={selection} pxPerMetre={k} />
-          <FurnitureLayer floor={floor} selection={selection} pxPerMetre={k} />
-          <WallsLayer floor={floor} selection={selection} />
-          <OpeningsLayer floor={floor} selection={selection} />
+          <RoomsLayer floor={floor} selection={selection} group={group} pxPerMetre={k} />
+          <FurnitureLayer floor={floor} selection={selection} group={group} pxPerMetre={k} />
+          <WallsLayer floor={floor} selection={selection} group={group} />
+          <OpeningsLayer floor={floor} selection={selection} group={group} />
           <DimensionsLayer floor={floor} pxPerMetre={k} />
           <PreviewLayer preview={preview} pxPerMetre={k} />
         </g>

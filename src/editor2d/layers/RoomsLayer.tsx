@@ -13,14 +13,14 @@ function areaLabel(points: { x: number; y: number }[], showArea: boolean): strin
   return [area, size].filter(Boolean).join(' · ');
 }
 
-export default function RoomsLayer({ floor, selection, pxPerMetre }: { floor: Floor; selection: Selection; pxPerMetre: number }) {
+export default function RoomsLayer({ floor, selection, group, pxPerMetre }: { floor: Floor; selection: Selection; group?: Set<string>; pxPerMetre: number }) {
   const font = 13 / pxPerMetre;
   const showArea = usePlanOptions((s) => s.showArea);
   return (
     <g className="rooms">
       {floor.rooms.map((r) => {
         const c = polygonCentroid(r.points);
-        const selected = selection?.kind === 'room' && selection.id === r.id;
+        const selected = (selection?.kind === 'room' && selection.id === r.id) || !!group?.has(r.id);
         return (
           <g key={r.id}>
             <polygon

@@ -56,13 +56,73 @@ export function setJoints(p: Project, floorId: string, joints: Joint[], to: Vec2
 
 export function translateJoints(p: Project, floorId: string, joints: Joint[], delta: Vec2): boolean {
   const f = getFloor(p, floorId);
-  return moveJoints(
+  // Walls moved whole (both ends): the room corners lying on their faces go with them, so rooms keep matching walls.
+  const ends = new Map<string, number>();
+  for (const j of joints) ends.set(j.wallId, (ends.get(j.wallId) ?? 0) | (j.end === 'a' ? 1 : 2));
+  const moved = f.walls.filter((w) => ends.get(w.id) === 3);
+  const followers = f.rooms.flatMap((r) =>
+    r.points.filter((q) => moved.some((w) => distToSegment(q, w.a, w.b) <= w.thickness / 2 + DEFAULTS.joinTolerance)),
+  );
+  const ok = moveJoints(
     f,
     joints.flatMap((joint) => {
       const w = getWall(f, joint.wallId);
       return w ? [{ joint, to: add(w[joint.end], delta) }] : [];
     }),
   );
+  if (ok) for (const q of new Set(followers)) Object.assign(q, add(q, delta));
+  return ok;
+}
+
+function distToSegment(q: Vec2, a: Vec2, b: Vec2): number {
+  const ab = sub(b, a);
+  const len2 = ab.x * ab.x + ab.y * ab.y;
+  const t = len2 ? Math.max(0, Math.min(1, ((q.x - a.x) * ab.x + (q.y - a.y) * ab.y) / len2)) : 0;
+  return dist(q, add(a, { x: ab.x * t, y: ab.y * t }));
+}
+
+/** Width (x) and length (y) of a room drawn as an axis-aligned rectangle, or null for any other shape. */
+export function rectRoomSize(r: { points: Vec2[] }): { width: number; depth: number } | null {
+  if (r.points.length !== 4) return null;
+  const xs = [...new Set(r.points.map((q) => Math.round(q.x * 1e4) / 1e4))];
+  const ys = [...new Set(r.points.map((q) => Math.round(q.y * 1e4) / 1e4))];
+  if (xs.length !== 2 || ys.length !== 2) return null;
+  return { width: Math.abs(xs[1] - xs[0]), depth: Math.abs(ys[1] - ys[0]) };
+}
+
+/**
+ * Resizes a rectangular room by moving its right side (width) or its bottom side (length), together with the walls
+ * standing on that side and everything joined to them; the opposite sides stay put.
+ */
+export function resizeRectRoom(p: Project, floorId: string, roomId: string, size: { width?: number; depth?: number }): boolean {
+  const f = getFloor(p, floorId);
+  const r = f.rooms.find((x) => x.id === roomId);
+  const cur = r && rectRoomSize(r);
+  if (!r || !cur) return false;
+  const x1 = Math.max(...r.points.map((q) => q.x));
+  const y1 = Math.max(...r.points.map((q) => q.y));
+  const y0 = Math.min(...r.points.map((q) => q.y));
+  const x0 = Math.min(...r.points.map((q) => q.x));
+  const shift = (axis: 'x' | 'y', delta: number) => {
+    if (Math.abs(delta) < 1e-6) return true;
+    const line = axis === 'x' ? x1 : y1;
+    const [lo, hi] = axis === 'x' ? [y0, y1] : [x0, x1];
+    const other = axis === 'x' ? 'y' : 'x';
+    const walls = f.walls.filter((w) => {
+      const along = Math.abs(w.a[axis] - w.b[axis]) < 1e-6 && Math.abs(w.a[axis] - (line + Math.sign(line - (axis === 'x' ? x0 : y0)) * w.thickness / 2)) < 0.02;
+      const overlap = Math.min(hi, Math.max(w.a[other], w.b[other])) - Math.max(lo, Math.min(w.a[other], w.b[other]));
+      return along && overlap > 0.05;
+    });
+    const step = axis === 'x' ? { x: delta, y: 0 } : { x: 0, y: delta };
+    if (!walls.length) {
+      for (const q of r.points) if (Math.abs(q[axis] - line) < 1e-6) Object.assign(q, add(q, step));
+      return true;
+    }
+    return translateJoints(p, floorId, walls.flatMap((w) => wallJoints(f, w.id)), step);
+  };
+  const okW = size.width === undefined || shift('x', size.width - cur.width);
+  const okD = size.depth === undefined || shift('y', size.depth - cur.depth);
+  return okW && okD;
 }
 
 /** Both ends of a wall plus every end joined to them. */
@@ -264,6 +324,20 @@ export function setRoofHeight(p: Project, floorId: string, roomId: string, heigh
 export function deleteRoom(p: Project, floorId: string, roomId: string): void {
   const f = getFloor(p, floorId);
   f.rooms = f.rooms.filter((r) => r.id !== roomId);
+}
+
+/** Deletes several items of one floor at once (a box selection). */
+export function deleteItems(p: Project, floorId: string, items: { kind: 'wall' | 'opening' | 'room' | 'furniture'; id: string }[]): void {
+  const f = getFloor(p, floorId);
+  const ids = (kind: string) => new Set(items.filter((i) => i.kind === kind).map((i) => i.id));
+  const walls = ids('wall');
+  const openings = ids('opening');
+  const rooms = ids('room');
+  const furniture = ids('furniture');
+  f.walls = f.walls.filter((w) => !walls.has(w.id));
+  f.openings = f.openings.filter((o) => !openings.has(o.id) && !walls.has(o.wallId));
+  f.rooms = f.rooms.filter((r) => !rooms.has(r.id));
+  f.furniture = f.furniture.filter((m) => !furniture.has(m.id));
 }
 
 export function addFloor(p: Project): string {

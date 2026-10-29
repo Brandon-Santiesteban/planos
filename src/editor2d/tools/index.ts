@@ -24,7 +24,8 @@ export type ToolPreview =
   | { kind: 'wall'; a: Vec2; b: Vec2; length: number; typed: string; typedValid: boolean }
   | { kind: 'polygon'; points: Vec2[]; cursor: Vec2 }
   | { kind: 'marker'; at: Vec2; valid?: boolean; segment?: [Vec2, Vec2] }
-  | { kind: 'quickRoom'; corners: Vec2[]; interior: Vec2[]; thickness: number; label: string };
+  | { kind: 'quickRoom'; corners: Vec2[]; interior: Vec2[]; thickness: number; label: string }
+  | { kind: 'box'; a: Vec2; b: Vec2 };
 
 export interface ToolHandler {
   onPointerDown?(p: Vec2, ctx: ToolContext): void;

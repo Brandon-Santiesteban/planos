@@ -181,20 +181,23 @@ function RoomSlab({ room, walls, selected, floorHeight, ground }: { room: Room; 
     );
   }
   const color = selected ? pal.selected : room.kind === 'balcony' ? pal.balcony : pal.room;
+  // Open ground sits a little lower than the house's floors, so a room drawn over it (e.g. a sketch on an empty
+  // lot) does not flicker against it (z-fighting).
+  const y = room.kind === 'exterior' ? -0.012 : 0.001;
   // The slab's top UVs are plan coordinates in metres, so floor textures keep their real size.
   const surface = !selected && room.floorMaterial ? floorSurfaceMaterial(room.floorMaterial) : null;
   return (
     <group>
       {/* Shape is in plan XY; +90° about X maps plan y to world z and extrudes downwards. */}
       {surface ? (
-        <mesh geometry={geometry} material={surface} rotation={[Math.PI / 2, 0, 0]} position={[0, 0.001, 0]} receiveShadow />
+        <mesh geometry={geometry} material={surface} rotation={[Math.PI / 2, 0, 0]} position={[0, y, 0]} receiveShadow />
       ) : (
-        <mesh geometry={geometry} rotation={[Math.PI / 2, 0, 0]} position={[0, 0.001, 0]} receiveShadow>
+        <mesh geometry={geometry} rotation={[Math.PI / 2, 0, 0]} position={[0, y, 0]} receiveShadow>
           <meshStandardMaterial color={color} roughness={0.8} />
         </mesh>
       )}
       {/* Seen from the floor below (walking) the slab is a ceiling: back faces drawn plain. */}
-      <mesh geometry={geometry} rotation={[Math.PI / 2, 0, 0]} position={[0, 0.001, 0]}>
+      <mesh geometry={geometry} rotation={[Math.PI / 2, 0, 0]} position={[0, y, 0]}>
         <meshStandardMaterial color="#efebe4" roughness={0.9} side={THREE.BackSide} />
       </mesh>
       {room.kind === 'balcony' &&

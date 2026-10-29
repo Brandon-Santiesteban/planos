@@ -236,6 +236,7 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 .dimension { fill: var(--tenue); pointer-events: none; font-variant-numeric: tabular-nums; }
 .background { pointer-events: none; }
 .preview-wall { fill: color-mix(in srgb, var(--acento) 35%, transparent); stroke: var(--acento); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.preview-box { fill: color-mix(in srgb, var(--acento) 8%, transparent); stroke: var(--acento); stroke-width: 1.5px; stroke-dasharray: 6 4; vector-effect: non-scaling-stroke; }
 .preview-polygon { fill: color-mix(in srgb, var(--acento) 10%, transparent); stroke: var(--acento); stroke-width: 1.5px; stroke-dasharray: 5 3; vector-effect: non-scaling-stroke; }
 .preview-length { fill: var(--acento); font-weight: 500; pointer-events: none; }
 .preview-opening { stroke: color-mix(in srgb, var(--acento) 70%, transparent); stroke-width: 8px; vector-effect: non-scaling-stroke; }

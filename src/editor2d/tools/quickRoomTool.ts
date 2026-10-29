@@ -10,7 +10,7 @@ import type { ToolContext, ToolHandler, ToolPreview } from './index';
 import { activeFloor } from './index';
 
 /** Interior size of the next quick room, in metres. */
-export const useQuickRoom = create<{ width: number; depth: number }>()(() => ({ width: 3, depth: 4 }));
+export const useQuickRoom = create<{ width: number; depth: number; name: string }>()(() => ({ width: 3, depth: 4, name: '' }));
 
 const SNAP_PX = 20;
 const T = DEFAULTS.wallThickness;
@@ -37,14 +37,16 @@ export function createQuickRoomTool(): ToolHandler {
     onPointerDown(p, ctx) {
       origin = place(p, ctx);
       const at = origin;
-      const { width, depth } = useQuickRoom.getState();
+      const { width, depth, name: typed } = useQuickRoom.getState();
       const { apply, activeFloorId, select } = useEditor.getState();
-      const name = `Habitación ${activeFloor(useEditor.getState()).rooms.length + 1}`;
+      const name = typed.trim() || `Habitación ${activeFloor(useEditor.getState()).rooms.length + 1}`;
       let id: string | null = null;
       apply((d) => {
         id = addRectRoom(d, activeFloorId, at, width, depth, name);
       });
       if (id) select({ kind: 'room', id });
+      // Each name is for one room: the next one asks for its own.
+      if (typed) useQuickRoom.setState({ name: '' });
     },
     onKey(key) {
       if (key.toLowerCase() !== 'r') return false;

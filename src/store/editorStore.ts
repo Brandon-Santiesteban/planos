@@ -4,12 +4,15 @@ import { createEmptyProject } from '../model/defaults';
 import type { Project } from '../model/types';
 
 export type Tool = 'select' | 'wall' | 'door' | 'window' | 'room' | 'calibrate' | 'moveBackground' | 'quickRoom' | 'furniture';
-export type Selection = { kind: 'wall' | 'opening' | 'room' | 'furniture'; id: string } | null;
+export type Item = { kind: 'wall' | 'opening' | 'room' | 'furniture'; id: string };
+export type Selection = Item | null;
 
 export interface EditorState {
   project: Project;
   activeFloorId: string;
   selection: Selection;
+  /** Several items picked at once with a selection box (empty when a single item or nothing is selected). */
+  group: Item[];
   tool: Tool;
   snapping: boolean;
   showUpperFloors: boolean;
@@ -24,6 +27,7 @@ export interface EditorState {
   redo(): void;
   setTool(t: Tool): void;
   select(s: Selection): void;
+  selectGroup(items: Item[]): void;
   setActiveFloor(id: string): void;
   setSnapping(on: boolean): void;
   setShowUpperFloors(on: boolean): void;
@@ -47,7 +51,8 @@ function selectionExists(p: Project, s: Selection): boolean {
 function reconcile(p: Project, state: EditorState): Partial<EditorState> {
   const activeFloorId = p.floors.some((f) => f.id === state.activeFloorId) ? state.activeFloorId : p.floors[0].id;
   const selection = selectionExists(p, state.selection) ? state.selection : null;
-  return { project: p, activeFloorId, selection };
+  const group = state.group.filter((g) => selectionExists(p, g));
+  return { project: p, activeFloorId, selection, group };
 }
 
 const pushPast = (past: Project[], p: Project) => [...past, p].slice(-HISTORY_LIMIT);
@@ -58,6 +63,7 @@ export const useEditor = create<EditorState>()((set, get) => ({
   project: initial,
   activeFloorId: initial.floors[0].id,
   selection: null,
+  group: [],
   tool: 'select',
   snapping: true,
   showUpperFloors: false,
@@ -111,9 +117,10 @@ export const useEditor = create<EditorState>()((set, get) => ({
   },
 
   setTool: (tool) => set({ tool }),
-  select: (selection) => set({ selection }),
+  select: (selection) => set({ selection, group: [] }),
+  selectGroup: (items) => set(items.length === 1 ? { selection: items[0], group: [] } : { selection: null, group: items }),
   setActiveFloor(id) {
-    if (get().project.floors.some((f) => f.id === id)) set({ activeFloorId: id, selection: null });
+    if (get().project.floors.some((f) => f.id === id)) set({ activeFloorId: id, selection: null, group: [] });
   },
   setSnapping: (snapping) => set({ snapping }),
   setShowUpperFloors: (showUpperFloors) => set({ showUpperFloors }),
@@ -122,6 +129,7 @@ export const useEditor = create<EditorState>()((set, get) => ({
       project: p,
       activeFloorId: p.floors[0].id,
       selection: null,
+      group: [],
       past: [],
       future: [],
       dirty: opts?.dirty ?? false,

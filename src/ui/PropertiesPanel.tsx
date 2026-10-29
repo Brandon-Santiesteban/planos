@@ -2,7 +2,7 @@ import { polygonArea } from '../geometry/polygons';
 import { wallLength } from '../geometry/walls';
 import { RoomMaterials, WallFinishes } from '../materials/MaterialPanels';
 import {
-  deleteOpening, deleteRoom, deleteWall, renameRoom, setRoofHeight, setRoomKind, setStairShape, setStairUp, setWallLength,
+  deleteItems, deleteOpening, deleteRoom, deleteWall, rectRoomSize, renameRoom, resizeRectRoom, setRoofHeight, setRoomKind, setStairShape, setStairUp, setWallLength,
   toggleDoorFlip, setDoorGlass, updateOpening, updateWall,
 } from '../model/ops';
 import type { Floor, Project, Room, RoomKind, StairShape, StairUp } from '../model/types';
@@ -122,6 +122,23 @@ function StairsFields({ r, id }: { r: Room; id: string }) {
   );
 }
 
+/** Width and length of a rectangular room: typing a new value moves its right or bottom side with the walls on it. */
+function RectSize({ r, id }: { r: Room; id: string }) {
+  const size = rectRoomSize(r);
+  if (!size) return null;
+  return (
+    <>
+      <LengthField label="Ancho (por dentro)" value={size.width} onCommit={(v) => edit((d, f) => void resizeRectRoom(d, f, id, { width: v! }))} />
+      <LengthField
+        label="Largo (por dentro)"
+        value={size.depth}
+        help="Se mueve el lado derecho o el de abajo, con sus muros. También puedes arrastrar un muro en el plano."
+        onCommit={(v) => edit((d, f) => void resizeRectRoom(d, f, id, { depth: v! }))}
+      />
+    </>
+  );
+}
+
 function RoomProps({ floor, id }: { floor: Floor; id: string }) {
   const r = floor.rooms.find((x) => x.id === id);
   if (!r) return null;
@@ -129,6 +146,7 @@ function RoomProps({ floor, id }: { floor: Floor; id: string }) {
     <>
       <h2>{KIND_NAMES[r.kind]}</h2>
       <TextField label="Nombre" value={r.name} onCommit={(v) => edit((d, f) => renameRoom(d, f, id, v))} />
+      <RectSize r={r} id={id} />
       <div className="field">
         <span className="label">Tipo</span>
         <Dropdown<RoomKind>
@@ -161,12 +179,22 @@ export default function PropertiesPanel() {
   const project = useEditor((s) => s.project);
   const activeFloorId = useEditor((s) => s.activeFloorId);
   const selection = useEditor((s) => s.selection);
+  const group = useEditor((s) => s.group);
   const tool = useEditor((s) => s.tool);
   const floor = project.floors.find((f) => f.id === activeFloorId) ?? project.floors[0];
 
   if (tool === 'quickRoom') return <QuickRoomPanel />;
   if (tool === 'furniture') return <CatalogPanel />;
 
+  if (group.length) {
+    return (
+      <section className="tarjeta properties">
+        <h2>{group.length} elementos seleccionados</h2>
+        <p className="hint parrafo">Pulsa Supr para borrarlos todos, o haz clic en un espacio vacío para soltar la selección.</p>
+        <DeleteButton onClick={() => remove(`${group.length} elementos eliminados`, (d, f) => deleteItems(d, f, group))} />
+      </section>
+    );
+  }
   if (!selection) {
     return (
       <>

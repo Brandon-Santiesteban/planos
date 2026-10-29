@@ -31,7 +31,31 @@ test('clicking empty space clears the selection', () => {
   const t = createSelectTool();
   s().select({ kind: 'wall', id: walls()[0].id });
   t.onPointerDown!({ x: 9, y: 9 }, ctx());
+  t.onPointerUp!({ x: 9, y: 9 }, ctx());
   expect(s().selection).toBeNull();
+});
+
+test('dragging a box over empty space selects everything inside it, and Supr deletes it all', () => {
+  const t = createSelectTool();
+  t.onPointerDown!({ x: -1, y: -1 }, ctx());
+  t.onPointerMove!({ x: 5, y: 4 }, ctx());
+  expect(t.preview()).toEqual({ kind: 'box', a: { x: -1, y: -1 }, b: { x: 5, y: 4 } });
+  t.onPointerUp!({ x: 5, y: 4 }, ctx());
+  expect(s().group.map((g) => g.kind).sort()).toEqual(['opening', 'wall', 'wall']);
+  expect(t.onKey!('Delete', ctx())).toBe(true);
+  expect(walls()).toHaveLength(0);
+  expect(s().project.floors[0].openings).toHaveLength(0);
+  s().undo();
+  expect(walls()).toHaveLength(2);
+});
+
+test('a box only takes what lies wholly inside it', () => {
+  const t = createSelectTool();
+  t.onPointerDown!({ x: 3, y: -1 }, ctx());
+  t.onPointerMove!({ x: 5, y: 4 }, ctx());
+  t.onPointerUp!({ x: 5, y: 4 }, ctx());
+  expect(s().selection).toEqual({ kind: 'wall', id: walls()[1].id });
+  expect(s().group).toEqual([]);
 });
 
 test('dragging a shared corner moves both walls and undoes in one step', () => {

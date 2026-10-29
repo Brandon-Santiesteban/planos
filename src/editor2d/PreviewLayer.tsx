@@ -18,6 +18,18 @@ export default function PreviewLayer({ preview, pxPerMetre }: { preview: ToolPre
       </g>
     );
   }
+  if (preview.kind === 'box') {
+    const { a, b } = preview;
+    return (
+      <rect
+        className="preview-box"
+        x={Math.min(a.x, b.x)}
+        y={Math.min(a.y, b.y)}
+        width={Math.abs(b.x - a.x)}
+        height={Math.abs(b.y - a.y)}
+      />
+    );
+  }
   if (preview.kind === 'quickRoom') {
     const font = 12 / pxPerMetre;
     const c = preview.interior;
