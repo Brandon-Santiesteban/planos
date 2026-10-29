@@ -58,7 +58,7 @@ import { interior, readCatalog } from '../casa-completa-muebles.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '../..');
-const OUT = join(root, 'public/ejemplos/nueva-casa.casa.json');
+const OUT = join(root, 'public/ejemplos/nueva-casa-propuestas.casa.json'); // nueva-casa.casa.json now holds only the user's sketch
 const PORT = process.argv[2] ?? '5173';
 const RIGHT = 30; // plan x of Lote 1's right boundary; design x runs leftwards from it
 const TOTAL = 32; // site depth

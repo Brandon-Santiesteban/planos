@@ -9,6 +9,7 @@ import FurnitureLayer from './layers/FurnitureLayer';
 import GridLayer from './layers/GridLayer';
 import OpeningsLayer from './layers/OpeningsLayer';
 import RoomsLayer from './layers/RoomsLayer';
+import SiteLayer from './layers/SiteLayer';
 import WallsLayer from './layers/WallsLayer';
 import Compass from './Compass';
 import PreviewLayer from './PreviewLayer';
@@ -18,12 +19,13 @@ import type { Project } from '../model/types';
 
 const DEFAULT_SIZE: Size = { w: 800, h: 600 };
 
-/** Walls of every floor plus balconies (a lot or garden zone shouldn't shrink the house on screen). */
+/** Walls of every floor plus balconies and the chosen lot (open ground zones shouldn't shrink the house on screen). */
 function houseBounds(p: Project): Bounds | null {
   const pts = p.floors.flatMap((f) => [
     ...f.walls.flatMap((w) => [w.a, w.b]),
     ...f.rooms.filter((r) => r.kind === 'balcony').flatMap((r) => r.points),
   ]);
+  if (p.site) pts.push({ x: p.site.x, y: p.site.y }, { x: p.site.x + p.site.width, y: p.site.y + p.site.depth });
   if (!pts.length) return null;
   const xs = pts.map((q) => q.x);
   const ys = pts.map((q) => q.y);
@@ -181,6 +183,7 @@ export default function Plan2D() {
         <g transform={transform}>
           <BackgroundLayer bg={floor.background} />
           <GridLayer view={view} size={size} />
+          <SiteLayer site={project.site} pxPerMetre={k} />
           {below && <WallsLayer floor={below} ghost />}
           <RoomsLayer floor={floor} selection={selection} group={group} pxPerMetre={k} />
           <FurnitureLayer floor={floor} selection={selection} group={group} pxPerMetre={k} />

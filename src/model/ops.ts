@@ -32,7 +32,7 @@ export function jointsAt(f: Floor, pt: Vec2): Joint[] {
 }
 
 /** Moves exactly the given joints; refuses (returns false) if any wall would become too short. */
-function moveJoints(f: Floor, moves: { joint: Joint; to: Vec2 }[]): boolean {
+function moveJoints(f: Floor, moves: { joint: Joint; to: Vec2 }[], mayShrink: string[] = []): boolean {
   const next = new Map<string, { a: Vec2; b: Vec2 }>();
   for (const { joint, to } of moves) {
     const w = getWall(f, joint.wallId);
@@ -40,7 +40,7 @@ function moveJoints(f: Floor, moves: { joint: Joint; to: Vec2 }[]): boolean {
     const cur = next.get(w.id) ?? { a: w.a, b: w.b };
     next.set(w.id, { ...cur, [joint.end]: to });
   }
-  for (const ends of next.values()) if (dist(ends.a, ends.b) < DEFAULTS.minWallLength) return false;
+  for (const [id, ends] of next) if (dist(ends.a, ends.b) < DEFAULTS.minWallLength && !mayShrink.includes(id)) return false;
   for (const [id, ends] of next) {
     const w = getWall(f, id)!;
     w.a = { ...ends.a };
@@ -54,24 +54,126 @@ export function setJoints(p: Project, floorId: string, joints: Joint[], to: Vec2
   return moveJoints(getFloor(p, floorId), joints.map((joint) => ({ joint, to })));
 }
 
-export function translateJoints(p: Project, floorId: string, joints: Joint[], delta: Vec2): boolean {
+/** A room corner, by room and position in its outline. */
+export type RoomPointRef = { roomId: string; index: number };
+
+/**
+ * Gets walls ready to be dragged whole (`joints` from wallJoints). A wall that carries straight on from a dragged one
+ * stays where it is (moving its end would turn it diagonal): the two come apart and a short wall joins them, starting
+ * at length 0 and growing with the drag. Room sides along the dragged walls get a matching step, so a room keeps to its
+ * walls. Returns the joints to move and the room corners that move with them.
+ */
+export function prepareWallDrag(p: Project, floorId: string, joints: Joint[]): { joints: Joint[]; followers: RoomPointRef[]; steps: string[] } {
   const f = getFloor(p, floorId);
-  // Walls moved whole (both ends): the room corners lying on their faces go with them, so rooms keep matching walls.
   const ends = new Map<string, number>();
   for (const j of joints) ends.set(j.wallId, (ends.get(j.wallId) ?? 0) | (j.end === 'a' ? 1 : 2));
   const moved = f.walls.filter((w) => ends.get(w.id) === 3);
-  const followers = f.rooms.flatMap((r) =>
-    r.points.filter((q) => moved.some((w) => distToSegment(q, w.a, w.b) <= w.thickness / 2 + DEFAULTS.joinTolerance)),
-  );
+  const tol = (w: Wall) => w.thickness / 2 + DEFAULTS.joinTolerance;
+
+  const kept: Joint[] = [];
+  const steps: string[] = [];
+  for (const j of joints) {
+    const w = getWall(f, j.wallId);
+    if (!w || ends.get(w.id) === 3) {
+      kept.push(j);
+      continue;
+    }
+    const at = w[j.end];
+    const other = w[j.end === 'a' ? 'b' : 'a'];
+    const runsOn = moved.find((m) => (dist(m.a, at) <= DEFAULTS.joinTolerance || dist(m.b, at) <= DEFAULTS.joinTolerance)
+      && distToLine(other, m.a, m.b) <= DEFAULTS.joinTolerance);
+    if (!runsOn) {
+      kept.push(j);
+      continue;
+    }
+    const id = newId(); // the step: from the wall that stays to the one that moves
+    f.walls.push({ id, a: { ...at }, b: { ...at }, thickness: runsOn.thickness, height: runsOn.height });
+    kept.push({ wallId: id, end: 'b' });
+    steps.push(id);
+  }
+
+  const onWall = (q: Vec2) => moved.some((w) => distToSegment(q, w.a, w.b) <= tol(w));
+  const followers: RoomPointRef[] = [];
+  for (const r of f.rooms) {
+    const out: { q: Vec2; follows: boolean }[] = [];
+    r.points.forEach((a, i) => {
+      const b = r.points[(i + 1) % r.points.length];
+      out.push({ q: a, follows: onWall(a) });
+      const ab = sub(b, a);
+      const len2 = ab.x * ab.x + ab.y * ab.y;
+      if (!len2) return;
+      const cuts: { t: number; entering: boolean }[] = [];
+      for (const w of moved) {
+        if (distToLine(a, w.a, w.b) > tol(w) || distToLine(b, w.a, w.b) > tol(w)) continue; // not along this wall
+        const ts = [w.a, w.b].map((e) => ((e.x - a.x) * ab.x + (e.y - a.y) * ab.y) / len2).sort((x, y) => x - y);
+        if (ts[1] <= 0 || ts[0] >= 1) continue;
+        if (ts[0] > 1e-6) cuts.push({ t: ts[0], entering: true });
+        if (ts[1] < 1 - 1e-6) cuts.push({ t: ts[1], entering: false });
+      }
+      for (const c of cuts.sort((x, y) => x.t - y.t)) {
+        const q = add(a, scale(ab, c.t));
+        const pair = [{ q, follows: false }, { q: { ...q }, follows: true }];
+        out.push(...(c.entering ? pair : pair.reverse()));
+      }
+    });
+    if (out.length !== r.points.length) r.points = out.map((o) => o.q);
+    out.forEach((o, index) => { if (o.follows) followers.push({ roomId: r.id, index }); });
+  }
+  return { joints: kept, followers, steps };
+}
+
+/**
+ * Moves wall ends by `delta`. Walls moved whole (both ends) carry the room corners lying on their faces, so rooms keep
+ * matching their walls. In a drag, `prepared` comes from prepareWallDrag at its start; without it this is one move.
+ */
+export function translateJoints(
+  p: Project,
+  floorId: string,
+  joints: Joint[],
+  delta: Vec2,
+  prepared?: ReturnType<typeof prepareWallDrag>,
+): boolean {
+  const f = getFloor(p, floorId);
+  const before = prepared ? null : structuredClone({ walls: f.walls, rooms: f.rooms });
+  const { joints: moving, followers, steps } = prepared ?? prepareWallDrag(p, floorId, joints);
   const ok = moveJoints(
     f,
-    joints.flatMap((joint) => {
+    moving.flatMap((joint) => {
       const w = getWall(f, joint.wallId);
       return w ? [{ joint, to: add(w[joint.end], delta) }] : [];
     }),
+    steps, // a step wall starts at length 0
   );
-  if (ok) for (const q of new Set(followers)) Object.assign(q, add(q, delta));
-  return ok;
+  if (!ok) {
+    if (before) Object.assign(f, before);
+    return false;
+  }
+  for (const { roomId, index } of followers) {
+    const q = f.rooms.find((r) => r.id === roomId)?.points[index];
+    if (q) Object.assign(q, add(q, delta));
+  }
+  if (!prepared) tidyRoomOutlines(p, floorId);
+  return true;
+}
+
+/** After a drag: drops step walls that stayed at length 0, repeated room corners and corners in the middle of a side. */
+export function tidyRoomOutlines(p: Project, floorId: string): void {
+  const f = getFloor(p, floorId);
+  f.walls = f.walls.filter((w) => dist(w.a, w.b) > 1e-6 || f.openings.some((o) => o.wallId === w.id));
+  for (const r of f.rooms) {
+    let pts = r.points.filter((q, i) => dist(q, r.points[(i + 1) % r.points.length]) > 1e-6);
+    pts = pts.filter((q, i) => {
+      const a = pts[(i + pts.length - 1) % pts.length];
+      const b = pts[(i + 1) % pts.length];
+      return distToLine(q, a, b) > 1e-6;
+    });
+    if (pts.length >= 3 && pts.length !== r.points.length) r.points = pts;
+  }
+}
+
+function distToLine(q: Vec2, a: Vec2, b: Vec2): number {
+  const l = dist(a, b);
+  return l ? Math.abs((q.x - a.x) * (b.y - a.y) - (q.y - a.y) * (b.x - a.x)) / l : dist(q, a);
 }
 
 function distToSegment(q: Vec2, a: Vec2, b: Vec2): number {

@@ -1,7 +1,8 @@
 import type { Floor, Project } from '../model/types';
 
 export type ExportScope = 'actual' | 'todas';
-export type ExportFormat = 'pdf' | 'dxf';
+export type ExportFormat = 'pdf' | 'dxf' | 'texto';
+const EXT: Record<ExportFormat, string> = { pdf: 'pdf', dxf: 'dxf', texto: 'txt' };
 
 export const hasContent = (f: Floor) => f.walls.length + f.rooms.length + f.furniture.length > 0;
 
@@ -14,8 +15,8 @@ export function floorsToExport(project: Project, activeFloorId: string, scope: E
 const clean = (s: string) => s.replace(/[\\/]+/g, '-').replace(/[<>:"|?*\x00-\x1f]+/g, '').replace(/\s+/g, ' ').trim();
 
 /** «<proyecto> - <planta>.<ext>», safe as a Windows file name. */
-export function exportFileName(projectName: string, label: string, ext: ExportFormat): string {
-  return `${clean(projectName) || 'Plano'} - ${clean(label) || 'Planta'}.${ext}`;
+export function exportFileName(projectName: string, label: string, format: ExportFormat): string {
+  return `${clean(projectName) || 'Plano'} - ${clean(label) || 'Planta'}.${EXT[format]}`;
 }
 
 export async function buildExport(project: Project, activeFloorId: string, scope: ExportScope, format: ExportFormat): Promise<{ name: string; blob: Blob }> {
@@ -26,6 +27,10 @@ export async function buildExport(project: Project, activeFloorId: string, scope
   if (format === 'pdf') {
     const { exportPdf } = await import('./pdf'); // jsPDF only loads when someone exports
     return { name, blob: new Blob([exportPdf(project, floors)], { type: 'application/pdf' }) };
+  }
+  if (format === 'texto') {
+    const { exportText } = await import('./texto');
+    return { name, blob: new Blob([exportText(project, floors)], { type: 'text/plain;charset=utf-8' }) };
   }
   const { exportDxf } = await import('./dxf');
   return { name, blob: new Blob([exportDxf(project, floors)], { type: 'application/dxf' }) };

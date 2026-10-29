@@ -16,6 +16,7 @@ const close = () => useExport.setState({ open: false });
 
 const HELP: Record<ExportFormat, string> = {
   pdf: 'Una hoja A3 por planta a escala 1:50 (1:100 o 1:200 si no cabe), con cotas, norte, escala gráfica y cajetín.',
+  texto: 'Un texto con cada espacio y sus medidas, qué puerta conecta con qué, los muebles y los muros. Cópialo y pégalo en el chat con Claude, o descárgalo como .txt.',
   dxf: 'Un archivo en metros para AutoCAD u otro CAD, con capas MUROS, HUECOS, HABITACIONES, MUEBLES, COTAS y TEXTOS. Con todas las plantas, van una al lado de otra.',
 };
 
@@ -38,6 +39,18 @@ function ExportDialog() {
       notify({ kind: 'error', text: 'No se pudo exportar el plano', detail: e instanceof Error ? e.message : String(e) });
     } finally {
       setBusy(false);
+    }
+  };
+
+  const copy = async () => {
+    if (busy || empty) return;
+    try {
+      const { exportText } = await import('./texto');
+      await navigator.clipboard.writeText(exportText(project, floorsToExport(project, activeFloorId, scope)));
+      close();
+      notify({ kind: 'ok', text: 'Texto copiado: pégalo en el chat con Ctrl+V' });
+    } catch (e) {
+      notify({ kind: 'error', text: 'No se pudo copiar el texto', detail: e instanceof Error ? e.message : String(e) });
     }
   };
 
@@ -71,13 +84,16 @@ function ExportDialog() {
           <SegmentedSwitch
             label="Formato"
             value={format}
-            options={[{ value: 'pdf', label: 'PDF a escala' }, { value: 'dxf', label: 'DXF para arquitecto' }]}
+            options={[{ value: 'pdf', label: 'PDF a escala' }, { value: 'dxf', label: 'DXF para arquitecto' }, { value: 'texto', label: 'Texto para Claude' }]}
             onChange={(v) => useExport.setState({ format: v })}
           />
           <span className="ayuda">{HELP[format]}</span>
         </div>
         <div className="ventana-botones">
           <button className="btn btn-sec" onClick={close}>Cancelar</button>
+          {format === 'texto' && !empty && (
+            <button className="btn btn-sec" onClick={copy}><Icon name="copy" size={16} />Copiar texto</button>
+          )}
           <button className="btn btn-pri" onClick={run} disabled={busy || empty} autoFocus>
             <Icon name={busy ? 'redo' : 'download'} size={16} className={busy ? 'girando' : undefined} />
             {empty ? `Nada que exportar: ${scope === 'actual' ? 'la planta está vacía' : 'no hay nada dibujado'}` :busy ? 'Descargando…' : 'Descargar'}
@@ -93,7 +109,7 @@ export default function ExportButton() {
   const open = useExport((s) => s.open);
   return (
     <>
-      <button className="btn btn-sec" onClick={() => useExport.setState({ open: true })} title="Plano en PDF a escala o DXF">
+      <button className="btn btn-sec" onClick={() => useExport.setState({ open: true })} title="Plano en PDF a escala, DXF o texto para Claude">
         <Icon name="download" size={16} />Exportar
       </button>
       {open && <ExportDialog />}

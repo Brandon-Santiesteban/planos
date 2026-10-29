@@ -129,4 +129,15 @@ export interface Project {
   north: number;
   /** ordered bottom to top */
   floors: Floor[];
+  /** The lot the house is drawn on (reference outline only): top-left corner in plan coordinates, street at +y. */
+  site?: Site;
+}
+
+export interface Site {
+  x: number;
+  y: number;
+  /** across the front (plan x) */
+  width: number;
+  /** from the street back (plan y) */
+  depth: number;
 }

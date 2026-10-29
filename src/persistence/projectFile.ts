@@ -53,7 +53,8 @@ const floor = z
     message: 'Hay una puerta o ventana en un muro que no existe',
   });
 // Files saved before projects had an id get one when opened.
-const project = z.object({ version: z.literal(1), id: z.string().min(1).optional(), name: z.string(), north: z.number().finite().optional(), floors: z.array(floor).min(1) });
+const project = z.object({ version: z.literal(1), id: z.string().min(1).optional(), name: z.string(), north: z.number().finite().optional(), floors: z.array(floor).min(1),
+  site: z.object({ x: z.number().finite(), y: z.number().finite(), width: positive, depth: positive }).optional() });
 
 const INVALID = 'El archivo no es un proyecto válido';
 

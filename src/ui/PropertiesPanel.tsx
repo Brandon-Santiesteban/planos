@@ -15,6 +15,7 @@ import Dropdown from './Dropdown';
 import { LengthField, TextField } from './fields';
 import OrientationPanel from './OrientationPanel';
 import QuickRoomPanel from './QuickRoomPanel';
+import SitePanel from './SitePanel';
 import Icon from './Icon';
 import SegmentedSwitch from './SegmentedSwitch';
 import { notify } from './toasts';
@@ -201,6 +202,9 @@ export default function PropertiesPanel() {
         <section className="tarjeta properties">
           <h3>Propiedades</h3>
           <p className="hint parrafo">Selecciona un muro, una puerta, una ventana, una habitación o un mueble para ver y cambiar sus medidas.</p>
+        </section>
+        <section className="tarjeta">
+          <SitePanel />
         </section>
         <section className="tarjeta">
           <OrientationPanel />

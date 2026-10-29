@@ -4,7 +4,8 @@ import { projectOntoWall } from '../../geometry/walls';
 import { DEFAULTS } from '../../model/defaults';
 import { deleteFurniture } from '../../model/furnitureOps';
 import {
-  deleteItems, deleteOpening, deleteRoom, deleteWall, type Joint, jointsAt, setJoints, translateJoints, updateOpening, wallJoints,
+  deleteItems, deleteOpening, deleteRoom, deleteWall, type Joint, jointsAt, prepareWallDrag, setJoints, tidyRoomOutlines,
+  translateJoints, updateOpening, wallJoints,
 } from '../../model/ops';
 import type { Floor, Vec2 } from '../../model/types';
 import { beginFurnitureDrag, dragFurnitureTo, type FurnitureDrag, rotateSelectedFurniture } from '../../furniture/actions';
@@ -20,7 +21,7 @@ const DRAG_START_PX = 3;
 
 type Drag =
   | { kind: 'endpoint'; wallId: string; end: 'a' | 'b'; joints: Joint[] }
-  | { kind: 'wall'; wallId: string; applied: Vec2; joints: Joint[] }
+  | { kind: 'wall'; wallId: string; applied: Vec2; joints: Joint[]; prepared?: ReturnType<typeof prepareWallDrag> }
   | { kind: 'opening'; openingId: string; wallId: string }
   | { kind: 'furniture'; drag: FurnitureDrag }
   | { kind: 'box'; roomId: string | null; to: Vec2 };
@@ -91,6 +92,11 @@ export function createSelectTool(): ToolHandler {
         if (dist(p, downAt) * ctx.view.pxPerMetre < DRAG_START_PX) return;
         store.checkpoint();
         started = true;
+        const d = drag;
+        if (d.kind === 'wall') {
+          const floorId = store.activeFloorId;
+          store.apply((draft) => { d.prepared = prepareWallDrag(draft, floorId, d.joints); }, { record: false });
+        }
       }
       const floorId = store.activeFloorId;
       const floor = activeFloor(store);
@@ -111,7 +117,7 @@ export function createSelectTool(): ToolHandler {
         if (step.x === 0 && step.y === 0) return;
         let moved = false;
         store.apply((draft) => {
-          moved = translateJoints(draft, floorId, d.joints, step);
+          moved = translateJoints(draft, floorId, d.joints, step, d.prepared);
         }, { record: false });
         if (moved) d.applied = total;
       } else {
@@ -124,6 +130,10 @@ export function createSelectTool(): ToolHandler {
     },
 
     onPointerUp(p, ctx) {
+      if (drag?.kind === 'wall' && started) {
+        const floorId = ctx.state.activeFloorId;
+        useEditor.getState().apply((draft) => tidyRoomOutlines(draft, floorId), { record: false });
+      }
       if (drag?.kind === 'box' && downAt) {
         const { select, selectGroup } = useEditor.getState();
         if (started) selectGroup(itemsInBox(activeFloor(ctx.state), downAt, p));
