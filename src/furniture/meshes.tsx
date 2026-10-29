@@ -4,6 +4,7 @@ import { type ThreeEvent, useThree } from '@react-three/fiber';
 import { type ReactElement, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { byElevation } from '../model/furnitureOps';
 import type { Floor, Furniture } from '../model/types';
@@ -40,6 +41,29 @@ function C({ p, r: radius, h, c, top, rough = 0.6, m = 0, rot, e, seg = 20 }: { 
   );
 }
 
+/** Rounded boxes are shared per size and radius (pieces repeat a lot: chairs, cushions, doors). */
+const roundedCache = new Map<string, THREE.BufferGeometry>();
+function roundedBox(s: V3, radius: number): THREE.BufferGeometry {
+  const size = s.map((v) => Math.max(v, 0.002)) as V3;
+  const rad = Math.min(radius, size[0] / 2, size[1] / 2, size[2] / 2) * 0.98;
+  const key = `${size.map((v) => v.toFixed(3)).join(',')}:${rad.toFixed(3)}`;
+  let g = roundedCache.get(key);
+  if (!g) {
+    g = new RoundedBoxGeometry(size[0], size[1], size[2], 3, rad);
+    roundedCache.set(key, g);
+  }
+  return g;
+}
+
+/** Box with rounded edges (radius `rad`), given by its centre and size: cushions, mattresses, tops, bodies. */
+function RB({ p, s, c, rad = 0.03, r = 0.8, m = 0, rot }: { p: V3; s: V3; c: string; rad?: number; r?: number; m?: number; rot?: V3 }) {
+  return (
+    <mesh position={p} rotation={rot} geometry={roundedBox(s, rad)} castShadow receiveShadow>
+      <meshStandardMaterial color={c} roughness={r} metalness={m} />
+    </mesh>
+  );
+}
+
 function S({ p, r, c, sc }: { p: V3; r: number; c: string; sc?: V3 }) {
   return (
     <mesh position={p} scale={sc} castShadow receiveShadow>
@@ -60,6 +84,15 @@ const WHITE = '#f4f2ee';
 const STONE = '#4a4846';
 const GREEN = '#5f8a4a';
 
+const WOOD = '#8a6446';
+const WOOD_DARK = '#4e3a2b';
+
+/** Four round legs, slimmer at the floor, their centres `inset` in from the corners of a w × d footprint. */
+const taperedLegs = (w: number, d: number, h: number, c: string, inset = 0.05, r = 0.022) =>
+  [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sz], i) => (
+    <C key={`tl${i}`} p={[sx * (w / 2 - inset), h / 2, sz * (d / 2 - inset)]} r={r * 0.65} top={r} h={h} c={c} rough={0.6} seg={12} />
+  ));
+
 const legs = (w: number, d: number, h: number, t: number, c: string, inset = 0.03) =>
   [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sz], i) => (
     <B key={`leg${i}`} p={[sx * (w / 2 - inset - t / 2), h / 2, sz * (d / 2 - inset - t / 2)]} s={[t, h, t]} c={c} />
@@ -67,34 +100,54 @@ const legs = (w: number, d: number, h: number, t: number, c: string, inset = 0.0
 
 const bed: Builder = ({ w, d, h, c, item }) => {
   const frame = shade('#b08a63', 0.85);
-  const top = Math.min(0.55, h * 0.55);
+  const leg = 0.12;
+  const base = leg + 0.2;
+  const top = base + 0.25;
   const pillows = item?.double ? 2 : 1;
-  const pw = (w - 0.12 * (pillows + 1)) / pillows;
+  const pw = (w - 0.1 * (pillows + 1)) / pillows;
+  const duvet = d * 0.66;
+  const channels = Math.max(3, Math.round(w / 0.28));
+  const cw = (w - 0.06) / channels;
   return (
     <>
-      <B p={[0, 0.17, 0]} s={[w, 0.24, d]} c={frame} />
-      <B p={[0, (0.29 + top) / 2, 0.02]} s={[w - 0.04, top - 0.29, d - 0.08]} c={WHITE} r={0.9} />
-      <B p={[0, top + 0.02, 0.18]} s={[w - 0.02, 0.06, d - 0.5]} c={c} r={0.95} />
-      <B p={[0, h / 2, -d / 2 + 0.03]} s={[w, h, 0.06]} c={frame} />
+      {taperedLegs(w - 0.04, d - 0.04, leg, WOOD_DARK, 0.06, 0.025)}
+      <RB p={[0, leg + 0.1, 0]} s={[w, 0.2, d]} c={frame} rad={0.02} r={0.7} />
+      <RB p={[0, base + 0.125, 0.02]} s={[w - 0.06, 0.25, d - 0.1]} c={WHITE} rad={0.06} r={0.95} />
+      {/* Duvet over the lower two thirds, falling over the sides, a folded band at its head and a throw at the foot. */}
+      <RB p={[0, top + 0.015, d / 2 - duvet / 2 - 0.02]} s={[w - 0.02, 0.05, duvet]} c={c} rad={0.025} r={1} />
+      {[-1, 1].map((sx) => <RB key={sx} p={[sx * (w / 2 - 0.02), top - 0.09, d / 2 - duvet / 2 - 0.02]} s={[0.04, 0.22, duvet]} c={c} rad={0.015} r={1} />)}
+      <RB p={[0, top + 0.035, d / 2 - duvet - 0.02]} s={[w - 0.01, 0.06, 0.16]} c={shade(c, 1.12)} rad={0.03} r={1} />
+      <RB p={[0, top + 0.05, d / 2 - 0.32]} s={[w + 0.02, 0.025, 0.42]} c={shade(c, 0.62)} rad={0.012} r={1} />
       {Array.from({ length: pillows }, (_, i) => (
-        <B key={i} p={[-w / 2 + 0.12 + pw / 2 + i * (pw + 0.12), top + 0.07, -d / 2 + 0.28]} s={[pw, 0.12, 0.34]} c={WHITE} r={0.95} />
+        <RB key={i} p={[-w / 2 + 0.1 + pw / 2 + i * (pw + 0.1), top + 0.1, -d / 2 + 0.24]} s={[pw, 0.16, 0.34]} rot={[-0.45, 0, 0]} c={WHITE} rad={0.07} r={1} />
+      ))}
+      {item?.double && <RB p={[0, top + 0.1, -d / 2 + 0.44]} s={[Math.min(0.5, w * 0.3), 0.16, 0.12]} rot={[-0.3, 0, 0]} c={shade(c, 0.62)} rad={0.05} r={1} />}
+      {/* Upholstered headboard with vertical channels. */}
+      <RB p={[0, (leg + h) / 2, -d / 2 + 0.03]} s={[w + 0.06, h - leg, 0.06]} c={frame} rad={0.02} r={0.7} />
+      {Array.from({ length: channels }, (_, i) => (
+        <RB key={`ch${i}`} p={[-w / 2 + 0.03 + cw * (i + 0.5), (base + 0.1 + h - 0.04) / 2, -d / 2 + 0.08]} s={[cw - 0.01, h - 0.04 - base - 0.1, 0.06]} c={shade(c, 0.86)} rad={0.025} r={1} />
       ))}
     </>
   );
 };
 
 const cabinet = (drawers: number, handle = METAL): Builder => ({ w, d, h, c }) => {
-  const gap = (h - 0.08) / drawers;
+  const leg = Math.min(0.12, h * 0.25);
+  const body = h - leg;
+  const gap = (body - 0.04) / drawers;
   return (
     <>
-      <B p={[0, h / 2 + 0.03, 0]} s={[w, h - 0.06, d]} c={c} />
-      <B p={[0, 0.03, -0.02]} s={[w - 0.04, 0.06, d - 0.06]} c={shade(c, 0.6)} />
-      {Array.from({ length: drawers }, (_, i) => (
-        <group key={i}>
-          <B p={[0, 0.06 + gap * (i + 0.5), d / 2 + 0.003]} s={[w - 0.04, gap - 0.02, 0.008]} c={shade(c, 1.06)} />
-          <B p={[0, 0.06 + gap * (i + 0.5), d / 2 + 0.015]} s={[Math.min(0.2, w * 0.3), 0.015, 0.015]} c={handle} m={0.6} r={0.4} />
-        </group>
-      ))}
+      {taperedLegs(w, d, leg, WOOD_DARK, 0.05, 0.018)}
+      <RB p={[0, leg + body / 2, 0]} s={[w, body, d]} c={c} rad={0.012} r={0.7} />
+      {Array.from({ length: drawers }, (_, i) => {
+        const y = leg + 0.02 + gap * (i + 0.5);
+        return (
+          <group key={i}>
+            <RB p={[0, y, d / 2 + 0.002]} s={[w - 0.04, gap - 0.012, 0.012]} c={shade(c, 1.05)} rad={0.004} r={0.65} />
+            <B p={[0, y + gap * 0.18, d / 2 + 0.014]} s={[Math.min(0.24, w * 0.35), 0.012, 0.012]} c={handle} m={0.7} r={0.35} />
+          </group>
+        );
+      })}
     </>
   );
 };
@@ -317,21 +370,43 @@ const lamp: Builder = ({ w, h, c }) => (
   </>
 );
 
-const sofa: Builder = ({ w, d, h, c }) => {
-  const arm = Math.min(0.18, w / 6);
-  const back = Math.min(0.22, d / 3);
+/** Upholstered sofa or armchair: slim wooden legs, a frame, loose seat and back cushions, rounded arms and a pair of
+ * accent cushions on a sofa. */
+const sofaDims = (w: number, d: number, h: number) => {
+  const leg = 0.1;
+  const arm = Math.min(0.2, w / 6);
   const seatH = Math.min(0.45, h * 0.55);
-  const seats = Math.max(1, Math.round((w - 2 * arm) / 0.65));
-  const sw = (w - 2 * arm) / seats;
+  const back = Math.min(0.16, d * 0.18);
+  return { leg, arm, seatH, back, baseH: seatH - leg - 0.14 };
+};
+
+const sofa: Builder = ({ w, d, h, c }) => {
+  const { leg, arm, seatH, back, baseH } = sofaDims(w, d, h);
+  const iw = w - 2 * arm;
+  const seats = Math.max(1, Math.round(iw / 0.7));
+  const sw = iw / seats;
+  const frame = shade(c, 0.86);
+  const backFront = -d / 2 + 2 * back;
+  const cushionD = d / 2 - 0.02 - backFront;
+  const bh = h - seatH - 0.03;
   return (
     <>
-      <B p={[0, 0.03, 0]} s={[w - 0.08, 0.06, d - 0.08]} c={DARK} />
-      <B p={[0, (0.06 + seatH - 0.1) / 2 + 0.03, back / 2]} s={[w - 2 * arm, seatH - 0.13, d - back]} c={shade(c, 0.9)} />
-      {Array.from({ length: seats }, (_, i) => (
-        <B key={i} p={[-w / 2 + arm + sw * (i + 0.5), seatH - 0.05, back / 2 + 0.01]} s={[sw - 0.02, 0.12, d - back - 0.02]} c={c} r={0.95} />
+      {taperedLegs(w - 0.06, d - 0.06, leg, WOOD_DARK, 0.04)}
+      <RB p={[0, leg + baseH / 2, 0]} s={[w, baseH, d]} c={frame} rad={0.03} r={0.95} />
+      <RB p={[0, leg + (h - leg) / 2, -d / 2 + back / 2]} s={[w, h - leg, back]} c={frame} rad={0.04} r={0.95} />
+      {Array.from({ length: seats }, (_, i) => {
+        const x = -iw / 2 + sw * (i + 0.5);
+        return (
+          <group key={i}>
+            <RB p={[x, leg + baseH + 0.07, backFront + cushionD / 2]} s={[sw - 0.012, 0.14, cushionD]} c={c} rad={0.05} r={1} />
+            <RB p={[x, seatH + bh / 2, -d / 2 + back * 1.5]} s={[sw - 0.02, bh, back]} rot={[-0.14, 0, 0]} c={c} rad={0.06} r={1} />
+          </group>
+        );
+      })}
+      {[-1, 1].map((sx) => <RB key={sx} p={[sx * (w / 2 - arm / 2), leg + (seatH + 0.2 - leg) / 2, 0]} s={[arm, seatH + 0.2 - leg, d]} c={c} rad={0.06} r={1} />)}
+      {seats > 1 && [-1, 1].map((sx) => (
+        <RB key={`a${sx}`} p={[sx * (iw / 2 - 0.26), seatH + 0.24, backFront + 0.08]} s={[0.42, 0.4, 0.12]} rot={[-0.25, sx * 0.3, sx * 0.06]} c={shade(c, 1.3)} rad={0.05} r={1} />
       ))}
-      <B p={[0, (h + 0.06) / 2, -d / 2 + back / 2]} s={[w, h - 0.06, back]} c={c} r={0.95} />
-      {[-1, 1].map((sx) => <B key={sx} p={[sx * (w / 2 - arm / 2), (seatH + 0.18 + 0.06) / 2, 0]} s={[arm, seatH + 0.18 - 0.06, d]} c={c} r={0.95} />)}
     </>
   );
 };
@@ -339,21 +414,27 @@ const sofa: Builder = ({ w, d, h, c }) => {
 const sofaL: Builder = ({ w, d, h, c }) => {
   const chaise = Math.min(0.9, w / 2);
   const main = Math.min(0.95, d);
+  const { leg, arm, baseH } = sofaDims(w, main, h);
+  const len = d - main;
+  const x = w / 2 - chaise / 2;
   return (
     <>
       <group position={[0, 0, -d / 2 + main / 2]}>{sofa({ w, d: main, h, c })}</group>
-      <B p={[w / 2 - chaise / 2, 0.21, main / 2]} s={[chaise - 0.02, 0.3, d - main]} c={shade(c, 0.9)} />
-      <B p={[w / 2 - chaise / 2, 0.4, main / 2]} s={[chaise - 0.04, 0.1, d - main - 0.02]} c={c} r={0.95} />
-      <B p={[w / 2 - 0.09, 0.32, main / 2]} s={[0.18, 0.5, d - main]} c={c} r={0.95} />
+      {[-1, 1].map((sx) => <C key={sx} p={[x + sx * (chaise / 2 - 0.06), leg / 2, d / 2 - 0.06]} r={0.014} top={0.022} h={leg} c={WOOD_DARK} seg={12} />)}
+      <RB p={[x, leg + baseH / 2, main / 2]} s={[chaise, baseH, len]} c={shade(c, 0.86)} rad={0.03} r={0.95} />
+      <RB p={[x - arm / 2, leg + baseH + 0.07, main / 2 + 0.01]} s={[chaise - arm - 0.012, 0.14, len - 0.02]} c={c} rad={0.05} r={1} />
+      <RB p={[w / 2 - arm / 2, leg + 0.25, main / 2]} s={[arm, 0.5, len]} c={c} rad={0.06} r={1} />
     </>
   );
 };
 
 const coffeeTable: Builder = ({ w, d, h, c }) => (
   <>
-    <B p={[0, h - 0.025, 0]} s={[w, 0.05, d]} c={c} r={0.5} />
-    <B p={[0, 0.12, 0]} s={[w - 0.1, 0.02, d - 0.1]} c={shade(c, 0.9)} />
-    {legs(w, d, h - 0.05, 0.04, shade(c, 0.7))}
+    <RB p={[0, h - 0.025, 0]} s={[w, 0.05, d]} c={c} rad={0.02} r={0.45} />
+    <RB p={[0, 0.14, 0]} s={[w - 0.12, 0.025, d - 0.12]} c={shade(c, 0.85)} rad={0.008} r={0.6} />
+    {[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sz], i) => (
+      <C key={i} p={[sx * (w / 2 - 0.06), (h - 0.05) / 2, sz * (d / 2 - 0.06)]} r={0.012} h={h - 0.05} c={DARK} m={0.6} rough={0.35} seg={10} />
+    ))}
   </>
 );
 
@@ -363,13 +444,17 @@ const chairAt = (x: number, z: number, ry: number, c: string, key?: string | num
   </group>
 );
 
+/** Dining chair: wooden frame on round tapered legs, an upholstered seat and backrest. */
 const chair: Builder = ({ w, d, h, c }) => {
   const seat = 0.46;
+  const post = -d / 2 + 0.035;
   return (
     <>
-      <B p={[0, seat - 0.02, 0.02]} s={[w, 0.04, d - 0.04]} c={c} />
-      {legs(w, d, seat - 0.04, 0.035, shade(c, 0.8), 0.02)}
-      <B p={[0, (seat + h) / 2, -d / 2 + 0.03]} s={[w, h - seat, 0.04]} c={c} />
+      {[-1, 1].map((sx) => <C key={`f${sx}`} p={[sx * (w / 2 - 0.04), (seat - 0.05) / 2, d / 2 - 0.05]} r={0.012} top={0.018} h={seat - 0.05} c={WOOD} seg={10} />)}
+      {[-1, 1].map((sx) => <C key={`b${sx}`} p={[sx * (w / 2 - 0.04), h / 2, post]} r={0.012} top={0.016} h={h} c={WOOD} rot={[-0.06, 0, 0]} seg={10} />)}
+      <RB p={[0, seat - 0.07, 0.01]} s={[w - 0.04, 0.04, d - 0.06]} c={WOOD} rad={0.01} r={0.6} />
+      <RB p={[0, seat - 0.025, 0.02]} s={[w, 0.06, d - 0.04]} c={c} rad={0.025} r={1} />
+      <RB p={[0, h - 0.13, post - 0.01]} s={[w - 0.02, 0.2, 0.035]} rot={[-0.1, 0, 0]} c={c} rad={0.015} r={1} />
     </>
   );
 };
@@ -379,8 +464,9 @@ const table: Builder = ({ w, d, h, c, item }) => {
   const per = Math.max(1, Math.floor(seats / 2));
   return (
     <>
-      <B p={[0, h - 0.02, 0]} s={[w, 0.04, d]} c={c} r={0.55} />
-      {legs(w, d, h - 0.04, 0.06, shade(c, 0.8), 0.06)}
+      <RB p={[0, h - 0.02, 0]} s={[w, 0.04, d]} c={c} rad={0.015} r={0.5} />
+      <B p={[0, h - 0.07, 0]} s={[w - 0.2, 0.06, d - 0.2]} c={shade(c, 0.8)} />
+      {taperedLegs(w, d, h - 0.04, shade(c, 0.8), 0.1, 0.03)}
       {seats > 0 && Array.from({ length: per }, (_, i) => {
         const x = -w / 2 + (w * (i + 0.5)) / per;
         return [chairAt(x, -d / 2 - 0.18, Math.PI, shade(c, 0.85), `n${i}`), chairAt(x, d / 2 + 0.18, 0, shade(c, 0.85), `s${i}`)];
@@ -389,14 +475,23 @@ const table: Builder = ({ w, d, h, c, item }) => {
   );
 };
 
+/** Base kitchen unit: recessed toe-kick, door fronts with slim bar handles, a stone top overhanging the front. */
 const counter = (extra?: (p: P) => ReactElement): Builder => (p) => {
   const { w, d, h, c } = p;
+  const n = Math.max(1, Math.round(w / 0.6));
+  const dw = w / n;
+  const body = h - 0.14;
   return (
     <>
-      <B p={[0, 0.05, -0.03]} s={[w, 0.1, d - 0.06]} c={DARK} />
-      <B p={[0, (h - 0.04 + 0.1) / 2, 0]} s={[w, h - 0.14, d - 0.02]} c={c} />
-      <B p={[0, (h - 0.04 + 0.1) / 2, d / 2 - 0.005]} s={[0.004, h - 0.18, 0.012]} c={shade(c, 0.85)} />
-      <B p={[0, h - 0.02, 0]} s={[w, 0.04, d]} c={STONE} r={0.35} />
+      <B p={[0, 0.05, -0.04]} s={[w, 0.1, d - 0.08]} c={DARK} />
+      <B p={[0, 0.1 + body / 2, -0.01]} s={[w, body, d - 0.04]} c={shade(c, 0.92)} />
+      {Array.from({ length: n }, (_, i) => (
+        <group key={i}>
+          <RB p={[-w / 2 + dw * (i + 0.5), 0.1 + body / 2, d / 2 - 0.02]} s={[dw - 0.006, body - 0.006, 0.02]} c={c} rad={0.004} r={0.5} />
+          <B p={[-w / 2 + dw * (i + 0.5), 0.1 + body - 0.06, d / 2 + 0.004]} s={[dw * 0.5, 0.012, 0.014]} c={STEEL} m={0.85} r={0.25} />
+        </group>
+      ))}
+      <RB p={[0, h - 0.02, 0.01]} s={[w, 0.04, d + 0.02]} c={STONE} rad={0.01} r={0.3} />
       {extra?.(p)}
     </>
   );
@@ -422,38 +517,68 @@ const stove: Builder = ({ w, d, h, c }) => (
 
 const fridge: Builder = ({ w, d, h, c }) => (
   <>
-    <B p={[0, h / 2, 0]} s={[w, h, d]} c={c} m={0.55} r={0.3} />
-    <B p={[0, h * 0.62, d / 2 + 0.002]} s={[w - 0.01, 0.01, 0.005]} c={shade(c, 0.6)} />
-    {[h * 0.8, h * 0.45].map((y) => <B key={y} p={[w / 2 - 0.07, y, d / 2 + 0.025]} s={[0.02, 0.28, 0.02]} c={DARK} />)}
+    <RB p={[0, h / 2, 0]} s={[w, h, d]} c={c} m={0.55} r={0.28} rad={0.03} />
+    <B p={[0, h * 0.62, d / 2 + 0.001]} s={[w - 0.01, 0.008, 0.004]} c={shade(c, 0.55)} />
+    <B p={[w * 0.12, h - 0.01 - (h * 0.38) / 2, d / 2 + 0.001]} s={[0.006, h * 0.38 - 0.03, 0.004]} c={shade(c, 0.55)} />
+    <C p={[w * 0.12 - 0.04, h * 0.82, d / 2 + 0.03]} r={0.011} h={0.32} c={STEEL} m={0.9} rough={0.2} seg={10} />
+    <C p={[w * 0.12 + 0.04, h * 0.82, d / 2 + 0.03]} r={0.011} h={0.32} c={STEEL} m={0.9} rough={0.2} seg={10} />
+    <C p={[w / 2 - 0.06, h * 0.35, d / 2 + 0.03]} r={0.011} h={0.4} c={STEEL} m={0.9} rough={0.2} seg={10} />
+    <B p={[w * 0.3, h * 0.82, d / 2 + 0.003]} s={[0.12, 0.16, 0.004]} c={'#1b1d20'} r={0.1} e={'#203a55'} />
   </>
 );
 
-const toilet: Builder = ({ w, d, h, c }) => (
-  <>
-    <B p={[0, h * 0.72, -d / 2 + d * 0.13]} s={[w, h * 0.55, d * 0.24]} c={c} r={0.25} />
-    <C p={[0, 0.2, d * 0.08]} r={w * 0.32} top={w * 0.42} h={0.4} c={c} rough={0.25} />
-    <mesh position={[0, 0.41, d * 0.1]} scale={[1, 1, 1.35]} castShadow>
-      <cylinderGeometry args={[w * 0.46, w * 0.46, 0.03, 24]} />
-      <meshStandardMaterial color={c} roughness={0.25} />
-    </mesh>
-  </>
-);
-
-const basin: Builder = ({ w, d, h, c, item }) => {
-  const n = item?.double ? 2 : 1;
+/** Toilet: rounded cistern with a flush button, a tapered bowl, the seat ring and the lid up. */
+const toilet: Builder = ({ w, d, h, c }) => {
+  const seatY = 0.42;
   return (
     <>
-      <B p={[0, (h - 0.12) / 2 + 0.1, -0.02]} s={[w - 0.04, h - 0.22, d - 0.06]} c={'#b08a63'} />
-      <B p={[0, h - 0.05, 0]} s={[w, 0.1, d]} c={c} r={0.25} />
+      <RB p={[0, h * 0.72, -d / 2 + d * 0.12]} s={[w, h * 0.55, d * 0.22]} c={c} rad={0.04} r={0.2} />
+      <C p={[0, h - 0.002, -d / 2 + d * 0.12]} r={0.025} h={0.01} c={STEEL} m={0.9} rough={0.2} />
+      <mesh position={[0, seatY / 2, d * 0.07]} scale={[1, 1, 1.3]} castShadow receiveShadow>
+        <cylinderGeometry args={[w * 0.44, w * 0.3, seatY - 0.02, 28]} />
+        <meshStandardMaterial color={c} roughness={0.2} />
+      </mesh>
+      <mesh position={[0, seatY, d * 0.08]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 1.3, 1]} castShadow>
+        <torusGeometry args={[w * 0.36, 0.035, 10, 28]} />
+        <meshStandardMaterial color={WHITE} roughness={0.3} />
+      </mesh>
+      <mesh position={[0, seatY + 0.005, d * 0.08]} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 1.3, 1]}>
+        <circleGeometry args={[w * 0.33, 24]} />
+        <meshStandardMaterial color={'#cfdade'} roughness={0.1} />
+      </mesh>
+      <mesh position={[0, seatY + w * 0.36, -d / 2 + d * 0.25]} rotation={[-0.15, 0, 0]} scale={[1, 1.3, 1]} castShadow>
+        <cylinderGeometry args={[w * 0.4, w * 0.4, 0.025, 28]} />
+        <meshStandardMaterial color={WHITE} roughness={0.3} />
+      </mesh>
+    </>
+  );
+};
+
+/** Floating vanity (wood drawers) with a stone top, white vessel basins and tall mixer taps. */
+const basin: Builder = ({ w, d, h, c, item }) => {
+  const n = item?.double ? 2 : 1;
+  const top = h - 0.12;
+  const body = Math.min(0.45, top - 0.2);
+  return (
+    <>
+      <RB p={[0, top - body / 2, -0.02]} s={[w - 0.02, body, d - 0.04]} c={'#b08a63'} rad={0.01} r={0.6} />
+      <B p={[0, top - body / 2, d / 2 - 0.035]} s={[w - 0.06, 0.006, 0.006]} c={shade('#b08a63', 0.6)} />
+      <RB p={[0, top + 0.015, 0]} s={[w, 0.03, d]} c={c} rad={0.008} r={0.3} />
       {Array.from({ length: n }, (_, i) => {
         const x = -w / 2 + (w * (i + 0.5)) / n;
+        const br = Math.min(0.2, w / n / 2 - 0.06);
         return (
           <group key={i}>
-            <mesh position={[x, h + 0.001, 0.03]} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 0.75, 1]}>
-              <circleGeometry args={[Math.min(0.2, w / n / 2 - 0.08), 24]} />
-              <meshStandardMaterial color={'#dfe4e6'} roughness={0.2} />
+            <mesh position={[x, top + 0.09, 0.03]} scale={[1, 1, 0.78]} castShadow>
+              <cylinderGeometry args={[br, br * 0.7, 0.12, 28]} />
+              <meshStandardMaterial color={WHITE} roughness={0.15} />
             </mesh>
-            <C p={[x, h + 0.08, -d / 2 + 0.07]} r={0.012} h={0.16} c={STEEL} m={0.9} rough={0.2} />
+            <mesh position={[x, top + 0.151, 0.03]} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 0.78, 1]}>
+              <circleGeometry args={[br - 0.012, 28]} />
+              <meshStandardMaterial color={'#dfe4e6'} roughness={0.1} />
+            </mesh>
+            <C p={[x, top + 0.17, -d / 2 + 0.06]} r={0.012} h={0.28} c={STEEL} m={0.9} rough={0.2} seg={10} />
+            <C p={[x, top + 0.3, -d / 2 + 0.11]} r={0.01} h={0.11} c={STEEL} m={0.9} rough={0.2} rot={[Math.PI / 2, 0, 0]} seg={10} />
           </group>
         );
       })}
@@ -542,19 +667,27 @@ const bench: Builder = ({ w, d, h, c }) => (
   </>
 );
 
+/** Sedan, length along x with the front at +x: rounded body, tinted glasshouse under the roof, wheels with rims. */
 const car: Builder = ({ w, d, h, c }) => {
   const wheelR = Math.min(0.33, h * 0.23);
-  const body = h * 0.45;
+  const body = h * 0.42;
+  const sill = wheelR * 0.55;
+  const cabin = h - sill - body;
   return (
     <>
-      <B p={[0, wheelR + body / 2 - 0.05, 0]} s={[w, body, d]} c={c} r={0.3} m={0.5} />
-      <B p={[-w * 0.04, wheelR + body - 0.05 + (h - wheelR - body + 0.05) / 2, 0]} s={[w * 0.5, h - wheelR - body + 0.05, d * 0.86]} c={'#2d3a44'} r={0.1} m={0.3} />
-      <B p={[-w * 0.04, h - 0.02, 0]} s={[w * 0.4, 0.04, d * 0.84]} c={c} r={0.3} m={0.5} />
+      <RB p={[0, sill + body / 2, 0]} s={[w, body, d]} c={c} rad={0.14} r={0.25} m={0.6} />
+      <RB p={[-w * 0.05, sill + body + cabin / 2 - 0.04, 0]} s={[w * 0.5, cabin + 0.08, d * 0.86]} c={'#1d2a33'} rad={0.16} r={0.08} m={0.5} />
+      <RB p={[-w * 0.07, h - 0.025, 0]} s={[w * 0.38, 0.05, d * 0.8]} c={c} rad={0.025} r={0.25} m={0.6} />
       {[[1, 1], [1, -1], [-1, 1], [-1, -1]].map(([sx, sz], i) => (
-        <C key={i} p={[sx * w * 0.32, wheelR, sz * (d / 2 - 0.12)]} r={wheelR} h={0.22} c={'#1a1a1a'} rough={0.9} rot={[Math.PI / 2, 0, 0]} />
+        <group key={i} position={[sx * w * 0.32, wheelR, sz * (d / 2 - 0.12)]}>
+          <C p={[0, 0, 0]} r={wheelR} h={0.22} c={'#161616'} rough={0.9} rot={[Math.PI / 2, 0, 0]} seg={24} />
+          <C p={[0, 0, sz * 0.006]} r={wheelR * 0.62} h={0.222} c={STEEL} m={0.85} rough={0.3} rot={[Math.PI / 2, 0, 0]} seg={20} />
+        </group>
       ))}
-      {[-1, 1].map((sz) => <B key={sz} p={[w / 2 + 0.005, wheelR + body * 0.6, sz * (d / 2 - 0.25)]} s={[0.01, 0.08, 0.3]} c={'#fff6d8'} e={'#fff1c4'} />)}
-      {[-1, 1].map((sz) => <B key={`t${sz}`} p={[-w / 2 - 0.005, wheelR + body * 0.6, sz * (d / 2 - 0.25)]} s={[0.01, 0.08, 0.3]} c={'#a01818'} />)}
+      <B p={[w / 2 - 0.01, sill + body * 0.45, 0]} s={[0.03, body * 0.3, d * 0.42]} c={DARK} r={0.5} />
+      {[-1, 1].map((sz) => <RB key={sz} p={[w / 2 - 0.03, sill + body * 0.68, sz * (d / 2 - 0.22)]} s={[0.06, 0.07, 0.3]} c={'#fff6d8'} rad={0.02} r={0.2} />)}
+      {[-1, 1].map((sz) => <RB key={`t${sz}`} p={[-w / 2 + 0.03, sill + body * 0.68, sz * (d / 2 - 0.22)]} s={[0.06, 0.07, 0.34]} c={'#a01818'} rad={0.02} r={0.3} />)}
+      {[-1, 1].map((sz) => <RB key={`m${sz}`} p={[w * 0.17, sill + body + 0.05, sz * (d / 2 + 0.05)]} s={[0.12, 0.08, 0.1]} c={c} rad={0.02} r={0.3} m={0.5} />)}
     </>
   );
 };
