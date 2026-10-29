@@ -39,6 +39,16 @@
 //   d 16,5–22,7 three bedrooms side by side (2 m each), every one opening straight onto the patio (no corridor):
 //               two with their own bathroom, the master with a walk-through dressing room and its bathroom
 //   a 0–0,6     an open side path (celosía on the boundary) for the breeze and the way to the back garden and pool
+//
+// Propuesta 2 (optimised, same 7 × 22 m and programme), on the lot to the left of the first (plan x = 58 + a): the two
+// secondary bedrooms go up into a wooden box floating over the parking, which frees the ground floor:
+//   d 0–6      parking and the covered entry under the box
+//   d 6–10,6   entry patio open to the sky (front door from the porch), the stair up beside it; laundry (also from the
+//              parking), pantry and guest bathroom along the party wall
+//   d 10,6–16,6 the double-height living-dining-kitchen, glass to the entry patio and to the side garden (cross air)
+//   d 16,6–22  the master suite (bedroom, walk-in dressing room, bathroom) beside its own side garden
+//   up         bedrooms 1 and 2 with their bathrooms in the box (windows to the street and to the patio), a terrace
+//              with BBQ over the services
 import { execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
@@ -309,6 +319,87 @@ const json = await page.evaluate(async ([RIGHT, TOTAL]) => {
   ];
   for (const [name, pts] of roofs7) ops.setRoofHeight(p, t, room(t, pts, name, 'roof'), 0.001);
 
+  // ======================= Propuesta 2 (optimised), lot at plan x 58–65 =======================
+  const M = (a, d) => ({ x: 58 + a, y: 32 - d });
+  const wall2 = (f, [a0, d0], [a1, d1], th) => {
+    const id = ops.addWall(p, f, M(a1, d1), M(a0, d0), th);
+    if (!id) throw new Error(`muro P2 ${JSON.stringify([a0, d0, a1, d1])}`);
+    lengths[id] = Math.hypot(a1 - a0, d1 - d0);
+    return id;
+  };
+  const rect2 = (a0, d0, a1, d1) => [M(a0, d0), M(a1, d0), M(a1, d1), M(a0, d1)];
+  const poly2 = (...qs) => qs.map(([a, d]) => M(a, d));
+
+  // Ground floor. Entry patio's front wall (d 6) with the front door; the laundry opens to the parking too.
+  opening(g, 'door', wall2(g, [0, 6], [4.6, 6], 0.2), 1.2, { width: 1.1, height: 2.4 }); // puerta principal
+  opening(g, 'door', wall2(g, [4.6, 6], [7, 6], 0.2), 1.2, { width: 0.8 }); // parqueadero → lavado
+  for (const [d0, d1] of [[6, 10.6], [10.6, 16.6], [16.6, 22]]) wall2(g, [0, d0], [0, d1], 0.2); // lindero izquierdo
+  for (const [d0, d1] of [[6, 7.6], [7.6, 9.0], [9.0, 10.6], [10.6, 16.6], [16.6, 19.8], [19.8, 22]]) wall2(g, [7, d0], [7, d1], 0.2);
+  opening(g, 'door', wall2(g, [4.6, 6], [4.6, 10.6]), 0.5, { width: 0.8 }); // patio → lavado
+  opening(g, 'door', wall2(g, [4.6, 7.6], [7, 7.6]), 0.9, { width: 0.7 }); // lavado → alacena
+  wall2(g, [4.6, 9.0], [7, 9.0]);
+  // Living space: glass on both ends (entry patio, side garden), the guest bathroom and the master open off it.
+  const front2 = wall2(g, [0, 10.6], [7, 10.6]);
+  glassDoor(g, front2, 1.9, { width: 2.8, height: 2.4 }); // sala ↔ patio de entrada
+  opening(g, 'door', front2, 5.55, { width: 0.7 }); // baño social
+  const back2 = wall2(g, [0, 16.6], [7, 16.6]);
+  glassDoor(g, back2, 1.2, { width: 1.8, height: 2.4 }); // sala ↔ jardín lateral
+  opening(g, 'door', back2, 5.0, { width: 0.8 }); // sala → habitación principal
+  // Master suite.
+  glassDoor(g, wall2(g, [2.4, 16.6], [2.4, 22]), 1.6, { width: 1.6, height: 2.4 }); // al jardín lateral
+  opening(g, 'door', wall2(g, [2.4, 19.8], [7, 19.8]), 1.2, { width: 0.8 }); // → vestier
+  opening(g, 'door', wall2(g, [4.6, 19.8], [4.6, 22]), 1.1, { width: 0.7 }); // vestier → baño
+  const backM = wall2(g, [2.4, 22], [7, 22], 0.2);
+  opening(g, 'window', backM, 1.1, { ...high, width: 1.0 }); // vestier
+  opening(g, 'window', backM, 3.4, { ...high, width: 0.9 }); // baño
+
+  room(g, rect2(4.6, 6, 7, 7.6), 'Lavado (propuesta 2)');
+  room(g, rect2(4.6, 7.6, 7, 9.0), 'Alacena (propuesta 2)');
+  room(g, rect2(4.6, 9.0, 7, 10.6), 'Baño social (propuesta 2)');
+  room(g, rect2(0, 10.6, 7, 16.6), 'Monoambiente (propuesta 2)');
+  room(g, rect2(2.4, 16.6, 7, 19.8), 'Habitación principal (propuesta 2)');
+  room(g, rect2(2.4, 19.8, 4.6, 22), 'Vestier (propuesta 2)');
+  room(g, rect2(4.6, 19.8, 7, 22), 'Baño principal (propuesta 2)');
+  room(g, rect2(0, 6, 4.6, 10.6), 'Patio de entrada (propuesta 2)', 'balcony', { openEdges: [0, 1, 2, 3], railing: 'celosia' });
+  room(g, rect2(0, 16.6, 2.4, 22), 'Jardín lateral (propuesta 2)', 'balcony', { openEdges: [0, 1, 2, 3], railing: 'celosia' });
+  // Stair along the services, rising towards the street; it arrives on the landing in front of the bedrooms (d 7).
+  room(g, rect2(3.5, 7.0, 4.6, 10.6), 'Escalera (propuesta 2)', 'stairs', { up: 'n', glass: true });
+
+  // Upper floor: the wooden box over the parking with the two bedrooms, the landing and the terrace over services.
+  const box = wall2(t, [0, 0], [7, 0], 0.2);
+  opening(t, 'window', box, 0.9, { ...high, width: 0.8 }); // baño 1
+  opening(t, 'window', box, 2.65, { width: 1.4, sill: 0.6, height: 1.6 }); // habitación 1
+  opening(t, 'window', box, 4.35, { width: 1.4, sill: 0.6, height: 1.6 }); // habitación 2
+  opening(t, 'window', box, 6.1, { ...high, width: 0.8 }); // baño 2
+  wall2(t, [0, 0], [0, 6], 0.2);
+  wall2(t, [7, 0], [7, 6], 0.2);
+  const boxBack = wall2(t, [0, 6], [7, 6], 0.2);
+  opening(t, 'window', boxBack, 1.2, { width: 1.2 }); // habitación 1 → patio
+  opening(t, 'door', boxBack, 2.9, { width: 0.8 }); // habitación 1
+  opening(t, 'door', boxBack, 4.0, { width: 0.8 }); // habitación 2
+  opening(t, 'window', boxBack, 6.0, { width: 1.0 }); // habitación 2 → terraza
+  wall2(t, [3.5, 0], [3.5, 6]);
+  opening(t, 'door', wall2(t, [1.8, 0], [1.8, 2.2]), 1.6, { width: 0.7 });
+  wall2(t, [0, 2.2], [1.8, 2.2]);
+  opening(t, 'door', wall2(t, [5.2, 0], [5.2, 2.2]), 1.6, { width: 0.7 });
+  wall2(t, [5.2, 2.2], [7, 2.2]);
+  room(t, poly2([0, 2.2], [1.8, 2.2], [1.8, 0], [3.5, 0], [3.5, 6], [0, 6]), 'Habitación 1 (propuesta 2)');
+  room(t, rect2(0, 0, 1.8, 2.2), 'Baño habitación 1 (propuesta 2)');
+  room(t, poly2([3.5, 0], [5.2, 0], [5.2, 2.2], [7, 2.2], [7, 6], [3.5, 6]), 'Habitación 2 (propuesta 2)');
+  room(t, rect2(5.2, 0, 7, 2.2), 'Baño habitación 2 (propuesta 2)');
+  // Landing + terrace: open at the bedrooms' wall (edge 0), the party wall (1), the living space's wall (2) and where
+  // the stair arrives (edge 4); glass over the patio elsewhere.
+  room(t, poly2([2.4, 6], [7, 6], [7, 10.6], [4.6, 10.6], [4.6, 7], [3.5, 7], [2.4, 7]), 'Rooftop (propuesta 2)', 'balcony',
+    { openEdges: [0, 1, 2, 4], railing: 'vidrio', floorMaterial: 'madera' });
+  // The living space's double height, with high windows over the patio and the side garden.
+  opening(t, 'window', wall2(t, [0, 10.6], [7, 10.6], 0.2), 2.2, { width: 3.4, sill: 0.6, height: 1.4 });
+  wall2(t, [0, 10.6], [0, 16.6], 0.2);
+  wall2(t, [7, 10.6], [7, 16.6], 0.2);
+  opening(t, 'window', wall2(t, [0, 16.6], [7, 16.6], 0.2), 3.5, { width: 4.0, sill: 0.6, height: 1.4 });
+  ops.setRoofHeight(p, t, room(t, rect2(0, 10.6, 7, 16.6), 'Techo del monoambiente (propuesta 2)', 'roof'), 2.6);
+  ops.setRoofHeight(p, t, room(t, rect2(0, 0, 7, 6), 'Techo del volumen (propuesta 2)', 'roof'), 2.6);
+  ops.setRoofHeight(p, t, room(t, rect2(2.4, 16.6, 7, 22), 'Cubierta de la suite (propuesta 2)', 'roof'), 0.001);
+
   return serializeProject(p);
 }, [RIGHT, TOTAL]);
 await browser.close();
@@ -386,11 +477,15 @@ for (const w of ground.walls) {
 // Casa de 7 m: sand inside; the street face in wood (as the first house's cube), the upper box in slate.
 for (const floor of [ground, rooftop]) {
   for (const w of floor.walls.filter(inBlock2)) {
-    const front = near(w.a.y, 25.8) && near(w.b.y, 25.8);
+    // The street face: proposal 1's monoambiente front, proposal 2's box over the parking.
+    const front = w.a.x > 64.9 ? near(w.a.y, 25.8) && near(w.b.y, 25.8) : floor === rooftop && near(w.a.y, 32) && near(w.b.y, 32);
+    const box2 = floor === rooftop && w.a.x < 65.1 && w.a.y > 25.9; // proposal 2's wooden box
+    const encl = floor.rooms.filter((r) => r.kind === 'room');
     const face = (side) => {
       const q = faceOf(w, side);
-      if (enclosed.some((r) => pointInPolygon(q, r.points)) || (floor === rooftop && q.x > 65.6 && q.x < 71.9 && q.y > 19.6 && q.y < 25.8)) return { finish: 'pintura', color: PALETA.arena };
-      if (front) return { finish: 'madera' };
+      if ([...enclosed, ...encl].some((r) => pointInPolygon(q, r.points))) return { finish: 'pintura', color: PALETA.arena };
+      if ((floor === rooftop && q.x > 65.6 && q.x < 71.9 && q.y > 19.6 && q.y < 25.8) || (floor === rooftop && q.x > 58 && q.x < 65 && q.y > 15.4 && q.y < 21.4)) return { finish: 'pintura', color: PALETA.arena };
+      if (front || box2) return { finish: 'madera' };
       return floor === rooftop ? { finish: 'pintura', color: PALETA.pizarra } : { finish: 'pintura', color: PALETA.arena };
     };
     w.sides = { left: face(1), right: face(-1) };
@@ -410,6 +505,8 @@ const ROOFS = {
   'Techo del cubo': PALETA.pizarra, 'Cubierta de la suite': PALETA.arena, 'Cubierta de la cocina': PALETA.arena,
   'Cubierta del estudio': PALETA.arena, 'Cubierta de servicios': PALETA.arena,
   'Techo del monoambiente': PALETA.pizarra, 'Cubierta de servicios (casa 7 m)': PALETA.arena,
+  'Techo del monoambiente (propuesta 2)': PALETA.pizarra, 'Techo del volumen (propuesta 2)': PALETA.pizarra,
+  'Cubierta de la suite (propuesta 2)': PALETA.arena,
 };
 for (const [name, edgeColor] of Object.entries(ROOFS)) Object.assign(rooftop.rooms.find((r) => r.name === name), { floorMaterial: 'concreto', edgeColor });
 for (const r of rooftop.rooms) if (r.name.startsWith('Pórtico')) Object.assign(r, { floorMaterial: 'madera', edgeColor: BLANCO });
@@ -439,7 +536,10 @@ const EXTERIOR = [
   ['Andén lateral', prect(30, 0, 31.5, TOTAL), 'concreto'],
   ['Calle lateral', prect(31.5, 0, 38.5, TOTAL), 'asfalto'],
   ['Andén lateral (manzana vecina)', prect(38.5, 0, 40, TOTAL), 'concreto'],
-  ['Lote vecino (por diseñar)', prect(40, 0, 65, TOTAL), 'tierra'],
+  ['Lote vecino (por diseñar)', prect(40, 0, 58, TOTAL), 'tierra'],
+  ['Parqueadero (propuesta 2)', prect(58 + 2.4, 26, 65, TOTAL), 'porcelanato'],
+  ['Acceso cubierto (propuesta 2)', prect(58, 26, 58 + 2.4, TOTAL), 'piedra'],
+  ['Patio trasero (propuesta 2)', prect(58, 0, 65, 10), 'cesped'],
   ['Parqueadero (casa 7 m)', [lot7(2.25, 0), lot7(7, 0), lot7(7, 6.2), lot7(2.25, 6.2)], 'porcelanato'],
   ['Acceso peatonal (casa 7 m)', [lot7(0, 0), lot7(2.25, 0), lot7(2.25, 6.2), lot7(0, 6.2)], 'piedra'],
   ['Patio trasero (casa 7 m)', [lot7(0, 22.7), lot7(7, 22.7), lot7(7, 32), lot7(0, 32)], 'cesped'],
@@ -720,8 +820,7 @@ onWallP(r, 'n', 'ducha', A(6.4), { width: 0.8, depth: 0.7 });
 onWallP(r, 'w', 'sanitario', D(22.2));
 onWallP(r, 'e', 'lavamanos', D(21.5), { color: caramelo });
 
-// Side path and back garden: plants along the celosía, a small pool with loungers, a tree.
-for (const d of [8.0, 11.0, 18.0, 21.0]) place('matera', A(0.3), D(d), 0, { color: oliva });
+// Back garden: a small pool with loungers, a tree (the 0,6 m side path is left clear).
 place('piscina', A(4.2), D(27.4), 90, { width: 5.0, depth: 2.4, height: 0.45, color: arena });
 for (const d of [25.4, 26.6]) place('asoleadora', A(1.4), D(d), 90, { color: arena });
 place('arbol-pequeno', A(1.4), D(30.6));
@@ -743,6 +842,90 @@ place('sillon-exterior', A(5.9), D(19.2), 270, { color: pizarra });
 place('parrilla', A(2.2), D(22.1), 0);
 place('bar', A(4.8), D(22.1), 0, { color: caramelo });
 for (const d of [17.0]) place('matera-alta', A(6.4), D(d), 0, { color: oliva });
+
+// ---------- Propuesta 2 furniture (same sides as proposal 1: s = street, n = back, w = left, e = party wall) ----------
+const A2 = (a) => 58 + a;
+target = ground;
+r = R('Monoambiente (propuesta 2)');
+onWallP(r, 'e', 'nevera', D(11.15));
+onWallP(r, 'e', 'meson', D(12.1), { color: arena });
+onWallP(r, 'e', 'estufa', D(13.0));
+onWallP(r, 'e', 'lavaplatos', D(13.7), { color: arena });
+onWallP(r, 'e', 'alacena', D(12.6), { width: 1.8, color: oliva, elevation: 1.5 });
+place('mesa-comedor-6', A2(3.5), D(12.6), 90, { color: caramelo });
+for (const d of [12.05, 12.6, 13.15]) {
+  place('silla-comedor', A2(2.65), D(d), 270, { color: pizarra });
+  place('silla-comedor', A2(4.35), D(d), 90, { color: pizarra });
+}
+onWallP(r, 'e', 'mueble-tv', D(15.5), { width: 1.8, color: oliva });
+onWallP(r, 'e', 'televisor-70', D(15.5), { gap: 0.02 });
+place('sofa-l', A2(2.9), D(15.15), 270, { color: taupe });
+place('alfombra', A2(4.5), D(15.3), 90, { width: 2.2, depth: 1.6, color: arena });
+place('mesa-centro', A2(4.5), D(15.3), 90, { color: caramelo });
+place('matera-alta', A2(0.45), D(11.1), 0, { color: oliva });
+place('lampara-pie', A2(0.5), D(16.1));
+
+r = R('Habitación principal (propuesta 2)');
+onWallP(r, 'e', 'cama-king', D(18.3), { color: arena });
+onWallP(r, 'e', 'cuadro-abstracto', D(18.3), { width: 1.2, height: 0.6, elevation: 1.3, color: caramelo });
+place('alfombra', A2(4.0), D(18.3), 90, { width: 1.8, depth: 1.0, color: taupe });
+place('sillon', A2(2.95), D(17.3), 270, { color: pizarra });
+r = R('Vestier (propuesta 2)');
+onWallP(r, 'n', 'vestier-colgar', A2(3.1));
+onWallP(r, 'w', 'vestier-cajones', D(20.6));
+r = R('Baño principal (propuesta 2)');
+onWallP(r, 'n', 'ducha', A2(6.45));
+onWallP(r, 'e', 'sanitario', D(20.4));
+onWallP(r, 's', 'lavamanos', A2(5.4), { color: caramelo });
+
+r = R('Lavado (propuesta 2)');
+onWallP(r, 'e', 'lavadora', D(6.4));
+onWallP(r, 'e', 'lavadero', D(7.1));
+r = R('Alacena (propuesta 2)');
+onWallP(r, 'e', 'estanteria', D(8.3), { width: 1.2, color: caramelo });
+r = R('Baño social (propuesta 2)');
+onWallP(r, 'e', 'sanitario', D(9.6));
+onWallP(r, 'w', 'lavamanos', D(9.6));
+onWallP(r, 'w', 'espejo', D(9.6), { width: 0.5 });
+
+// Entry patio and side garden: a tree, planters, a bench; the back garden with a small pool.
+place('arbol-pequeno', A2(1.7), D(8.4));
+place('banca', A2(0.35), D(9.0), 270, { width: 1.2, color: caramelo });
+place('jardinera', A2(2.2), D(10.2), 0, { width: 1.6, color: oliva });
+place('arbol-pequeno', A2(1.2), D(20.5));
+place('arbusto', A2(0.5), D(17.3));
+place('piscina', A2(3.5), D(26.0), 0, { width: 5.0, depth: 2.4, height: 0.45, color: arena });
+place('asoleadora', A2(1.4), D(28.6), 0, { color: arena });
+place('asoleadora', A2(2.6), D(28.6), 0, { color: arena });
+place('arbol-pequeno', A2(5.6), D(30.5));
+// Under the box: the car, planters along the covered entry.
+place('carro', A2(4.7), D(3.0), 90, { color: '#6b7178' });
+place('jardinera', A2(0.45), D(2.4), 90, { width: 1.6, color: pizarra });
+place('tira-led', A2(3.5), D(0.4), 0, { width: 6.4, elevation: 2.4, color: '#ffd9a0' });
+
+// Upper floor: bedrooms in the box, the terrace with a BBQ.
+target = rooftop;
+const RT = (name) => interior(rooftop, rooftop.rooms.find((x) => x.name === name));
+for (const [name, side, bedD, closetSide, deskA, bath, bathA] of [
+  ['Habitación 1 (propuesta 2)', 'w', 4.1, 'e', 2.65, 'Baño habitación 1 (propuesta 2)', 0],
+  ['Habitación 2 (propuesta 2)', 'e', 4.1, 'w', 4.35, 'Baño habitación 2 (propuesta 2)', 5.2],
+]) {
+  r = RT(name);
+  onWallP(r, side, 'cama-doble', D(bedD), { color: arena });
+  onWallP(r, side, 'cuadro-paisaje', D(bedD), { width: 1.0, height: 0.5, elevation: 1.3, color: caramelo });
+  onWallP(r, closetSide, 'closet', D(3.1), { color: taupe });
+  onWallP(r, 's', 'escritorio', A2(deskA), { width: 1.2, color: caramelo });
+  place('silla-oficina', A2(deskA), D(1.15), 180);
+  const b = RT(bath);
+  onWallP(b, 's', 'ducha', A2(bathA + 0.5));
+  onWallP(b, bathA ? 'e' : 'w', 'sanitario', D(1.65));
+  onWallP(b, 'n', 'lavamanos', A2(bathA + (bathA ? 0.55 : 1.25)));
+}
+r = RT('Rooftop (propuesta 2)');
+onWallP(r, 'e', 'parrilla', D(9.9));
+place('mesa-exterior', A2(5.6), D(7.9), 0, { color: caramelo });
+place('sillon-exterior', A2(5.6), D(6.9), 0, { color: pizarra });
+place('matera-alta', A2(4.9), D(10.2), 0, { color: oliva });
 
 // ---------- Check: nothing may sit inside a wall; a piece a few centimetres into one is pushed out to its face ----------
 const FREE = /alfombra|cuadro|tira-led|espejo|televisor|cortina|jardin-vertical|arbol|pergola|porton/;
