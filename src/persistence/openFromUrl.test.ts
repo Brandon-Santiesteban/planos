@@ -79,3 +79,13 @@ test('paths outside the app are refused', async () => {
   expect(r).toEqual({ error: 'No se pudo abrir «https://otro-sitio.com/x.json»' });
   expect(calls).toEqual([]);
 });
+
+test('a copy saved before links followed their file is kept the first time', async () => {
+  const lib = createLibrary(memoryKV());
+  const edited = structuredClone(example);
+  addWall(edited, edited.floors[0].id, { x: 0, y: 0 }, { x: 4, y: 0 });
+  await lib.save(edited);
+  const r = await projectFromUrl('?p=casa', fetchText, lib);
+  expect(r && 'project' in r && r.project.floors[0].walls).toHaveLength(1);
+  expect(await lib.origin(example.id)).toMatchObject({ file: 'ejemplos/casa.casa.json' });
+});

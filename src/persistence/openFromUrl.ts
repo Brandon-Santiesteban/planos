@@ -52,6 +52,11 @@ export async function adoptFile(
   const fileHash = hashText(text);
   const [saved, origin] = await Promise.all([lib.load(fresh.id), lib.origin(fresh.id)]);
   if (saved && origin?.fileHash === fileHash) return { project: saved };
+  if (saved && !origin) {
+    // Opened before links followed their file: keep the user's copy and start following the file from now on.
+    await lib.setOrigin(fresh.id, { file, fileHash, projectHash: hashProject(fresh) });
+    return { project: saved };
+  }
 
   let notice: string | undefined;
   if (saved && hashProject(saved) !== (origin?.projectHash ?? hashProject(fresh))) {
