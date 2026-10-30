@@ -152,6 +152,45 @@ const cabinet = (drawers: number, handle = METAL): Builder => ({ w, d, h, c }) =
   );
 };
 
+/**
+ * Chest of drawers: columns of drawers by width (about 70 cm each) and rows by height (about 24 cm each), on short
+ * legs; with `mirrorAbove` a framed mirror stands on its top, against the back.
+ */
+const chest: Builder = ({ w, d, h, c, item }) => {
+  const body = item?.mirrorAbove ? Math.min(item.mirrorAbove, h) : h;
+  const leg = Math.min(0.1, body * 0.12);
+  const box = body - leg;
+  const cols = Math.max(1, Math.min(3, Math.round(w / 0.7)));
+  const rows = Math.max(2, Math.round((box - 0.04) / 0.24));
+  const cw = (w - 0.03) / cols;
+  const rh = (box - 0.05) / rows;
+  const mh = h - body - 0.04;
+  return (
+    <>
+      {taperedLegs(w, d, leg, WOOD_DARK, 0.05, 0.018)}
+      <RB p={[0, leg + box / 2, 0]} s={[w, box, d]} c={c} rad={0.012} r={0.7} />
+      <RB p={[0, body - 0.012, 0]} s={[w + 0.02, 0.024, d + 0.015]} c={shade(c, 0.92)} rad={0.008} r={0.6} />
+      {Array.from({ length: cols * rows }, (_, k) => {
+        const i = k % cols;
+        const j = Math.floor(k / cols);
+        const x = -w / 2 + 0.015 + cw * (i + 0.5);
+        const y = leg + 0.02 + rh * (j + 0.5);
+        return (
+          <group key={k}>
+            <RB p={[x, y, d / 2 + 0.002]} s={[cw - 0.012, rh - 0.012, 0.012]} c={shade(c, 1.05)} rad={0.004} r={0.65} />
+            <B p={[x, y, d / 2 + 0.014]} s={[Math.min(0.18, cw * 0.35), 0.012, 0.012]} c={METAL} m={0.7} r={0.35} />
+          </group>
+        );
+      })}
+      {mh > 0.2 && (
+        <group position={[0, body, -d / 2 + 0.04]}>
+          {mirror({ w: Math.min(w * 0.8, 1), d: 0.03, h: mh, c: '#dfe7ee' })}
+        </group>
+      )}
+    </>
+  );
+};
+
 const doorsBox: Builder = ({ w, d, h, c }) => {
   const n = Math.max(1, Math.round(w / 0.55));
   const dw = w / n;
@@ -1497,7 +1536,7 @@ const tree: Builder = ({ w, d, h, c, item, seed = 1 }) => {
 const rug: Builder = ({ w, d, h, c }) => <B p={[0, Math.max(h, 0.008) / 2, 0]} s={[w, Math.max(h, 0.008), d]} c={c} r={1} />;
 
 const BUILDERS: Record<FurnitureModel, Builder> = {
-  cama: bed, mesaNoche: cabinet(2), closet: doorsBox, comoda: cabinet(3), escritorio: desk, escritorioL: deskL,
+  cama: bed, mesaNoche: cabinet(2), closet: doorsBox, comoda: chest, escritorio: desk, escritorioL: deskL,
   sillaOficina: officeChair(false), sillaGamer: officeChair(true), monitor, torre: tower,
   tablero: panel('#c9ccd0', { c: '#fbfbf9', r: 0.2, m: 0 }), estanteria: shelves, lampara: lamp, sofa, sofaL,
   sillon: sofa, mesaCentro: coffeeTable, muebleTV: cabinet(1), televisor: tv, alfombra: rug, mesa: table, silla: chair,

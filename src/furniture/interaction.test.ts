@@ -1,12 +1,12 @@
 import { createEmptyProject } from '../model/defaults';
 import { addFurniture, furnitureFromCatalog } from '../model/furnitureOps';
-import { addOpening, addRoom, addWall } from '../model/ops';
+import { addFloor, addOpening, addRoom, addWall } from '../model/ops';
 import { hitTest } from '../editor2d/hitTest';
 import { createSelectTool } from '../editor2d/tools/selectTool';
 import type { ToolContext } from '../editor2d/tools';
 import type { View } from '../editor2d/viewport';
 import { useEditor } from '../store/editorStore';
-import { duplicateSelectedFurniture } from './actions';
+import { copySelectedFurniture, duplicateSelectedFurniture, pasteFurniture } from './actions';
 
 const view: View = { centre: { x: 0, y: 0 }, pxPerMetre: 100 };
 const ctx = (over: Partial<ToolContext> = {}): ToolContext => ({ state: useEditor.getState(), view, altKey: false, shiftKey: false, ...over });
@@ -97,6 +97,26 @@ test('Ctrl+D duplicates the selected piece and selects the copy', () => {
   expect(s().selection).toEqual({ kind: 'furniture', id: pieces()[1].id });
   s().select(null);
   expect(duplicateSelectedFurniture()).toBe(false);
+});
+
+test('Ctrl+C then Ctrl+V pastes copies 30 cm apart each time, and on another floor in the same spot', () => {
+  s().select({ kind: 'furniture', id: deskId });
+  expect(copySelectedFurniture()).toBe(true);
+  s().select(null);
+  expect(pasteFurniture()).toBe(true);
+  expect(pasteFurniture()).toBe(true);
+  expect(pieces().map((p) => [p.x, p.y])).toEqual([[1, 1.5], [1.3, 1.8], [1.6, 2.1]]);
+  expect(s().selection).toEqual({ kind: 'furniture', id: pieces()[2].id });
+  let f2 = '';
+  s().apply((d) => void (f2 = addFloor(d)));
+  s().setActiveFloor(f2);
+  pasteFurniture();
+  expect(s().project.floors[1].furniture.map((p) => [p.x, p.y])).toEqual([[1, 1.5]]);
+});
+
+test('Ctrl+C with no piece selected copies nothing', () => {
+  s().select(null);
+  expect(copySelectedFurniture()).toBe(false);
 });
 
 test('a furniture selection survives undo only while the piece exists', () => {

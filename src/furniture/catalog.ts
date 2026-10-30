@@ -50,6 +50,8 @@ export interface CatalogItem {
   flowers?: string;
   /** walk-in dressing modules: hanging rail, shelves, shoe rack or drawers */
   dressing?: Dressing;
+  /** chests of drawers: a framed mirror standing on top, the chest itself this tall (the rest is the mirror) */
+  mirrorAbove?: number;
 }
 
 const item = (
@@ -81,6 +83,9 @@ export const CATALOG: CatalogItem[] = [
   item('vestier-zapatos', 'Vestier: zapatero y bolsos', 'Dormitorio', 'vestier', [0.7, 0.55, 2.4], NOGAL_CLARO, { dressing: 'zapatos' }),
   item('vestier-cajones', 'Vestier: cajonera con repisas', 'Dormitorio', 'vestier', [1.0, 0.55, 2.4], NOGAL_CLARO, { dressing: 'cajones' }),
   item('comoda', 'Cómoda', 'Dormitorio', 'comoda', [1.0, 0.45, 0.85], ROBLE),
+  item('comoda-6', 'Cómoda de 6 cajones', 'Dormitorio', 'comoda', [1.5, 0.48, 0.85], NOGAL_CLARO),
+  item('semanario', 'Semanario (cómoda alta)', 'Dormitorio', 'comoda', [0.6, 0.45, 1.3], ROBLE),
+  item('comoda-espejo', 'Cómoda con espejo', 'Dormitorio', 'comoda', [1.2, 0.45, 1.75], BLANCO, { mirrorAbove: 0.85 }),
   // Sala
   item('sofa-3', 'Sofá 3 puestos', 'Sala', 'sofa', [2.1, 0.9, 0.85], GRIS),
   item('sofa-l', 'Sofá en L', 'Sala', 'sofaL', [2.6, 1.6, 0.85], GRIS),

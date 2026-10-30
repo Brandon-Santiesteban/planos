@@ -7,8 +7,8 @@ const CLOSE_DELAY = 350;
 const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 /**
- * The guide's single-choice dropdown (never the browser `<select>`): opens on hover, click or keyboard; closes
- * 350 ms after the mouse leaves, on a click outside, with Esc or on choosing. Search box on top; no option creation.
+ * The guide's single-choice dropdown (never the browser `<select>`): opens on click or keyboard, never just by
+ * passing the mouse over it (the user asked); closes 350 ms after the mouse leaves, on a click outside, with Esc or on choosing. Search box on top; no option creation.
  */
 export default function Dropdown<T extends string>({ label, value, options, onChange }: {
   label: string;
@@ -106,7 +106,7 @@ export default function Dropdown<T extends string>({ label, value, options, onCh
   };
 
   return (
-    <div className={`desplegable${open ? ' abierta' : ''}`} ref={rootRef} onMouseEnter={() => show(false)} onMouseLeave={onLeave}>
+    <div className={`desplegable${open ? ' abierta' : ''}`} ref={rootRef} onMouseEnter={cancelClose} onMouseLeave={onLeave}>
       <button
         ref={fieldRef}
         type="button"
@@ -116,8 +116,7 @@ export default function Dropdown<T extends string>({ label, value, options, onCh
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={`${id}-lista`}
-        // Opened by hover, a click moves into the search; opened by click, it closes.
-        onClick={() => (open && focusSearch.current ? close() : show(true))}
+        onClick={() => (open ? close() : show(true))}
         onKeyDown={onFieldKey}
       >
         <span className="desplegable-valor">{current?.label ?? ''}</span>

@@ -85,6 +85,18 @@ const doors = (n?: number): Builder => ({ w, d }) => {
   );
 };
 
+/** Chest of drawers seen from above: its drawer columns, and the mirror on top along the back. */
+const chest: Builder = ({ w, d, item }) => {
+  const cols = Math.max(1, Math.min(3, Math.round(w / 0.7)));
+  return (
+    <>
+      {line(-w / 2, d / 2 - 0.03, w / 2, d / 2 - 0.03)}
+      {range(cols - 1).map((i) => line(-w / 2 + ((i + 1) * w) / cols, -d / 2, -w / 2 + ((i + 1) * w) / cols, d / 2, i))}
+      {item?.mirrorAbove && line(-Math.min(w * 0.4, 0.5), -d / 2 + 0.05, Math.min(w * 0.4, 0.5), -d / 2 + 0.05, 'espejo')}
+    </>
+  );
+};
+
 const closet: Builder = ({ w, d }) => (
   <>
     {line(-w / 2, 0, w / 2, 0)}
@@ -309,7 +321,7 @@ const shelfDots: Builder = ({ w, d }) => (
 
 const BUILDERS: Record<FurnitureModel, Builder> = {
   piscina: pool, asoleadora: lounger, sombrilla: umbrella, pergola, bar, parrilla: grill, jardinera: planter,
-  cama: bed, mesaNoche: doors(1), closet, comoda: doors(), escritorio: counter, escritorioL: () => <></>,
+  cama: bed, mesaNoche: doors(1), closet, comoda: chest, escritorio: counter, escritorioL: () => <></>,
   sillaOficina: roundChair, sillaGamer: roundChair, monitor, torre: tower, tablero: flat, estanteria: shelves,
   lampara: lamp, sofa, sofaL, sillon: sofa, mesaCentro: box(0.05), muebleTV: doors(), televisor: flat, alfombra: rug,
   mesa: table, silla: chair, meson: counter, estufa: stove, nevera: fridge, lavaplatos: kitchenSink, alacena: doors(),

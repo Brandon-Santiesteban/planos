@@ -1,10 +1,10 @@
 // Store-level furniture actions shared by the 2D tools, the 3D view, the panels and the shortcuts.
 import { snapToGrid } from '../geometry/snap';
 import {
-  deleteFurniture, dropElevation, duplicateFurniture, isStacked, piecesOnTop, rotateFurniture, snapFlushToWall,
+  addFurniture, deleteFurniture, dropElevation, duplicateFurniture, isStacked, piecesOnTop, rotateFurniture, snapFlushToWall,
   updateFurniture,
 } from '../model/furnitureOps';
-import type { Vec2 } from '../model/types';
+import type { Furniture, Vec2 } from '../model/types';
 import { useEditor } from '../store/editorStore';
 import { notify } from '../ui/toasts';
 
@@ -88,6 +88,43 @@ export function duplicateSelectedFurniture(): boolean {
   });
   if (copy) select({ kind: 'furniture', id: copy });
   return copy !== null;
+}
+
+/** Pieces copied with Ctrl+C (kept as they were then), the floor they came from and how many times pasted. */
+let clipboard: { pieces: Furniture[]; floorId: string; pasted: number } | null = null;
+
+/** Ctrl+C: remembers the selected piece, or the pieces of a box selection. */
+export function copySelectedFurniture(): boolean {
+  const { project, activeFloorId, selection, group } = useEditor.getState();
+  const floor = project.floors.find((f) => f.id === activeFloorId);
+  const ids = new Set([selection, ...group].filter((x) => x?.kind === 'furniture').map((x) => x!.id));
+  const pieces = floor?.furniture.filter((f) => ids.has(f.id)) ?? [];
+  if (!pieces.length) return false;
+  clipboard = { pieces: structuredClone(pieces), floorId: activeFloorId, pasted: 0 };
+  notify({ kind: 'ok', text: pieces.length === 1 ? 'Mueble copiado: Ctrl+V para pegarlo' : `${pieces.length} muebles copiados: Ctrl+V para pegarlos` });
+  return true;
+}
+
+/**
+ * Ctrl+V: pastes a copy of what was copied, 30 cm further down and right each time on the same floor (so copies
+ * don't pile up), or in the same spot on another floor. The copies end up selected.
+ */
+export function pasteFurniture(): boolean {
+  if (!clipboard) return false;
+  const clip = clipboard;
+  const { apply, activeFloorId, select, selectGroup } = useEditor.getState();
+  const step = activeFloorId === clip.floorId ? 0.3 * (clip.pasted + 1) : 0;
+  const ids: string[] = [];
+  apply((d) => {
+    for (const { id: _old, ...rest } of clip.pieces) {
+      void _old;
+      ids.push(addFurniture(d, activeFloorId, { ...structuredClone(rest), x: rest.x + step, y: rest.y + step }));
+    }
+  });
+  clip.pasted++;
+  if (ids.length === 1) select({ kind: 'furniture', id: ids[0] });
+  else selectGroup(ids.map((id) => ({ kind: 'furniture' as const, id })));
+  return true;
 }
 
 /** Deletes the selected piece right away and offers Deshacer. */

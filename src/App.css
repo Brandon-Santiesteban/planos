@@ -221,7 +221,7 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 .grid-minor { stroke: color-mix(in srgb, var(--linea) 55%, transparent); stroke-width: 1px; vector-effect: non-scaling-stroke; }
 .room { fill: color-mix(in srgb, var(--acento) 6%, transparent); stroke: color-mix(in srgb, var(--acento) 30%, transparent); stroke-width: 1px; vector-effect: non-scaling-stroke; }
 .room.balcony { fill: color-mix(in srgb, var(--t3) 12%, transparent); stroke: var(--t3); stroke-dasharray: 5 4; }
-.room.selected { fill: color-mix(in srgb, var(--acento) 16%, transparent); stroke: var(--acento); stroke-width: 1.5px; }
+.room.selected { stroke: var(--acento); stroke-width: 2.5px; }
 .room-name { fill: var(--tinta); font-weight: 500; pointer-events: none; }
 .room-area { fill: var(--tenue); pointer-events: none; font-variant-numeric: tabular-nums; }
 .wall { fill: var(--tinta); stroke: var(--tinta); stroke-width: .5px; vector-effect: non-scaling-stroke; }
@@ -336,7 +336,7 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 .scene-toggle .carril { min-width: 230px; }
 .scene-toggle .carril button { height: 28px; }
 .room.roof { fill: none; stroke: var(--tenue); stroke-dasharray: 2 4; stroke-width: 1.5px; }
-.room.roof.selected { stroke: var(--acento); fill: color-mix(in srgb, var(--acento) 6%, transparent); }
+.room.roof.selected { stroke: var(--acento); }
 
 /* ---- Exportar planos (src/export) ---- */
 .ventana-exportar { max-width: 520px; }

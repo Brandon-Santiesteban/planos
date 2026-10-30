@@ -157,7 +157,7 @@ export default function FurnitureProps({ floor, id }: { floor: Floor; id: string
         </button>
       </div>
       <div className="acciones">
-        <button className="btn btn-sec" title="Ctrl+D" onClick={() => duplicateSelectedFurniture()}><Icon name="copy" size={16} />Duplicar</button>
+        <button className="btn btn-sec" title="Ctrl+D, o Ctrl+C y Ctrl+V" onClick={() => duplicateSelectedFurniture()}><Icon name="copy" size={16} />Duplicar</button>
         <button className="btn btn-sec" onClick={() => removeSelectedFurniture()}><Icon name="trash" size={16} />Eliminar</button>
       </div>
     </>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react';
+import { Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { add, dist, lerp, normalize, scale, sub } from '../geometry/vec';
 import { wallLength } from '../geometry/walls';
@@ -156,6 +157,16 @@ function Railing({ a, b, type, color, ground }: { a: Vec2; b: Vec2; type: Railin
 /** Thickness of a solid (finished) roof slab. */
 const SOLID_ROOF = 0.3;
 
+/** A selected room keeps its own floor; only its edge is marked, just above the slab. */
+function SelectionOutline({ room, y }: { room: Room; y: number }) {
+  const pal = usePalette();
+  const points = useMemo(
+    () => [...room.points, room.points[0]].map((p) => new THREE.Vector3(p.x, y, p.y)),
+    [room.points, y],
+  );
+  return <Line points={points} color={pal.selected} lineWidth={3} />;
+}
+
 function RoomSlab({ room, walls, selected, floorHeight, ground }: { room: Room; walls: Wall[]; selected: boolean; floorHeight: number; ground: boolean }) {
   const pal = usePalette();
   const geometry = useMemo(() => {
@@ -164,28 +175,35 @@ function RoomSlab({ room, walls, selected, floorHeight, ground }: { room: Room; 
     return new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false });
   }, [room.points, room.kind, room.floorMaterial]);
   if (room.kind === 'stairs') return <StairsMesh room={room} rise={floorHeight} selected={selected} />;
-  if (room.kind === 'roof' && room.floorMaterial && !selected) {
+  const outline = selected ? <SelectionOutline room={room} y={room.kind === 'roof' ? (room.height ?? floorHeight) + 0.07 : 0.02} /> : null;
+  if (room.kind === 'roof' && room.floorMaterial) {
     // A solid roof: an opaque slab with its finish on top and a fascia of its own colour, hanging down from the
     // same top level as the light sheet below.
     const materials = [floorSurfaceMaterial(room.floorMaterial), plainMaterial(room.edgeColor ?? '#e8ebef', 0.8)];
     return (
-      <mesh geometry={geometry} material={materials} rotation={[Math.PI / 2, 0, 0]} position={[0, (room.height ?? floorHeight) + 0.06, 0]} castShadow receiveShadow />
+      <group>
+        <mesh geometry={geometry} material={materials} rotation={[Math.PI / 2, 0, 0]} position={[0, (room.height ?? floorHeight) + 0.06, 0]} castShadow receiveShadow />
+        {outline}
+      </group>
     );
   }
   if (room.kind === 'roof') {
     // A covering only: a thin light sheet at its own height, slightly see-through.
     return (
-      <mesh geometry={geometry} rotation={[Math.PI / 2, 0, 0]} position={[0, (room.height ?? floorHeight) + 0.06, 0]} castShadow receiveShadow>
-        <meshStandardMaterial color={selected ? pal.selected : '#e8ebef'} roughness={0.6} transparent opacity={0.85} side={THREE.DoubleSide} />
-      </mesh>
+      <group>
+        <mesh geometry={geometry} rotation={[Math.PI / 2, 0, 0]} position={[0, (room.height ?? floorHeight) + 0.06, 0]} castShadow receiveShadow>
+          <meshStandardMaterial color="#e8ebef" roughness={0.6} transparent opacity={0.85} side={THREE.DoubleSide} />
+        </mesh>
+        {outline}
+      </group>
     );
   }
-  const color = selected ? pal.selected : room.kind === 'balcony' ? pal.balcony : pal.room;
+  const color = room.kind === 'balcony' ? pal.balcony : pal.room;
   // Open ground sits a little lower than the house's floors, so a room drawn over it (e.g. a sketch on an empty
   // lot) does not flicker against it (z-fighting).
   const y = room.kind === 'exterior' ? -0.012 : 0.001;
   // The slab's top UVs are plan coordinates in metres, so floor textures keep their real size.
-  const surface = !selected && room.floorMaterial ? floorSurfaceMaterial(room.floorMaterial) : null;
+  const surface = room.floorMaterial ? floorSurfaceMaterial(room.floorMaterial) : null;
   return (
     <group>
       {/* Shape is in plan XY; +90° about X maps plan y to world z and extrudes downwards. */}
@@ -200,6 +218,7 @@ function RoomSlab({ room, walls, selected, floorHeight, ground }: { room: Room; 
       <mesh geometry={geometry} rotation={[Math.PI / 2, 0, 0]} position={[0, y, 0]}>
         <meshStandardMaterial color="#efebe4" roughness={0.9} side={THREE.BackSide} />
       </mesh>
+      {outline}
       {room.kind === 'balcony' &&
         railingEdges(room, walls).map((e) => (
           <Railing key={e.index} a={e.a} b={e.b} type={room.railing} color={room.railingColor} ground={ground} />

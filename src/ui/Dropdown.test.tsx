@@ -37,18 +37,14 @@ test('choosing an option reports it and closes the list', () => {
   expect(screen.queryByRole('listbox')).toBeNull();
 });
 
-test('opens on hover and closes 350 ms after the mouse leaves', () => {
-  vi.useFakeTimers();
+test('passing the mouse over it does not open it', () => {
   const { field } = setup();
   const root = field.closest('.desplegable')!;
   fireEvent.mouseEnter(root);
+  expect(screen.queryByRole('listbox')).toBeNull();
+  fireEvent.click(field);
   expect(screen.getByRole('listbox')).toBeInTheDocument();
-  fireEvent.mouseLeave(root);
-  act(() => void vi.advanceTimersByTime(300));
-  expect(screen.getByRole('listbox')).toBeInTheDocument();
-  fireEvent.mouseEnter(root); // coming back keeps it open
-  fireEvent.mouseLeave(root);
-  act(() => void vi.advanceTimersByTime(350));
+  fireEvent.click(field); // a second click closes it
   expect(screen.queryByRole('listbox')).toBeNull();
 });
 
@@ -74,7 +70,7 @@ test('does not close on mouse leave while typing in the search box', () => {
   vi.useFakeTimers();
   const { field } = setup();
   const root = field.closest('.desplegable')!;
-  fireEvent.mouseEnter(root);
+  fireEvent.click(field);
   const search = screen.getByRole('searchbox');
   search.focus();
   fireEvent.change(search, { target: { value: 'b' } });
