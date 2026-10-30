@@ -6,6 +6,12 @@ import { adoptFile, hashProject, hashText, linkFor } from './openFromUrl';
 
 const POLL_MS = 8000;
 
+/** While a rename writes the file, its change is ours: don't offer it as a «versión nueva». */
+let pausedUntil = 0;
+export const pauseLiveCheck = (ms = 3000) => {
+  pausedUntil = Date.now() + ms;
+};
+
 /** The file the open project comes from, if any (shown in Mis proyectos and used for «Copiar enlace»). */
 export const useLinkedOrigin = create<{ origin: Origin | null }>()(() => ({ origin: null }));
 
@@ -53,10 +59,11 @@ export function startLiveLink({ lib, fetchText }: { lib: Library; fetchText: (pa
   }
 
   async function check() {
-    const { origin } = useLinkedOrigin.getState();
-    if (!origin || checking || stopped) return;
+    if (checking || stopped || Date.now() < pausedUntil) return;
     checking = true;
     try {
+      const origin = await lib.origin(useEditor.getState().project.id);
+      if (!origin) return;
       const text = await fetchText(`/${origin.file}`);
       const fileHash = hashText(text);
       const project = useEditor.getState().project;

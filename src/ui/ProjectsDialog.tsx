@@ -6,8 +6,10 @@ import { library } from '../persistence/appLibrary';
 import type { LibraryEntry } from '../persistence/library';
 import { adoptFile, fetchText, linkFor } from '../persistence/openFromUrl';
 import { parseProject } from '../persistence/projectFile';
+import { renameProject } from '../persistence/rename';
 import { useEditor } from '../store/editorStore';
 import { askConfirm } from './Dialog';
+import { isEditableTarget } from './keys';
 import Icon from './Icon';
 import PlanThumbnail from './PlanThumbnail';
 import { notify } from './toasts';
@@ -70,12 +72,49 @@ function Preview({ image, load, cacheKey }: { image?: string | null; load: () =>
   );
 }
 
+/** Inline name field shown in a card: Enter or «Guardar» renames, Escape or «Cancelar» leaves it as it was. */
+function RenameForm({ name, onSave, onCancel }: { name: string; onSave: (name: string) => Promise<void>; onCancel: () => void }) {
+  const [text, setText] = useState(name);
+  const [busy, setBusy] = useState(false);
+  const save = async () => {
+    const next = text.trim();
+    if (!next || next === name) return onCancel();
+    setBusy(true);
+    try {
+      await onSave(next);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="ficha-renombrar">
+      <input
+        autoFocus
+        aria-label="Nombre del proyecto"
+        value={text}
+        disabled={busy}
+        onFocus={(e) => e.target.select()}
+        onChange={(e) => setText(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') void save();
+          if (e.key === 'Escape') onCancel();
+        }}
+      />
+      <div className="ficha-acciones">
+        <button className="btn btn-chico" onClick={() => void save()} disabled={busy}><Icon name="check" size={16} />Guardar</button>
+        <button className="btn btn-chico" onClick={onCancel} disabled={busy}>Cancelar</button>
+      </div>
+    </div>
+  );
+}
+
 /** "Mis proyectos": the projects Claude prepared (files in the app) and the ones drawn in this browser, as a gallery. */
 export default function ProjectsDialog({ onOpenFile }: { onOpenFile: () => void }) {
   const open = useProjectsDialog((s) => s.open);
   const currentId = useEditor((s) => s.project.id);
   const [catalog, setCatalog] = useState<CatalogEntry[] | null>(null);
   const [entries, setEntries] = useState<LibraryEntry[] | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
 
   const refresh = () => {
     void loadCatalog().then(setCatalog);
@@ -88,7 +127,7 @@ export default function ProjectsDialog({ onOpenFile }: { onOpenFile: () => void 
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
+      if (e.key !== 'Escape' || isEditableTarget(e.target)) return;
       close();
       e.stopImmediatePropagation();
     };
@@ -123,13 +162,24 @@ export default function ProjectsDialog({ onOpenFile }: { onOpenFile: () => void 
   const removeEntry = async (e: LibraryEntry) => {
     const ok = await askConfirm({
       title: `¿Eliminar «${e.name}»?`,
-      text: 'Se borrará de Mis proyectos en este navegador. Los archivos que hayas guardado en tu PC no se tocan.',
+      text: 'Se borrará de Mis proyectos. Los archivos que hayas guardado con Guardar no se tocan.',
       confirmLabel: 'Eliminar proyecto',
       danger: true,
     });
     if (!ok) return;
     await library.remove(e.id);
     refresh();
+  };
+
+  const rename = async (id: string, oldName: string, name: string, file?: string) => {
+    try {
+      await renameProject(id, name, file);
+      notify({ kind: 'ok', text: `«${oldName}» ahora se llama «${name}»`, detail: 'Solo cambió el nombre: el dibujo y el enlace siguen iguales.' });
+      setEditing(null);
+      refresh();
+    } catch (err) {
+      notify({ kind: 'error', text: 'No se pudo cambiar el nombre', detail: (err as Error).message });
+    }
   };
 
   const startNew = () => {
@@ -165,19 +215,26 @@ export default function ProjectsDialog({ onOpenFile }: { onOpenFile: () => void 
                       </span>
                       {isCurrent && <span className="etiqueta-estado">Abierto</span>}
                     </button>
-                    <div className="ficha-acciones">
-                      <button className="btn btn-chico" onClick={() => copyLink(c.file)} title={shareLink(c.file)}>
-                        <Icon name="copy" size={16} />Copiar enlace
-                      </button>
-                    </div>
+                    {editing === c.file ? (
+                      <RenameForm name={c.name} onCancel={() => setEditing(null)} onSave={(n) => rename(c.id, c.name, n, c.file)} />
+                    ) : (
+                      <div className="ficha-acciones">
+                        <button className="btn btn-chico" onClick={() => copyLink(c.file)} title={shareLink(c.file)}>
+                          <Icon name="copy" size={16} />Copiar enlace
+                        </button>
+                        <button className="btn btn-chico" onClick={() => setEditing(c.file)} title="Cambiar nombre" aria-label={`Cambiar nombre de ${c.name}`}>
+                          <Icon name="edit" size={16} />Nombre
+                        </button>
+                      </div>
+                    )}
                   </article>
                 );
               })}
             </div>
           </section>
           <section>
-            <h3 className="biblioteca-titulo">Dibujados en este navegador</h3>
-            <p className="hint">Se guardan solos mientras trabajas. Para tener una copia en tu PC, usa Guardar.</p>
+            <h3 className="biblioteca-titulo">Mis dibujos</h3>
+            <p className="hint">Se guardan solos en este PC mientras trabajas, así que aparecen con cualquier enlace o computador.</p>
             <div className="galeria">
               {own === null ? loadingCards : own.length === 0 ? <p className="hint">Todavía no hay proyectos propios.</p> : own.map((e) => {
                 const isCurrent = e.id === currentId;
@@ -191,11 +248,18 @@ export default function ProjectsDialog({ onOpenFile }: { onOpenFile: () => void 
                       </span>
                       {isCurrent && <span className="etiqueta-estado">Abierto</span>}
                     </button>
-                    <div className="ficha-acciones">
-                      <button className="btn btn-chico" aria-label={`Eliminar ${e.name}`} onClick={() => removeEntry(e)} disabled={isCurrent}>
-                        <Icon name="trash" size={16} />Eliminar
-                      </button>
-                    </div>
+                    {editing === e.id ? (
+                      <RenameForm name={e.name} onCancel={() => setEditing(null)} onSave={(n) => rename(e.id, e.name, n)} />
+                    ) : (
+                      <div className="ficha-acciones">
+                        <button className="btn btn-chico" onClick={() => setEditing(e.id)} title="Cambiar nombre" aria-label={`Cambiar nombre de ${e.name}`}>
+                          <Icon name="edit" size={16} />Nombre
+                        </button>
+                        <button className="btn btn-chico" aria-label={`Eliminar ${e.name}`} onClick={() => removeEntry(e)} disabled={isCurrent}>
+                          <Icon name="trash" size={16} />Eliminar
+                        </button>
+                      </div>
+                    )}
                   </article>
                 );
               })}

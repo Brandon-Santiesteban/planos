@@ -4,6 +4,7 @@ import { useEditor } from '../store/editorStore';
 import { useSaveStatus } from '../persistence/autosave';
 import { openProjectsDialog } from './ProjectsDialog';
 import { notify } from './toasts';
+import { renameProject } from '../persistence/rename';
 import Icon from './Icon';
 import { useTheme } from './theme';
 import { useProjectFile } from './useProjectFile';
@@ -26,7 +27,8 @@ export default function TopBar() {
 
   const rename = () => {
     const next = prompt('Nombre del proyecto', name)?.trim();
-    if (next) useEditor.getState().apply((d) => { d.name = next; });
+    if (!next || next === name) return;
+    renameProject(useEditor.getState().project.id, next).catch((e: Error) => notify({ kind: 'error', text: 'No se pudo cambiar el nombre', detail: e.message }));
   };
 
   return (

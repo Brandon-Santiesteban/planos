@@ -4,6 +4,9 @@ test('draw a wall, undo/redo it, and get it back after a reload', async ({ page 
   await page.goto('/');
   await page.evaluate(() => indexedDB.deleteDatabase('keyval-store'));
   await page.reload();
+  // A browser with nothing open starts on Mis proyectos.
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.keyboard.press('Escape');
 
   await page.getByTestId('tool-wall').click();
   const box = (await page.getByTestId('plan2d').boundingBox())!;

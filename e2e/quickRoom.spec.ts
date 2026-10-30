@@ -4,6 +4,9 @@ test('two quick rooms side by side share a wall that takes a door', async ({ pag
   await page.goto('/');
   await page.evaluate(() => indexedDB.deleteDatabase('keyval-store'));
   await page.reload();
+  // A browser with nothing open starts on Mis proyectos.
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.keyboard.press('Escape');
 
   await page.getByTestId('tool-quickRoom').click();
   await page.getByLabel('Ancho (por dentro)').fill('3');

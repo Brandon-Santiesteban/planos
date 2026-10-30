@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import GridControls from './editor2d/GridControls';
 import { duplicateSelectedFurniture } from './furniture/actions';
 import Plan2D from './editor2d/Plan2D';
-import { library, writeLinkedFile } from './persistence/appLibrary';
+import { library, uploadBrowserProjects, writeLinkedFile } from './persistence/appLibrary';
 import { startAutosave } from './persistence/autosave';
 import { startLiveLink } from './persistence/liveLink';
 import { fetchText, projectFromUrl } from './persistence/openFromUrl';
@@ -38,6 +38,8 @@ export default function App() {
     const stops: (() => void)[] = [];
     let cancelled = false;
     void (async () => {
+      const uploaded = await uploadBrowserProjects();
+      if (uploaded) notify({ kind: 'ok', text: `${uploaded === 1 ? 'Un proyecto de este navegador quedó guardado' : `${uploaded} proyectos de este navegador quedaron guardados`} en el PC` });
       const fromUrl = await projectFromUrl(location.search, fetchText, library);
       const p = fromUrl && 'project' in fromUrl ? fromUrl.project : await library.last().catch(() => null);
       if (cancelled) return;
