@@ -80,7 +80,7 @@ const json = await page.evaluate(async ([RIGHT, TOTAL]) => {
   const { serializeProject } = await import('/src/persistence/projectFile.ts');
   const P = (x, y) => ({ x: Math.round((RIGHT - x) * 1e6) / 1e6 + 0, y: Math.round((TOTAL - y) * 1e6) / 1e6 + 0 });
   const Q = (x, y) => ({ x, y });
-  const p = createEmptyProject('Nueva casa');
+  const p = createEmptyProject('Nueva casa — propuestas');
   const lengths = {};
   // Walls are stored reversed (design b → a), so an opening's offset (its centre) is measured from design point a.
   const wall = (f, a, b, t) => {

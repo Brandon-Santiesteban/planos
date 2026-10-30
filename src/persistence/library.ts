@@ -22,10 +22,21 @@ export function memoryKV(): KV {
 
 export type LibraryEntry = { id: string; name: string; updatedAt: number; floors: number };
 
+/** Where a project came from when it was opened from a file served by the app (`ejemplos/…`). */
+export type Origin = {
+  /** e.g. `ejemplos/nueva-casa.casa.json` */
+  file: string;
+  /** hash of the file's text the last time it was loaded */
+  fileHash: string;
+  /** hash of the project exactly as loaded from that file: a different hash means the user changed it */
+  projectHash: string;
+};
+
 const INDEX = 'proyectos';
 const LAST = 'ultimo';
 const LEGACY = 'autosave'; // single slot used before the library existed
 const projectKey = (id: string) => `proyecto:${id}`;
+const originKey = (id: string) => `origen:${id}`;
 
 /** Every project the user works on, saved in the browser on this PC. */
 export function createLibrary(kv: KV = idbKV, now: () => number = Date.now) {
@@ -58,6 +69,7 @@ export function createLibrary(kv: KV = idbKV, now: () => number = Date.now) {
 
   async function remove(id: string): Promise<void> {
     await kv.del(projectKey(id));
+    await kv.del(originKey(id));
     await kv.set(INDEX, JSON.stringify((await readIndex()).filter((e) => e.id !== id)));
   }
 
@@ -83,7 +95,20 @@ export function createLibrary(kv: KV = idbKV, now: () => number = Date.now) {
     return r.project;
   }
 
-  return { save, load, list, remove, last, setLast };
+  async function origin(id: string): Promise<Origin | null> {
+    try {
+      const text = await kv.get(originKey(id));
+      return text ? (JSON.parse(text) as Origin) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function setOrigin(id: string, o: Origin): Promise<void> {
+    await kv.set(originKey(id), JSON.stringify(o));
+  }
+
+  return { save, load, list, remove, last, setLast, origin, setOrigin };
 }
 
 export type Library = ReturnType<typeof createLibrary>;

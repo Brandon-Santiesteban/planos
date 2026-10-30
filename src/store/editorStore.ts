@@ -32,6 +32,8 @@ export interface EditorState {
   setSnapping(on: boolean): void;
   setShowUpperFloors(on: boolean): void;
   loadProject(p: Project, opts?: { dirty?: boolean }): void;
+  /** Swaps in a newer version of the open project (same id) without moving the camera or changing floor. */
+  refreshProject(p: Project): void;
   markSaved(): void;
 }
 
@@ -135,5 +137,12 @@ export const useEditor = create<EditorState>()((set, get) => ({
       dirty: opts?.dirty ?? false,
       loadCount: s.loadCount + 1,
     })),
+  refreshProject: (p) =>
+    set((s) => {
+      // Stay on the same floor (by id, else by name) so a live update doesn't jump around.
+      const current = s.project.floors.find((f) => f.id === s.activeFloorId);
+      const floor = p.floors.find((f) => f.id === s.activeFloorId) ?? p.floors.find((f) => f.name === current?.name) ?? p.floors[p.floors.length - 1];
+      return { project: p, activeFloorId: floor.id, selection: null, group: [], past: [], future: [], dirty: false };
+    }),
   markSaved: () => set({ dirty: false }),
 }));

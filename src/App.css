@@ -265,21 +265,45 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 
 /* ---------- Mis proyectos ---------- */
 .estado-guardado.error, .estado-guardado.error .icono { color: var(--peligro); }
-.lista-proyectos { list-style: none; margin: 16px 0 0; padding: 0; max-height: 50vh; overflow-y: auto; }
-.lista-proyectos li { display: flex; align-items: center; gap: 4px; border-radius: 8px; }
-.lista-proyectos li:hover { background: var(--fondo); }
-.fila-proyecto {
-  flex: 1; display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: 0; background: transparent;
-  color: var(--tinta); font: inherit; text-align: left; cursor: pointer; border-radius: 8px;
+.ventana-biblioteca { max-width: 1120px; display: flex; flex-direction: column; max-height: calc(100vh - 32px); }
+.biblioteca-cuerpo { overflow-y: auto; margin: 0 -24px; padding: 0 24px; display: flex; flex-direction: column; gap: 22px; }
+.biblioteca-titulo { font-size: 15px; font-weight: 500; margin: 6px 0 2px; }
+.galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 12px; }
+.ficha {
+  display: flex; flex-direction: column; border-radius: 12px; background: var(--sup);
+  box-shadow: 0 0 0 1px var(--linea); overflow: hidden; transition: box-shadow .15s ease, transform .15s ease;
 }
-.fila-proyecto:disabled { cursor: default; }
-.fila-proyecto .inicial {
-  width: 32px; height: 32px; border-radius: 50%; background: var(--sup2); color: var(--tenue);
-  display: grid; place-items: center; font-weight: 500; flex: none;
+.ficha:hover { box-shadow: 0 0 0 1px var(--acento), var(--sombra); }
+.ficha.actual { box-shadow: 0 0 0 2px var(--acento); }
+.ficha-abrir {
+  position: relative; display: flex; flex-direction: column; border: 0; padding: 0; background: transparent;
+  color: var(--tinta); font: inherit; text-align: left; cursor: pointer;
 }
-.fila-proyecto .datos { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-.fila-proyecto .nombre { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.fila-proyecto .secundario { font-size: 12px; color: var(--tenue); font-variant-numeric: tabular-nums; }
+.ficha-abrir:disabled { cursor: default; }
+.ficha-abrir:focus-visible { outline: 2px solid var(--acento); outline-offset: -2px; }
+.ficha-vista { position: relative; display: block; aspect-ratio: 16 / 10; background: var(--fondo); border-bottom: 1px solid var(--linea); }
+.ficha-vista > img, .ficha-vista > .miniatura-plano { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ficha-vista > img { object-fit: cover; }
+.ficha-vista > .miniatura-plano { padding: 10px; box-sizing: border-box; }
+.ficha-vista > .fila-cargando { position: absolute; inset: 0; height: auto; margin: 0; border-radius: 0; }
+.ficha-plano {
+  position: absolute; right: 8px; bottom: 8px; width: 34%; aspect-ratio: 1; padding: 4px; box-sizing: border-box;
+  background: color-mix(in srgb, var(--sup) 88%, transparent); border-radius: 8px; box-shadow: var(--sombra);
+}
+.ficha-plano .miniatura-plano { width: 100%; height: 100%; }
+.miniatura-vacia { position: absolute; inset: 0; display: grid; place-items: center; color: var(--tenue); font-size: 13px; }
+.mini-sala { fill: color-mix(in srgb, var(--acento) 9%, transparent); stroke: color-mix(in srgb, var(--acento) 35%, transparent); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.mini-sala.exterior, .mini-sala.balcony { fill: color-mix(in srgb, var(--t3) 12%, transparent); stroke: none; }
+.mini-sala.roof { fill: none; stroke-dasharray: 2 3; }
+.mini-sala.stairs { fill: color-mix(in srgb, var(--t2) 14%, transparent); }
+.mini-muro { stroke: var(--tinta); stroke-linecap: square; }
+.ficha-datos { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px 4px; min-width: 0; }
+.ficha-datos .nombre { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ficha-datos .secundario { font-size: 12px; color: var(--tenue); font-variant-numeric: tabular-nums; }
+.ficha-abrir .etiqueta-estado { position: absolute; top: 8px; left: 8px; }
+.tarjeta-acciones { display: flex; gap: 6px; padding: 6px 12px 12px; margin-top: auto; }
+.tarjeta-cargando { min-height: 230px; background: linear-gradient(90deg, var(--sup2), var(--sup), var(--sup2)); background-size: 200% 100%; animation: brillo 1.4s ease infinite; }
+@media (max-width: 600px) { .galeria { grid-template-columns: 1fr; } .ventana-biblioteca .ventana-botones { flex-wrap: wrap; } }
 .etiqueta-estado {
   font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 6px;
   color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, var(--sup));

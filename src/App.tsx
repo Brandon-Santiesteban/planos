@@ -4,6 +4,7 @@ import { duplicateSelectedFurniture } from './furniture/actions';
 import Plan2D from './editor2d/Plan2D';
 import { library, writeLinkedFile } from './persistence/appLibrary';
 import { startAutosave } from './persistence/autosave';
+import { startLiveLink } from './persistence/liveLink';
 import { fetchText, projectFromUrl } from './persistence/openFromUrl';
 import { notify } from './ui/toasts';
 import { trackProjectLoads } from './persistence/currentFile';
@@ -34,7 +35,7 @@ export default function App() {
   useEffect(() => trackProjectLoads(), []);
 
   useEffect(() => {
-    let stop: (() => void) | undefined;
+    const stops: (() => void)[] = [];
     let cancelled = false;
     void (async () => {
       const fromUrl = await projectFromUrl(location.search, fetchText, library);
@@ -46,12 +47,16 @@ export default function App() {
         if (fromUrl) useEditor.getState().setActiveFloor(p.floors[p.floors.length - 1].id);
       }
       if (fromUrl && 'error' in fromUrl) notify({ kind: 'error', text: fromUrl.error });
-      if (fromUrl) history.replaceState(null, '', location.pathname); // a reload keeps your edits
-      stop = startAutosave({ lib: library, writeFile: writeLinkedFile });
+      if (fromUrl && 'notice' in fromUrl && fromUrl.notice) notify({ kind: 'info', text: fromUrl.notice });
+      // `?biblioteca`, or nothing to show yet: start on Mis proyectos to pick one.
+      if (new URLSearchParams(location.search).has('biblioteca') || !p) openProjectsDialog();
+      stops.push(startAutosave({ lib: library, writeFile: writeLinkedFile }));
+      // The address bar keeps the open project's link, and a file project follows its file's changes.
+      stops.push(startLiveLink({ lib: library, fetchText }));
     })();
     return () => {
       cancelled = true;
-      stop?.();
+      stops.forEach((f) => f());
     };
   }, []);
 

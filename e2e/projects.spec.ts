@@ -14,6 +14,9 @@ test('starting a new project keeps the previous one in Mis proyectos', async ({ 
   await page.goto('/');
   await page.evaluate(() => indexedDB.deleteDatabase('keyval-store'));
   await page.reload();
+  // Nothing saved yet: the app starts on Mis proyectos.
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.keyboard.press('Escape');
 
   await drawWall(page, '4');
   await expect(page.getByTestId('estado-guardado')).toContainText('Guardado');
@@ -25,10 +28,23 @@ test('starting a new project keeps the previous one in Mis proyectos', async ({ 
 
   await page.getByRole('button', { name: 'Mis proyectos' }).click();
   const dialog = page.getByRole('dialog');
-  await expect(dialog.locator('.fila-proyecto')).toHaveCount(2);
-  await dialog.locator('.fila-proyecto:not([disabled])').click();
+  const own = dialog.locator('section').filter({ hasText: 'Dibujados en este navegador' }).locator('.ficha-abrir');
+  await expect(own).toHaveCount(2);
+  await own.and(page.locator(':not([disabled])')).click();
   await expect(page.getByTestId('plan2d').getByText('4,00 m')).toBeVisible();
 
   await page.reload(); // the last opened project comes back
   await expect(page.getByTestId('plan2d').getByText('4,00 m')).toBeVisible();
+});
+
+test('a project link always shows the latest version of its file, and the gallery lists the app projects', async ({ page }) => {
+  await page.goto('/?p=casa-etapa-1');
+  await expect(page).toHaveURL(/\?p=casa-etapa-1/);
+  await page.reload(); // the link stays in the address bar
+  await expect(page).toHaveURL(/\?p=casa-etapa-1/);
+  await page.getByRole('button', { name: 'Mis proyectos' }).click();
+  const app = page.getByRole('dialog').locator('section').filter({ hasText: 'Proyectos de la app' });
+  await expect(app.getByRole('button', { name: 'Abrir Casa CJ' })).toBeVisible();
+  await app.getByRole('button', { name: 'Abrir Casa CJ' }).click();
+  await expect(page).toHaveURL(/\?p=casa-cj/);
 });
