@@ -13,7 +13,7 @@ export default function WallsLayer({ floor, selection, group, ghost = false }: {
         return (
           <polygon
             key={w.id}
-            className={`wall${ghost ? ' ghost' : ''}${selected ? ' selected' : ''}`}
+            className={`wall${w.kind === 'drywall' ? ' drywall' : ''}${ghost ? ' ghost' : ''}${selected ? ' selected' : ''}`}
             points={pts(fp)}
             data-id={w.id}
           />

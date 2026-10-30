@@ -1,14 +1,24 @@
 import { useEffect, useId, useState } from 'react';
-import { setGateOpen, updateFurniture, type FurniturePatch } from '../model/furnitureOps';
+import { fitToWall, setGateOpen, updateFurniture, type FurniturePatch } from '../model/furnitureOps';
 import type { Floor } from '../model/types';
 import { formatMetres, parseLength } from '../model/units';
 import { useEditor } from '../store/editorStore';
 import { LengthField } from '../ui/fields';
 import Icon from '../ui/Icon';
+import { notify } from '../ui/toasts';
 import { duplicateSelectedFurniture, removeSelectedFurniture } from './actions';
 import { catalogItem } from './catalog';
 import { Thumb } from './CatalogPanel';
 import FurnitureColor from './FurnitureColor';
+
+function fit(id: string) {
+  const { apply, activeFloorId } = useEditor.getState();
+  let ok = false;
+  apply((d) => {
+    ok = fitToWall(d, activeFloorId, id, { toCeiling: true });
+  });
+  if (!ok) notify({ kind: 'warn', text: 'No hay un muro cerca para encajarlo', detail: 'Acércalo a menos de 1 m del muro donde va.' });
+}
 
 function set(id: string, patch: FurniturePatch) {
   const { apply, activeFloorId } = useEditor.getState();
@@ -94,6 +104,12 @@ export default function FurnitureProps({ floor, id }: { floor: Floor; id: string
           />
           Portón abierto
         </label>
+      )}
+      {(item?.model === 'closet' || item?.model === 'vestier') && (
+        <div className="field">
+          <button className="btn btn-sec" onClick={() => fit(id)}><Icon name="maximize" size={16} />Encajar en el muro</button>
+          <span className="ayuda">Lo pega al muro que tiene detrás (de mampostería o drywall) y lo estira de esquina a esquina y hasta el techo, sin tapar puertas.</span>
+        </div>
       )}
       <FurnitureColor floor={floor} ids={[id]} />
       <LengthField label="Ancho" value={f.width} onCommit={(v) => set(id, { width: v! })} />

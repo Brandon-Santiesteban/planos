@@ -12,7 +12,7 @@ const wallSide = z.object({
   color: color.optional(), finish: z.enum(['pintura', 'ladrillo', 'piedra', 'madera', 'enchape']).optional(),
 });
 const wall = z.object({
-  id: z.string(), a: vec, b: vec, thickness: positive, height: positive.nullable(),
+  id: z.string(), a: vec, b: vec, thickness: positive, height: positive.nullable(), kind: z.literal('drywall').optional(),
   sides: z.object({ left: wallSide.optional(), right: wallSide.optional() }).optional(),
 });
 const opening = z.object({

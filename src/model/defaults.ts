@@ -3,6 +3,7 @@ import type { Floor, Project } from './types';
 
 export const DEFAULTS = {
   wallThickness: 0.15,
+  drywallThickness: 0.1,
   floorHeight: 2.6,
   door: { width: 0.8, height: 2.1, sill: 0 },
   window: { width: 1.2, height: 1.2, sill: 0.9 },

@@ -73,7 +73,7 @@ function floorText(floor: Floor): string[] {
   out.push(`### Muros (${floor.walls.length}; de punto a punto, eje del muro)`);
   for (const w of floor.walls) {
     const h = w.height === null ? '' : `, alto ${n(w.height)}`;
-    out.push(`- (${n(w.a.x)}; ${n(w.a.y)}) → (${n(w.b.x)}; ${n(w.b.y)}), largo ${n(wallLength(w))}, grosor ${n(w.thickness)}${h}`);
+    out.push(`- (${n(w.a.x)}; ${n(w.a.y)}) → (${n(w.b.x)}; ${n(w.b.y)}), largo ${n(wallLength(w))}, grosor ${n(w.thickness)}${w.kind === 'drywall' ? ', drywall' : ''}${h}`);
   }
   out.push('');
   return out;

@@ -17,6 +17,8 @@ export interface Wall {
   thickness: number;
   /** null = use the floor height */
   height: number | null;
+  /** Light partition of plasterboard on a metal frame; absent = masonry (brick/block). */
+  kind?: 'drywall';
   /** Faces of the wall: `left` is on the left when walking from a to b (the +perp side), `right` the other. */
   sides?: { left?: WallSide; right?: WallSide };
 }

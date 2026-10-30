@@ -1,10 +1,11 @@
 import { polygonArea } from '../geometry/polygons';
 import FurnitureColor from '../furniture/FurnitureColor';
+import { useWallKind } from '../editor2d/tools/wallTool';
 import { wallLength } from '../geometry/walls';
 import { RoomMaterials, WallFinishes } from '../materials/MaterialPanels';
 import {
   deleteItems, deleteOpening, deleteRoom, deleteWall, rectRoomSize, renameRoom, resizeRectRoom, setRoofHeight, setRoomKind, setStairShape, setStairUp, setWallLength,
-  toggleDoorFlip, setDoorGlass, updateOpening, updateWall,
+  toggleDoorFlip, setDoorGlass, updateOpening, updateWall, setWallKind,
 } from '../model/ops';
 import type { Floor, Project, Room, RoomKind, StairShape, StairUp } from '../model/types';
 import { formatArea } from '../model/units';
@@ -43,12 +44,42 @@ function DeleteButton({ onClick }: { onClick: () => void }) {
   );
 }
 
+const WALL_KINDS: { value: 'mamposteria' | 'drywall'; label: string }[] = [
+  { value: 'mamposteria', label: 'Mampostería' },
+  { value: 'drywall', label: 'Drywall' },
+];
+
+/** While drawing walls: which kind the new ones are. */
+function NewWallKind() {
+  const kind = useWallKind((s) => s.kind);
+  return (
+    <section className="tarjeta properties">
+      <h3>Muro nuevo</h3>
+      <SegmentedSwitch label="Tipo de muro nuevo" value={kind} options={WALL_KINDS} onChange={(k) => useWallKind.setState({ kind: k })} />
+      <p className="hint parrafo">
+        {kind === 'drywall'
+          ? 'Tabique liviano de 10 cm: ideal para dividir, armar el vestier o encajar clósets. Se dibuja más claro en el plano.'
+          : 'Muro de ladrillo o bloque de 15 cm.'}
+      </p>
+    </section>
+  );
+}
+
 function WallProps({ floor, id }: { floor: Floor; id: string }) {
   const w = floor.walls.find((x) => x.id === id);
   if (!w) return null;
   return (
     <>
-      <h2>Muro</h2>
+      <h2>{w.kind === 'drywall' ? 'Muro de drywall' : 'Muro'}</h2>
+      <div className="field">
+        <span className="label">Tipo</span>
+        <SegmentedSwitch
+          label="Tipo de muro"
+          value={w.kind === 'drywall' ? 'drywall' : 'mamposteria'}
+          options={WALL_KINDS}
+          onChange={(k) => edit((d, f) => void setWallKind(d, f, id, k))}
+        />
+      </div>
       <LengthField label="Longitud" value={wallLength(w)} onCommit={(v) => edit((d, f) => void setWallLength(d, f, id, v!))} />
       <LengthField label="Grosor" value={w.thickness} onCommit={(v) => edit((d, f) => void updateWall(d, f, id, { thickness: v! }))} />
       <LengthField
@@ -187,6 +218,7 @@ export default function PropertiesPanel() {
 
   if (tool === 'quickRoom') return <QuickRoomPanel />;
   if (tool === 'furniture') return <CatalogPanel />;
+  const newWall = tool === 'wall' ? <NewWallKind /> : null;
 
   if (group.length) {
     const pieces = group.filter((g) => g.kind === 'furniture').map((g) => g.id);
@@ -207,6 +239,7 @@ export default function PropertiesPanel() {
   if (!selection) {
     return (
       <>
+        {newWall}
         <section className="tarjeta properties">
           <h3>Propiedades</h3>
           <p className="hint parrafo">Selecciona un muro, una puerta, una ventana, una habitación o un mueble para ver y cambiar sus medidas.</p>

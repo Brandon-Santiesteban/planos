@@ -259,17 +259,36 @@ function refitOpenings(f: Floor): void {
   f.openings = kept;
 }
 
-export function addWall(p: Project, floorId: string, a: Vec2, b: Vec2, thickness?: number): string | null {
+export function addWall(p: Project, floorId: string, a: Vec2, b: Vec2, thickness?: number, kind?: Wall['kind']): string | null {
   if (dist(a, b) < DEFAULTS.minWallLength) return null;
   const id = newId();
   getFloor(p, floorId).walls.push({
     id,
     a: { ...a },
     b: { ...b },
-    thickness: thickness ?? DEFAULTS.wallThickness,
+    thickness: thickness ?? (kind === 'drywall' ? DEFAULTS.drywallThickness : DEFAULTS.wallThickness),
     height: null,
+    ...(kind ? { kind } : {}),
   });
   return id;
+}
+
+/**
+ * Masonry or drywall. The thickness follows the kind when it still has the other kind's usual value
+ * (15 cm ↔ 10 cm); a thickness the user typed is kept.
+ */
+export function setWallKind(p: Project, floorId: string, wallId: string, kind: 'mamposteria' | 'drywall'): boolean {
+  const w = getFloor(p, floorId).walls.find((x) => x.id === wallId);
+  if (!w) return false;
+  const near = (a: number, b: number) => Math.abs(a - b) < 1e-6;
+  if (kind === 'drywall') {
+    if (near(w.thickness, DEFAULTS.wallThickness)) w.thickness = DEFAULTS.drywallThickness;
+    w.kind = 'drywall';
+  } else {
+    if (near(w.thickness, DEFAULTS.drywallThickness)) w.thickness = DEFAULTS.wallThickness;
+    delete w.kind;
+  }
+  return true;
 }
 
 export function updateWall(

@@ -1,9 +1,9 @@
 import { createEmptyProject } from './defaults';
 import {
   addFurniture, deleteFurniture, duplicateFurniture, furnitureCorners, furnitureFromCatalog, moveFurniture,
-  dropElevation, isStacked, piecesOnTop, pointInFurniture, rotateFurniture, snapFlushToWall, snapToWalls, stackElevation, tiltedSize, updateFurniture, setFurnitureColor,
+  dropElevation, isStacked, piecesOnTop, pointInFurniture, rotateFurniture, snapFlushToWall, snapToWalls, stackElevation, tiltedSize, updateFurniture, setFurnitureColor, fitToWall,
 } from './furnitureOps';
-import { addWall } from './ops';
+import { addOpening, addWall } from './ops';
 import type { Furniture, Wall } from './types';
 
 function setup() {
@@ -161,4 +161,58 @@ test('setFurnitureColor paints several pieces and null puts back the catalogue c
   expect(setFurnitureColor(p, fl.id, ['a'], 'rojo')).toBe(0);
   setFurnitureColor(p, fl.id, ['b'], null);
   expect('color' in fl.furniture[1]).toBe(false);
+});
+
+describe('fitToWall', () => {
+  // A 4 × 3 room (wall centrelines), 15 cm masonry, with a 10 cm drywall partition at x = 2.5 from y = 0 to 1.
+  function room() {
+    const p = createEmptyProject();
+    const f = p.floors[0];
+    addWall(p, f.id, { x: 0, y: 0 }, { x: 4, y: 0 });
+    addWall(p, f.id, { x: 4, y: 0 }, { x: 4, y: 3 });
+    addWall(p, f.id, { x: 4, y: 3 }, { x: 0, y: 3 });
+    addWall(p, f.id, { x: 0, y: 3 }, { x: 0, y: 0 });
+    return { p, f };
+  }
+  const closet = (x: number, y: number, rotation = 0): Furniture => ({ id: 'c', type: 'closet', x, y, rotation, width: 1.2, depth: 0.6, height: 2.2, elevation: 0 });
+
+  test('a closet fills the wall behind it from corner to corner, back to the face and front to the room', () => {
+    const { p, f } = room();
+    f.furniture.push(closet(1.5, 0.6));
+    expect(fitToWall(p, f.id, 'c', { toCeiling: true })).toBe(true);
+    const c = f.furniture[0];
+    expect(c.height).toBeCloseTo(f.height, 6);
+    expect(c.width).toBeCloseTo(4 - 0.15 - 0.01, 3);
+    expect(c.x).toBeCloseTo(2, 3);
+    expect(c.y).toBeCloseTo(0.075 + 0.3, 3);
+    expect(c.rotation).toBe(0); // front towards +y, into the room
+  });
+
+  test('a drywall partition crossing the wall closes the stretch; the closet takes the side it is on', () => {
+    const { p, f } = room();
+    addWall(p, f.id, { x: 2.5, y: 0 }, { x: 2.5, y: 1 }, undefined, 'drywall');
+    f.furniture.push(closet(3.2, 0.5));
+    fitToWall(p, f.id, 'c');
+    const c = f.furniture[0];
+    expect(c.width).toBeCloseTo(4 - 0.075 - (2.5 + 0.05) - 0.01, 3);
+    expect(c.x).toBeCloseTo((2.55 + 3.925) / 2, 3);
+  });
+
+  test('it stops at a door and turns the piece to face the room', () => {
+    const { p, f } = room();
+    const right = f.walls[1];
+    addOpening(p, f.id, right.id, 'door', 1); // door centred 1 m along the right wall, 0.8 wide
+    f.furniture.push(closet(3.5, 2.2, 45));
+    fitToWall(p, f.id, 'c');
+    const c = f.furniture[0];
+    expect(c.rotation).toBe(90); // back to the right wall, front to −x
+    expect(c.width).toBeCloseTo(3 - 0.075 - 1.4 - 0.01, 3);
+    expect(c.x).toBeCloseTo(4 - 0.075 - 0.3, 3);
+  });
+
+  test('no wall nearby, nothing changes', () => {
+    const { p, f } = room();
+    f.furniture.push(closet(2, 1.5));
+    expect(fitToWall(p, f.id, 'c')).toBe(false);
+  });
 });

@@ -535,3 +535,6 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 .color-codigo { display: flex; gap: 6px; align-items: center; }
 .color-codigo input { flex: 1; min-width: 0; font-variant-numeric: tabular-nums; }
 .igualar { justify-content: flex-start; height: auto; min-height: 30px; padding: 6px 10px; text-align: left; display: inline-flex; align-items: center; gap: 6px; }
+/* Drywall: lighter fill with the outline, so it reads apart from masonry */
+.wall.drywall { fill: color-mix(in srgb, var(--tinta) 22%, var(--plano-fondo)); stroke: var(--tinta); stroke-width: 1px; }
+.wall.drywall.selected { fill: color-mix(in srgb, var(--acento) 40%, var(--plano-fondo)); stroke: var(--acento); }

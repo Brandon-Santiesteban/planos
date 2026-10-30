@@ -4,8 +4,12 @@ import { addWall } from '../../model/ops';
 import { parseLength } from '../../model/units';
 import type { Vec2 } from '../../model/types';
 import { useEditor } from '../../store/editorStore';
+import { create } from 'zustand';
 import type { ToolContext, ToolHandler, ToolPreview } from './index';
 import { snapForTool } from './index';
+
+/** Kind of the walls the wall tool draws (chosen in the side panel while the tool is active). */
+export const useWallKind = create<{ kind: 'mamposteria' | 'drywall' }>()(() => ({ kind: 'mamposteria' }));
 
 const LENGTH_START = /^[0-9.,]$/;
 const LENGTH_CHAR = /^[0-9.,cm ]$/;
@@ -27,7 +31,7 @@ export function createWallTool(): ToolHandler {
     const { activeFloorId, apply } = useEditor.getState();
     let created = false;
     apply((d) => {
-      created = addWall(d, activeFloorId, from, end) !== null;
+      created = addWall(d, activeFloorId, from, end, undefined, useWallKind.getState().kind === 'drywall' ? 'drywall' : undefined) !== null;
     });
     if (created) start = end;
     typed = '';

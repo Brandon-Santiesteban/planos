@@ -269,3 +269,65 @@ export function setFurnitureColor(p: Project, floorId: string, ids: string[], co
   }
   return n;
 }
+
+/**
+ * Fits a piece (a closet, a dressing module…) into the wall behind it, masonry or drywall: back against the wall's
+ * face, front to the room, and as wide as the free stretch of that face — from corner to corner, stopping at the
+ * walls that cross it and at doors (`toCeiling`: also up to the ceiling). Returns false when there is no wall within 1 m.
+ */
+export function fitToWall(p: Project, floorId: string, id: string, opts: { toCeiling?: boolean } = {}): boolean {
+  const floor = getFloor(p, floorId);
+  const f = floor.furniture.find((x) => x.id === id);
+  if (!f) return false;
+  const back = { x: Math.sin(rad(f.rotation)), y: -Math.cos(rad(f.rotation)) };
+  let best: { w: Wall; fr: ReturnType<typeof wallFrame>; out: Vec2; score: number } | null = null;
+  for (const w of floor.walls) {
+    const fr = wallFrame(w, f);
+    if (fr.length === 0 || fr.along < 0 || fr.along > fr.length) continue;
+    const gap = Math.abs(fr.side) - w.thickness / 2;
+    if (gap < 0 || gap > f.depth / 2 + 1) continue;
+    const sign = fr.side >= 0 ? 1 : -1;
+    const out = { x: fr.n.x * sign, y: fr.n.y * sign };
+    // Prefer the wall the piece already has its back to, then the nearest.
+    const score = gap - (dot(out, back) < -0.7 ? 10 : 0);
+    if (!best || score < best.score) best = { w, fr, out, score };
+  }
+  if (!best) return false;
+  const { w, fr, out } = best;
+  const face = w.thickness / 2;
+  let lo = 0;
+  let hi = fr.length;
+  // A line just in front of the face: walls crossing it close the stretch.
+  const probe = face + 0.05;
+  for (const o of floor.walls) {
+    if (o.id === w.id) continue;
+    const od = sub(o.b, o.a);
+    const ol = len(od);
+    if (ol === 0) continue;
+    const ou = { x: od.x / ol, y: od.y / ol };
+    const across = dot(ou, out); // how much the other wall heads away from the face
+    if (Math.abs(across) < 0.2) continue; // parallel
+    const sa = dot(sub(o.a, w.a), out) - probe;
+    const t = -sa / across; // along o, where it meets the probe line
+    if (t < -o.thickness / 2 || t > ol + o.thickness / 2) continue;
+    const hit = dot(sub({ x: o.a.x + ou.x * t, y: o.a.y + ou.y * t }, w.a), fr.d);
+    const half = o.thickness / 2 / Math.abs(across);
+    if (hit <= fr.along) lo = Math.max(lo, hit + half);
+    else hi = Math.min(hi, hit - half);
+  }
+  for (const op of floor.openings) {
+    if (op.wallId !== w.id || op.kind !== 'door') continue;
+    if (op.offset <= fr.along) lo = Math.max(lo, op.offset + op.width / 2);
+    else hi = Math.min(hi, op.offset - op.width / 2);
+  }
+  const width = hi - lo - 0.01;
+  if (width < 0.3) return false;
+  const mid = (lo + hi) / 2;
+  const depth = tiltedSize(f).depth;
+  f.width = Math.round(width * 1000) / 1000;
+  if (opts.toCeiling) f.height = (w.height ?? floor.height) - f.elevation; // built in: floor to ceiling
+  f.rotation = facing(out);
+  f.x = w.a.x + fr.d.x * mid + out.x * (face + depth / 2);
+  f.y = w.a.y + fr.d.y * mid + out.y * (face + depth / 2);
+  return true;
+}
