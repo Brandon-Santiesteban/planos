@@ -101,22 +101,23 @@ test('Ctrl+D duplicates the selected piece and selects the copy', () => {
 
 test('Ctrl+C then Ctrl+V pastes copies 30 cm apart each time, and on another floor in the same spot', () => {
   s().select({ kind: 'furniture', id: deskId });
-  expect(copySelectedFurniture()).toBe(true);
+  const text = copySelectedFurniture()!;
   s().select(null);
-  expect(pasteFurniture()).toBe(true);
-  expect(pasteFurniture()).toBe(true);
+  expect(pasteFurniture(text)).toBe(true);
+  expect(pasteFurniture(text)).toBe(true);
   expect(pieces().map((p) => [p.x, p.y])).toEqual([[1, 1.5], [1.3, 1.8], [1.6, 2.1]]);
   expect(s().selection).toEqual({ kind: 'furniture', id: pieces()[2].id });
   let f2 = '';
   s().apply((d) => void (f2 = addFloor(d)));
   s().setActiveFloor(f2);
-  pasteFurniture();
+  pasteFurniture(text);
   expect(s().project.floors[1].furniture.map((p) => [p.x, p.y])).toEqual([[1, 1.5]]);
 });
 
 test('Ctrl+C with no piece selected copies nothing', () => {
   s().select(null);
-  expect(copySelectedFurniture()).toBe(false);
+  expect(copySelectedFurniture()).toBeNull();
+  expect(pasteFurniture('texto cualquiera')).toBe(false);
 });
 
 test('a furniture selection survives undo only while the piece exists', () => {
