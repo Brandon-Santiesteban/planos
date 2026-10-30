@@ -256,3 +256,16 @@ export function snapFlushToWall(walls: Wall[], f: Furniture, maxGap: number): Ve
   }
   return best && { x: best.x, y: best.y };
 }
+
+/** Paints several pieces at once; `null` puts back each piece's own catalogue colour. Returns how many changed. */
+export function setFurnitureColor(p: Project, floorId: string, ids: string[], color: string | null): number {
+  if (color !== null && !HEX.test(color)) return 0;
+  let n = 0;
+  for (const f of getFloor(p, floorId).furniture) {
+    if (!ids.includes(f.id)) continue;
+    if (color === null) delete f.color;
+    else f.color = color.toLowerCase();
+    n++;
+  }
+  return n;
+}

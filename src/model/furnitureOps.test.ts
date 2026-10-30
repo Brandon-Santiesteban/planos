@@ -1,7 +1,7 @@
 import { createEmptyProject } from './defaults';
 import {
   addFurniture, deleteFurniture, duplicateFurniture, furnitureCorners, furnitureFromCatalog, moveFurniture,
-  dropElevation, isStacked, piecesOnTop, pointInFurniture, rotateFurniture, snapFlushToWall, snapToWalls, stackElevation, tiltedSize, updateFurniture,
+  dropElevation, isStacked, piecesOnTop, pointInFurniture, rotateFurniture, snapFlushToWall, snapToWalls, stackElevation, tiltedSize, updateFurniture, setFurnitureColor,
 } from './furnitureOps';
 import { addWall } from './ops';
 import type { Furniture, Wall } from './types';
@@ -146,4 +146,19 @@ test('tilt is kept in 0–360 and dropped at 0', () => {
   expect(piece().tilt).toBe(270);
   updateFurniture(p, f, id, { tilt: 360 });
   expect(piece().tilt).toBeUndefined();
+});
+
+test('setFurnitureColor paints several pieces and null puts back the catalogue colour', () => {
+  const p = createEmptyProject();
+  const fl = p.floors[0];
+  fl.furniture.push(
+    { id: 'a', type: 'sofa-3', x: 0, y: 0, rotation: 0, width: 2, depth: 1, height: 1, elevation: 0 },
+    { id: 'b', type: 'sofa-3', x: 3, y: 0, rotation: 0, width: 2, depth: 1, height: 1, elevation: 0, color: '#111111' },
+    { id: 'c', type: 'cama', x: 6, y: 0, rotation: 0, width: 2, depth: 1, height: 1, elevation: 0 },
+  );
+  expect(setFurnitureColor(p, fl.id, ['a', 'b'], '#7A5A3F')).toBe(2);
+  expect(fl.furniture.map((f) => f.color)).toEqual(['#7a5a3f', '#7a5a3f', undefined]);
+  expect(setFurnitureColor(p, fl.id, ['a'], 'rojo')).toBe(0);
+  setFurnitureColor(p, fl.id, ['b'], null);
+  expect('color' in fl.furniture[1]).toBe(false);
 });

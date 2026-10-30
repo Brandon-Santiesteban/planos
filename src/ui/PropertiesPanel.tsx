@@ -1,4 +1,5 @@
 import { polygonArea } from '../geometry/polygons';
+import FurnitureColor from '../furniture/FurnitureColor';
 import { wallLength } from '../geometry/walls';
 import { RoomMaterials, WallFinishes } from '../materials/MaterialPanels';
 import {
@@ -188,10 +189,17 @@ export default function PropertiesPanel() {
   if (tool === 'furniture') return <CatalogPanel />;
 
   if (group.length) {
+    const pieces = group.filter((g) => g.kind === 'furniture').map((g) => g.id);
     return (
       <section className="tarjeta properties">
         <h2>{group.length} elementos seleccionados</h2>
         <p className="hint parrafo">Pulsa Supr para borrarlos todos, o haz clic en un espacio vacío para soltar la selección.</p>
+        {pieces.length > 0 && (
+          <>
+            {pieces.length < group.length && <p className="hint">El color se aplica a los {pieces.length} muebles de la selección.</p>}
+            <FurnitureColor floor={floor} ids={pieces} />
+          </>
+        )}
         <DeleteButton onClick={() => remove(`${group.length} elementos eliminados`, (d, f) => deleteItems(d, f, group))} />
       </section>
     );

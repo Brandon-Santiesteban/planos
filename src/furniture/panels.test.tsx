@@ -42,12 +42,31 @@ test('the furniture panel edits sizes, elevation, rotation and colour', () => {
   expect(piece().rotation).toBe(270);
   typeInto('Rotación', '45');
   expect(piece().rotation).toBe(45);
-  fireEvent.click(screen.getByLabelText('Color #3b3f45'));
+  fireEvent.click(screen.getByLabelText('Grafito (#3b3f45)'));
   expect(piece().color).toBe('#3b3f45');
+  expect(screen.getByText('Grafito')).toBeInTheDocument();
   const hex = typeInto('Color', 'zz');
   expect(hex).toHaveClass('invalid');
   typeInto('Color', '#AABBCC');
   expect(piece().color).toBe('#aabbcc');
+  // The colour now shows up among the ones used in the house, and «Original» puts the catalogue colour back.
+  expect(screen.getByRole('group', { name: 'Usados en esta casa' })).toContainElement(screen.getByLabelText('#aabbcc'));
+  fireEvent.click(screen.getByText('Original'));
+  expect(piece().color).toBeUndefined();
+});
+
+test('one colour for every piece of the same kind, or for a multiple selection', () => {
+  s().apply((d) => void addFurniture(d, d.floors[0].id, furnitureFromCatalog('escritorio', { x: 4, y: 1 })));
+  s().apply((d) => void addFurniture(d, d.floors[0].id, furnitureFromCatalog('cama-doble', { x: 4, y: 5 })));
+  const { rerender } = render(<PropertiesPanel />);
+  fireEvent.click(screen.getByLabelText('Nogal (#7a5a3f)'));
+  fireEvent.click(screen.getByText(/Mismo color a los 2/));
+  expect(s().project.floors[0].furniture.map((f) => f.color)).toEqual(['#7a5a3f', '#7a5a3f', '#d9cfc0']); // the bed keeps its own
+  s().selectGroup(s().project.floors[0].furniture.map((f) => ({ kind: 'furniture' as const, id: f.id })));
+  rerender(<PropertiesPanel />);
+  expect(screen.getByText('Varios colores')).toBeInTheDocument();
+  fireEvent.click(screen.getByLabelText('Salvia (#8a9a7b)'));
+  expect(s().project.floors[0].furniture.map((f) => f.color)).toEqual(['#8a9a7b', '#8a9a7b', '#8a9a7b']);
 });
 
 test('Duplicar copies and Eliminar removes with Deshacer', () => {
