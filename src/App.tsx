@@ -37,13 +37,15 @@ export default function App() {
   useEffect(() => {
     const stops: (() => void)[] = [];
     let cancelled = false;
+    // If the user opens a project while this is still starting, theirs wins.
+    const loadsAtStart = useEditor.getState().loadCount;
     void (async () => {
       const uploaded = await uploadBrowserProjects();
       if (uploaded) notify({ kind: 'ok', text: `${uploaded === 1 ? 'Un proyecto de este navegador quedó guardado' : `${uploaded} proyectos de este navegador quedaron guardados`} en el PC` });
       const fromUrl = await projectFromUrl(location.search, fetchText, library);
       const p = fromUrl && 'project' in fromUrl ? fromUrl.project : await library.last().catch(() => null);
       if (cancelled) return;
-      if (p) {
+      if (p && useEditor.getState().loadCount === loadsAtStart) {
         useEditor.getState().loadProject(p);
         // Opened from a link: start on the top floor so the 3D view shows the whole house.
         if (fromUrl) useEditor.getState().setActiveFloor(p.floors[p.floors.length - 1].id);

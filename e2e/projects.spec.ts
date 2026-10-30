@@ -46,7 +46,7 @@ test('a project link always shows the latest version of its file, and the galler
   const app = page.getByRole('dialog').locator('section').filter({ hasText: 'Proyectos de la app' });
   await expect(app.getByRole('button', { name: 'Abrir Casa CJ' })).toBeVisible();
   await app.getByRole('button', { name: 'Abrir Casa CJ' }).click();
-  await expect(page).toHaveURL(/\?p=casa-cj/);
+  await expect(page).toHaveURL(/\?p=casa-cj/, { timeout: 20_000 }); // software 3D in tests is slow with a big house
 });
 
 test('drawings are saved on the PC: another address (another link) lists them too', async ({ page, browser }) => {
@@ -67,7 +67,7 @@ test('drawings are saved on the PC: another address (another link) lists them to
 test('a project is renamed from its card without losing its drawing or its link', async ({ page }) => {
   await page.goto('/?biblioteca');
   const app = page.getByRole('dialog').locator('section').filter({ hasText: 'Proyectos de la app' });
-  await app.getByRole('button', { name: 'Cambiar nombre de Casa etapa 1' }).click();
+  await app.getByRole('button', { name: 'Cambiar nombre de Casa etapa 1', exact: true }).click();
   await page.getByLabel('Nombre del proyecto').fill('Casa etapa 1 (renombrada)');
   await page.keyboard.press('Enter');
   await expect(app.getByRole('button', { name: 'Abrir Casa etapa 1 (renombrada)' })).toBeVisible();
@@ -75,5 +75,5 @@ test('a project is renamed from its card without losing its drawing or its link'
   await app.getByRole('button', { name: 'Cambiar nombre de Casa etapa 1 (renombrada)' }).click();
   await page.getByLabel('Nombre del proyecto').fill('Casa etapa 1');
   await page.keyboard.press('Enter');
-  await expect(app.getByRole('button', { name: 'Abrir Casa etapa 1' })).toBeVisible();
+  await expect(app.getByRole('button', { name: 'Abrir Casa etapa 1', exact: true })).toBeVisible();
 });
