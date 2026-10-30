@@ -3,6 +3,7 @@ import GridControls from './editor2d/GridControls';
 import { duplicateSelectedFurniture, startFurnitureClipboard } from './furniture/actions';
 import Plan2D from './editor2d/Plan2D';
 import { library, uploadBrowserProjects, writeLinkedFile } from './persistence/appLibrary';
+import { startAppUpdates } from './persistence/appUpdates';
 import { startAutosave } from './persistence/autosave';
 import { startLiveLink } from './persistence/liveLink';
 import { fetchText, projectFromUrl } from './persistence/openFromUrl';
@@ -57,6 +58,8 @@ export default function App() {
       stops.push(startAutosave({ lib: library, writeFile: writeLinkedFile }));
       // The address bar keeps the open project's link, and a file project follows its file's changes.
       stops.push(startLiveLink({ lib: library, fetchText }));
+      // A page the live connection doesn't reach still gets the latest app code.
+      stops.push(startAppUpdates({ lib: library }));
     })();
     return () => {
       cancelled = true;

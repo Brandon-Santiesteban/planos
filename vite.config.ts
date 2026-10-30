@@ -70,6 +70,9 @@ function catalogo() {
 }
 
 /** Serves /ejemplos/catalogo.json and tells the open pages when a project file changes, so they update by themselves. */
+/** Changes whenever the app's code does (dev server). */
+let appVersion = Date.now().toString(36);
+
 function ejemplos(): Plugin {
   return {
     name: 'ejemplos',
@@ -80,7 +83,28 @@ function ejemplos(): Plugin {
         rmSync(BIBLIOTECA, { recursive: true, force: true });
       }
     },
+    transformIndexHtml() {
+      return [{ tag: 'meta', attrs: { name: 'app-version', content: appVersion }, injectTo: 'head' }];
+    },
     configureServer(server) {
+      // The app's code must never be kept by the browser: a restored tab or a reload would run an old version.
+      // (Pre-bundled libraries under /node_modules/.vite keep their long cache: their URLs change with them.)
+      server.middlewares.use((req, res, next) => {
+        if (!req.url?.startsWith('/node_modules/.vite/')) {
+          const setHeader = res.setHeader.bind(res);
+          res.setHeader = (name, value) => setHeader(name, String(name).toLowerCase() === 'cache-control' && value === 'no-cache' ? 'no-store' : value);
+        }
+        next();
+      });
+      // Version of the app code: changes whenever a source file does (see src/persistence/appUpdates.ts).
+      server.middlewares.use('/api/version', (_req, res) => {
+        res.setHeader('Cache-Control', 'no-store');
+        res.end(appVersion);
+      });
+      server.watcher.on('all', (_event, path) => {
+        const rel = relative(fileURLToPath(new URL('.', import.meta.url)), path).replaceAll('\\', '/');
+        if (rel.startsWith('src/') || rel === 'index.html') appVersion = Date.now().toString(36);
+      });
       server.middlewares.use('/ejemplos/catalogo.json', (_req, res) => {
         res.setHeader('Content-Type', 'application/json');
         res.setHeader('Cache-Control', 'no-store');
