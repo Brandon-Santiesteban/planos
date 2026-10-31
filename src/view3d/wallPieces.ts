@@ -28,7 +28,11 @@ export function wallPieces(length: number, height: number, openings: Hole[], ext
 
 /** True when the polygon edge runs along one wall (within half its thickness + 1 cm). */
 export function edgeTouchesWall(edge: [Vec2, Vec2], walls: Wall[]): boolean {
-  const probes = [edge[0], lerp(edge[0], edge[1], 0.5), edge[1]];
+  // Probed a little in from the ends: an edge drawn on a wall's outer face reaches past its centre line at the
+  // corners (by half the crossing wall's thickness), which is still along the wall.
+  const len = Math.hypot(edge[1].x - edge[0].x, edge[1].y - edge[0].y) || 1;
+  const t = Math.min(0.25, 0.15 / len);
+  const probes = [lerp(edge[0], edge[1], t), lerp(edge[0], edge[1], 0.5), lerp(edge[0], edge[1], 1 - t)];
   return walls.some((w) => {
     const tol = w.thickness / 2 + 0.01;
     return probes.every((p) => projectOntoWall(w, p).distance <= tol);

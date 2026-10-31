@@ -143,6 +143,34 @@ test('a copied wall takes its door along; walls, rooms and furniture paste toget
   expect(s().group).toHaveLength(3);
 });
 
+test('grabbing one item of a box selection moves the whole selection, in one undo step', () => {
+  const wall = s().project.floors[0].walls[0];
+  const room = s().project.floors[0].rooms[0];
+  s().selectGroup([{ kind: 'furniture', id: deskId }, { kind: 'wall', id: wall.id }, { kind: 'room', id: room.id }]);
+  const t = createSelectTool();
+  t.onPointerDown!({ x: 1, y: 1.5 }, ctx());
+  t.onPointerMove!({ x: 1.3, y: 1.6 }, ctx());
+  t.onPointerMove!({ x: 1.5, y: 2 }, ctx());
+  t.onPointerUp!({ x: 1.5, y: 2 }, ctx());
+  const f = s().project.floors[0];
+  expect(pieces()[0]).toMatchObject({ x: 1.5, y: 2 });
+  expect(f.walls[0].a).toEqual({ x: wall.a.x + 0.5, y: wall.a.y + 0.5 });
+  expect(f.rooms[0].points[0]).toEqual({ x: room.points[0].x + 0.5, y: room.points[0].y + 0.5 });
+  expect(s().group).toHaveLength(3); // still selected, ready to move again
+  s().undo();
+  expect(pieces()[0]).toMatchObject({ x: 1, y: 1.5 });
+  expect(s().project.floors[0].walls[0].a).toEqual(wall.a);
+});
+
+test('a plain click on an item of a box selection selects just that item', () => {
+  const wall = s().project.floors[0].walls[0];
+  s().selectGroup([{ kind: 'furniture', id: deskId }, { kind: 'wall', id: wall.id }]);
+  const t = createSelectTool();
+  t.onPointerDown!({ x: 1, y: 1.5 }, ctx());
+  t.onPointerUp!({ x: 1, y: 1.5 }, ctx());
+  expect(s().selection).toEqual({ kind: 'furniture', id: deskId });
+});
+
 test('a furniture selection survives undo only while the piece exists', () => {
   s().select({ kind: 'furniture', id: deskId });
   s().undo(); // back to the empty project

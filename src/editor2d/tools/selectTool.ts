@@ -22,7 +22,20 @@ type Drag =
   | { kind: 'wall'; wallId: string; applied: Vec2; joints: Joint[]; prepared?: ReturnType<typeof prepareWallDrag> }
   | { kind: 'opening'; openingId: string; wallId: string }
   | { kind: 'furniture'; drag: FurnitureDrag }
-  | { kind: 'box'; roomId: string | null; to: Vec2 };
+  | { kind: 'box'; roomId: string | null; to: Vec2 }
+  | { kind: 'group'; clicked: Item; base: GroupBase };
+
+/** Where the pieces of a box selection were when the drag started. */
+type GroupBase = { walls: Map<string, { a: Vec2; b: Vec2 }>; rooms: Map<string, Vec2[]>; furniture: Map<string, Vec2> };
+
+function groupBase(floor: Floor, items: Item[]): GroupBase {
+  const ids = new Set(items.map((i) => i.id));
+  return {
+    walls: new Map(floor.walls.filter((w) => ids.has(w.id)).map((w) => [w.id, { a: { ...w.a }, b: { ...w.b } }])),
+    rooms: new Map(floor.rooms.filter((r) => ids.has(r.id)).map((r) => [r.id, r.points.map((q) => ({ ...q }))])),
+    furniture: new Map(floor.furniture.filter((f) => ids.has(f.id)).map((f) => [f.id, { x: f.x, y: f.y }])),
+  };
+}
 
 /** Everything of the floor lying wholly inside the box a–b. */
 export function itemsInBox(floor: Floor, a: Vec2, b: Vec2): Item[] {
@@ -55,6 +68,15 @@ export function createSelectTool(): ToolHandler {
       downAt = p;
       started = false;
       drag = null;
+      // Grabbing anything of a box selection moves the whole selection; a plain click selects just that item.
+      const group = useEditor.getState().group;
+      const hitItem: Item | null = !hit ? null
+        : hit.kind === 'endpoint' ? { kind: 'wall', id: hit.wallId }
+        : { kind: hit.kind, id: hit.id } as Item;
+      if (hitItem && group.length > 1 && group.some((g) => g.id === hitItem.id)) {
+        drag = { kind: 'group', clicked: hitItem, base: groupBase(floor, group) };
+        return;
+      }
       // On empty ground or inside a room, dragging draws a selection box; a plain click selects the room.
       if (!hit || hit.kind === 'room') {
         drag = { kind: 'box', roomId: hit ? hit.id : null, to: p };
@@ -99,7 +121,28 @@ export function createSelectTool(): ToolHandler {
       const floorId = store.activeFloorId;
       const floor = activeFloor(store);
       const d = drag;
-      if (d.kind === 'furniture') {
+      if (d.kind === 'group') {
+        let by = sub(p, downAt);
+        if (ctx.shiftKey) by = alongAxis(by);
+        if (ctx.state.snapping && !ctx.altKey) by = snapToGrid(by, MOVE_STEP);
+        const at = (q: Vec2) => ({ x: q.x + by.x, y: q.y + by.y });
+        store.apply((draft) => {
+          const fl = draft.floors.find((x) => x.id === floorId);
+          if (!fl) return;
+          for (const w of fl.walls) {
+            const b = d.base.walls.get(w.id);
+            if (b) Object.assign(w, { a: at(b.a), b: at(b.b) });
+          }
+          for (const r of fl.rooms) {
+            const b = d.base.rooms.get(r.id);
+            if (b) r.points = b.map(at);
+          }
+          for (const f of fl.furniture) {
+            const b = d.base.furniture.get(f.id);
+            if (b) Object.assign(f, at(b));
+          }
+        }, { record: false });
+      } else if (d.kind === 'furniture') {
         const s0 = d.drag.start;
         const by = sub(p, downAt);
         const move = ctx.shiftKey ? alongAxis(by) : by;
@@ -137,6 +180,7 @@ export function createSelectTool(): ToolHandler {
         const floorId = ctx.state.activeFloorId;
         useEditor.getState().apply((draft) => tidyRoomOutlines(draft, floorId), { record: false });
       }
+      if (drag?.kind === 'group' && !started) useEditor.getState().select(drag.clicked);
       if (drag?.kind === 'box' && downAt) {
         const { select, selectGroup } = useEditor.getState();
         if (started) selectGroup(itemsInBox(activeFloor(ctx.state), downAt, p));
