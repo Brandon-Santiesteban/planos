@@ -1,7 +1,7 @@
 // Parametric 3D furniture built from primitives. Local frame: x = width, y = up (0 at the base), z = depth,
 // the front of a piece facing +z (plan +y at rotation 0). Every model scales with width/depth/height.
 import { type ThreeEvent, useThree } from '@react-three/fiber';
-import { type ReactElement, type ReactNode, useMemo, useRef } from 'react';
+import { type ReactElement, type ReactNode, useMemo } from 'react';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
@@ -11,7 +11,6 @@ import type { Floor, Furniture } from '../model/types';
 import { useEditor } from '../store/editorStore';
 import { usePalette } from '../view3d/palette';
 import { useSceneOptions } from '../view3d/sceneOptions';
-import { beginFurnitureDrag, dragFurnitureTo, type FurnitureDrag } from './actions';
 import { type CatalogItem, catalogItem, type FurnitureModel } from './catalog';
 import { gatePanels } from './gate';
 
@@ -1602,14 +1601,12 @@ function SelectionBox({ f, color }: { f: Furniture; color: string }) {
   );
 }
 
-type Controls = { enabled: boolean } | null;
-
-/** Every piece of a floor, at the floor's elevation. A click selects; dragging a selected piece moves it on its floor (one undo step). */
+/**
+ * Every piece of a floor, at the floor's elevation. The 3D view is for looking only (the user's call): a click selects
+ * a piece to edit it in its panel, but nothing is moved here — that is done in the plan.
+ */
 export default function FurnitureMeshes({ floor, elevation, selectedId }: { floor: Floor; elevation: number; selectedId: string | null }) {
   const pal = usePalette();
-  const { camera, gl } = useThree();
-  const controls = useThree((s) => s.controls) as unknown as Controls;
-  const dragRef = useRef<{ drag: FurnitureDrag; plane: THREE.Plane; offset: { x: number; y: number }; started: boolean; downX: number; downY: number } | null>(null);
 
   const onClick = (e: ThreeEvent<MouseEvent>, f: Furniture) => {
     if (e.delta > 4) return; // that was a camera drag, not a click
@@ -1617,48 +1614,6 @@ export default function FurnitureMeshes({ floor, elevation, selectedId }: { floo
     const store = useEditor.getState();
     if (store.activeFloorId !== floor.id) store.setActiveFloor(floor.id);
     useEditor.getState().select({ kind: 'furniture', id: f.id });
-  };
-
-  // Only an already selected piece is dragged: dragging anything else orbits the camera.
-  const onPointerDown = (e: ThreeEvent<PointerEvent>, f: Furniture) => {
-    if (e.button !== 0 || f.id !== selectedId) return;
-    e.stopPropagation();
-    const drag = beginFurnitureDrag(f.id, floor.id);
-    if (!drag) return;
-    if (controls) controls.enabled = false;
-    dragRef.current = {
-      drag,
-      plane: new THREE.Plane(new THREE.Vector3(0, 1, 0), -e.point.y),
-      offset: { x: f.x - e.point.x, y: f.y - e.point.z },
-      started: false,
-      downX: e.nativeEvent.clientX,
-      downY: e.nativeEvent.clientY,
-    };
-    const raycaster = new THREE.Raycaster();
-    const hit = new THREE.Vector3();
-    const move = (ev: PointerEvent) => {
-      const st = dragRef.current;
-      if (!st) return;
-      if (!st.started) {
-        if (Math.hypot(ev.clientX - st.downX, ev.clientY - st.downY) < 3) return;
-        useEditor.getState().checkpoint();
-        st.started = true;
-      }
-      const r = gl.domElement.getBoundingClientRect();
-      const ndc = new THREE.Vector2(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
-      raycaster.setFromCamera(ndc, camera);
-      if (!raycaster.ray.intersectPlane(st.plane, hit)) return;
-      const snap = useEditor.getState().snapping && !ev.altKey;
-      dragFurnitureTo(st.drag, { x: hit.x + st.offset.x, y: hit.z + st.offset.y }, snap, true);
-    };
-    const up = () => {
-      dragRef.current = null;
-      if (controls) controls.enabled = true;
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', up);
-    };
-    window.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', up);
   };
 
   const time = useSceneOptions((s) => s.time);
@@ -1673,7 +1628,6 @@ export default function FurnitureMeshes({ floor, elevation, selectedId }: { floo
           key={f.id}
           position={[f.x, f.elevation, f.y]}
           rotation={[0, (-f.rotation * Math.PI) / 180, 0]}
-          onPointerDown={(e) => onPointerDown(e, f)}
           onClick={(e) => onClick(e, f)}
         >
           <Tilted f={f}><FurnitureModel3D f={f} /></Tilted>
