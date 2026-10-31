@@ -10,7 +10,7 @@
       "height": 2.6,
       "walls": [
         {
-          "id": "a2787873-b5e8-4d9a-9c03-758527f7419d",
+          "id": "b22be592-f67e-48a2-b910-d8960b6f2b8a",
           "a": {
             "x": -0.075,
             "y": -0.075
@@ -23,7 +23,7 @@
           "height": null
         },
         {
-          "id": "933050e1-e7f2-4efd-9c5a-3d4b3a816f99",
+          "id": "61133481-89bf-4878-a8d3-ab1632d19dc4",
           "a": {
             "x": 4.075,
             "y": -0.075
@@ -36,7 +36,7 @@
           "height": null
         },
         {
-          "id": "0bdfe150-c444-4ab6-adc8-29a7c4910c94",
+          "id": "0e1ce55e-2d8f-47b1-bc6f-4ba95697f5e3",
           "a": {
             "x": -0.075,
             "y": 3.075
@@ -49,7 +49,7 @@
           "height": null
         },
         {
-          "id": "e9726d34-045c-488f-89e5-13e708a1d425",
+          "id": "412a9148-9803-4bce-aa31-cbdcbde88884",
           "a": {
             "x": -0.075,
             "y": 3.075
@@ -64,8 +64,8 @@
       ],
       "openings": [
         {
-          "id": "a23078be-d622-4957-9430-b8e8545e5012",
-          "wallId": "e9726d34-045c-488f-89e5-13e708a1d425",
+          "id": "22769762-35d3-4b31-b79e-bc11a0ed4517",
+          "wallId": "412a9148-9803-4bce-aa31-cbdcbde88884",
           "kind": "door",
           "offset": 0.575,
           "width": 0.8,
@@ -74,8 +74,8 @@
           "flip": true
         },
         {
-          "id": "96f0b542-9ae5-4b18-ac31-8f011aa73b06",
-          "wallId": "a2787873-b5e8-4d9a-9c03-758527f7419d",
+          "id": "8cfd3925-a1df-4855-bfb3-eadbe90f55fb",
+          "wallId": "b22be592-f67e-48a2-b910-d8960b6f2b8a",
           "kind": "window",
           "offset": 3.1750000000000003,
           "width": 1.2,
@@ -85,7 +85,7 @@
       ],
       "rooms": [
         {
-          "id": "703b6cb6-bd4c-4927-a1af-6758cfac45bf",
+          "id": "8ccc3033-62f5-4dc8-88fd-e4d2d79da709",
           "name": "Cuarto",
           "kind": "room",
           "floorMaterial": "madera",
@@ -120,7 +120,127 @@
           "height": 0.02,
           "elevation": 2.58,
           "color": "#f4f1ea",
-          "id": "dc386454-0b06-4e39-8a05-6ba7ebdf7c24"
+          "id": "bcffb333-3478-4c46-a1f1-efa8c9067e9e"
+        },
+        {
+          "type": "cama-doble",
+          "x": 3.05,
+          "y": 1.5,
+          "rotation": 90,
+          "width": 1.4,
+          "depth": 1.9,
+          "height": 1,
+          "elevation": 0,
+          "color": "#d9cfc0",
+          "id": "900c70c3-ff0d-44fe-8199-a084fa47e992"
+        },
+        {
+          "type": "mesa-noche",
+          "x": 3.8,
+          "y": 0.55,
+          "rotation": 90,
+          "width": 0.45,
+          "depth": 0.4,
+          "height": 0.55,
+          "elevation": 0,
+          "color": "#b08a63",
+          "id": "484bf8ad-df3a-4d60-853e-afd971d8fd84"
+        },
+        {
+          "type": "mesa-noche",
+          "x": 3.8,
+          "y": 2.45,
+          "rotation": 90,
+          "width": 0.45,
+          "depth": 0.4,
+          "height": 0.55,
+          "elevation": 0,
+          "color": "#b08a63",
+          "id": "32b16659-8bdd-4bfd-85be-5866ca68ac57"
+        },
+        {
+          "type": "closet",
+          "x": 1.55,
+          "y": 2.7,
+          "rotation": 180,
+          "width": 1.2,
+          "depth": 0.6,
+          "height": 2.2,
+          "elevation": 0,
+          "color": "#eeebe5",
+          "id": "9915ed16-a615-4394-8aa1-78f4191ab2f0"
+        },
+        {
+          "type": "escritorio",
+          "x": 0.85,
+          "y": 0.35,
+          "rotation": 0,
+          "width": 1.4,
+          "depth": 0.7,
+          "height": 0.75,
+          "elevation": 0,
+          "color": "#b08a63",
+          "id": "9fcf6607-0768-4608-a55a-3d00c54ed1ef"
+        },
+        {
+          "type": "monitor",
+          "x": 0.75,
+          "y": 0.15,
+          "rotation": 0,
+          "width": 0.61,
+          "depth": 0.2,
+          "height": 0.45,
+          "elevation": 0.75,
+          "color": "#1d1f22",
+          "id": "c03a886c-6c3a-4560-b25a-f8781398f589"
+        },
+        {
+          "type": "torre-pc",
+          "x": 1.38,
+          "y": 0.3,
+          "rotation": 0,
+          "width": 0.22,
+          "depth": 0.48,
+          "height": 0.48,
+          "elevation": 0,
+          "color": "#25272b",
+          "id": "8950ba70-11ff-40bd-b75b-96613f4b5080"
+        },
+        {
+          "type": "silla-gamer",
+          "x": 0.8,
+          "y": 1.05,
+          "rotation": 180,
+          "width": 0.7,
+          "depth": 0.7,
+          "height": 1.35,
+          "elevation": 0,
+          "color": "#2b2d31",
+          "id": "6e36e5ef-f115-48e7-9070-856eee06390c"
+        },
+        {
+          "type": "tira-led",
+          "x": 0.85,
+          "y": 0.01,
+          "rotation": 0,
+          "width": 1.4,
+          "depth": 0.02,
+          "height": 0.02,
+          "elevation": 1.3,
+          "color": "#8a5cff",
+          "id": "c807691e-8930-4981-a184-ef60b3c23795"
+        },
+        {
+          "type": "poster-gamer",
+          "x": 0.01,
+          "y": 0.9,
+          "rotation": 270,
+          "width": 0.6,
+          "depth": 0.02,
+          "height": 0.85,
+          "elevation": 1.07,
+          "color": "#15161a",
+          "id": "26a209da-88dd-4106-ae34-ae83dce0f48d"
         }
       ],
       "background": null

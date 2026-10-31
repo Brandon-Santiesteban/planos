@@ -61,7 +61,22 @@ const json = await page.evaluate(async (ID) => {
     id: newId(), name: 'Cuarto', kind: 'room', floorMaterial: 'madera',
     points: [{ x: 0, y: 0 }, { x: W, y: 0 }, { x: W, y: D }, { x: 0, y: D }],
   });
-  fo.addFurniture(p, f.id, fo.furnitureFromCatalog('luz-empotrada', { x: W / 2, y: D / 2 }, 0));
+  const put = (type, x, y, rotation = 0, extra = {}) => fo.addFurniture(p, f.id, { ...fo.furnitureFromCatalog(type, { x, y }, rotation), ...extra });
+  put('luz-empotrada', W / 2, D / 2);
+
+  // Furniture (asked 2026-10-31): double bed, wardrobe and a gaming setup, the way from the door kept clear.
+  // Double bed with its head on the right wall, nightstands either side; the window is beside it on the back wall.
+  put('cama-doble', W - 0.95, D / 2, 90);
+  for (const sy of [-1, 1]) put('mesa-noche', W - 0.2, D / 2 + sy * 0.95, 90);
+  // Wardrobe on the front wall, just right of the door's swing.
+  put('closet', 1.55, D - 0.3, 180);
+  // Gaming setup in the back-left corner: desk on the back wall, monitor and PC tower on it, LED strip and a poster.
+  put('escritorio', 0.85, 0.35);
+  put('monitor', 0.75, 0.15);
+  put('torre-pc', 1.38, 0.3);
+  put('silla-gamer', 0.8, 1.05, 180);
+  put('tira-led', 0.85, 0.01, 0, { width: 1.4, elevation: 1.3 });
+  put('poster-gamer', 0.01, 0.9, 270);
 
   // The open page follows the file: count the saved copy as the file's version, so the new one loads by itself.
   const origin = JSON.parse(await (await fetch(`/api/kv/origen:${ID}`)).text());
