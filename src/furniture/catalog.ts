@@ -18,7 +18,8 @@ export type FurnitureModel =
   | 'banca' | 'carro' | 'moto' | 'piscina' | 'asoleadora' | 'sombrilla' | 'pergola' | 'bar' | 'parrilla'
   | 'jardinera' | 'arbol' | 'poste' | 'centroEntretenimiento' | 'cortina' | 'tiraLed' | 'cuadro' | 'repisa'
   | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical' | 'porton' | 'vestier'
-  | 'luzEmpotrada' | 'colgante' | 'aplique' | 'aire' | 'canasta' | 'centroEscritorio' | 'impresora';
+  | 'luzEmpotrada' | 'colgante' | 'aplique' | 'aire' | 'canasta' | 'centroEscritorio' | 'impresora'
+  | 'matita' | 'monstera' | 'plantaColgante' | 'pampas' | 'adornos' | 'repisaDeco';
 
 /** Open walk-in dressing modules (model 'vestier'): what each one holds. */
 export type Dressing = 'colgar' | 'repisas' | 'zapatos' | 'cajones';
@@ -148,6 +149,12 @@ export const CATALOG: CatalogItem[] = [
   item('espejo-cuerpo', 'Espejo de cuerpo entero', 'Decoración', 'espejo', [0.6, 0.05, 1.7], '#dfe7ee', { elevation: 0.25 }),
   item('cortina', 'Cortina', 'Decoración', 'cortina', [1.2, 0.08, 2.4], '#d8cdbb'),
   item('aire-acondicionado', 'Aire acondicionado (minisplit)', 'Dormitorio', 'aire', [0.9, 0.23, 0.3], '#f4f4f2', { elevation: 2.1 }),
+  item('repisa-decorativa', 'Repisas decorativas (libros, plantas, velas)', 'Decoración', 'repisaDeco', [0.8, 0.22, 0.6], '#8a6446', { elevation: 1.2 }),
+  item('matita', 'Matita (planta pequeña)', 'Decoración', 'matita', [0.14, 0.14, 0.24], '#e9e4da', { onTop: true }),
+  item('monstera', 'Planta monstera (de piso)', 'Decoración', 'monstera', [0.7, 0.7, 1.2], '#c9b18a'),
+  item('planta-colgante', 'Planta colgante (macramé)', 'Decoración', 'plantaColgante', [0.4, 0.4, 0.9], '#e9e4da', { elevation: 1.7 }),
+  item('jarron-pampas', 'Jarrón con pampas', 'Decoración', 'pampas', [0.25, 0.25, 0.9], '#d9cbb3'),
+  item('adornos-mesa', 'Adornos de mesa (libros, vela, matita)', 'Decoración', 'adornos', [0.35, 0.2, 0.25], '#c87a55', { onTop: true }),
   item('repisa-coleccionables', 'Repisa con coleccionables', 'Decoración', 'repisa', [1.0, 0.25, 0.6], '#2e3036', { elevation: 1.45 }),
   // Lavandería
   item('lavadero', 'Lavadero', 'Lavandería', 'lavadero', [0.7, 0.6, 0.85], '#c9c6c0'),
@@ -213,6 +220,11 @@ const SYNONYMS: Record<string, string> = {
   lampara: 'luz',
   tira: 'luz led',
   matera: 'planta maceta',
+  matita: 'planta maceta suculenta cactus mata',
+  monstera: 'planta maceta mata',
+  pampas: 'florero jarron decoracion',
+  repisas: 'estante repisa libros',
+  adornos: 'decoracion libros vela',
   jardinera: 'planta',
   arbol: 'planta',
   alfombra: 'tapete',

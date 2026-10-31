@@ -1340,6 +1340,309 @@ const collectiblesShelf: Builder = ({ w, d, h, c }) => {
   );
 };
 
+// --- Interior decor: plants, vases, books ---
+
+const LEAF = ['#4f7f3f', '#5f8f45', '#3f6d38', '#6e9a4e'];
+const SPINES = ['#7a5c45', '#c9b38f', '#5d6b5a', '#a4553d', '#e3d9c6', '#3e4a55', '#b08d5b'];
+
+/** One flat leaf, `l` long and `wd` wide, lying along +z from its base (for plants to fan out). */
+function Leaf({ l, wd, c, droop = 0 }: { l: number; wd: number; c: string; droop?: number }) {
+  return (
+    <group rotation={[droop, 0, 0]}>
+      <mesh position={[0, 0, l / 2]} scale={[wd, 0.012, l]} castShadow>
+        <sphereGeometry args={[0.5, 12, 6]} />
+        <meshStandardMaterial color={c} roughness={0.65} side={THREE.DoubleSide} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Leaves fanning up and out from a point: `n` leaves, tilted between `lo` and `hi` radians from upright. */
+function leafFan(p: V3, n: number, l: number, wd: number, rand: () => number, lo = 0.35, hi = 1.1, key = 'f') {
+  return (
+    <group key={key} position={p}>
+      {Array.from({ length: n }, (_, i) => {
+        const a = (i / n) * Math.PI * 2 + rand() * 0.6;
+        const tilt = lo + rand() * (hi - lo);
+        const k = 0.75 + rand() * 0.5;
+        return (
+          <group key={i} rotation={[0, a, 0]}>
+            <group rotation={[-(Math.PI / 2 - tilt), 0, 0]}>
+              <Leaf l={l * k} wd={wd * k} c={LEAF[(i + Math.floor(rand() * 4)) % LEAF.length]} droop={0.15} />
+            </group>
+          </group>
+        );
+      })}
+    </group>
+  );
+}
+
+/** Trailing stems hanging from a rim of radius `r`, `len` long at most, small leaves along them. */
+function trailing(p: V3, r: number, n: number, len: number, rand: () => number, key = 't') {
+  return (
+    <group key={key} position={p}>
+      {Array.from({ length: n }, (_, i) => {
+        const a = (i / n) * Math.PI * 2 + rand() * 0.5;
+        const L = len * (0.5 + rand() * 0.5);
+        const steps = Math.max(3, Math.round(L / 0.045));
+        return (
+          <group key={i} rotation={[0, a, 0]}>
+            <C p={[0, -L / 2, r]} r={0.002} h={L} c={'#4b6b34'} seg={4} />
+            {Array.from({ length: steps }, (_, j) => (
+              <group key={j} position={[0, -(j / steps) * L, r + 0.008]} rotation={[0, j % 2 ? 0.9 : -0.9, 0]}>
+                <group rotation={[0.5, 0, 0]}>
+                  <Leaf l={0.04} wd={0.03} c={LEAF[(i + j) % LEAF.length]} />
+                </group>
+              </group>
+            ))}
+          </group>
+        );
+      })}
+    </group>
+  );
+}
+
+/** A small potted plant: leafy, a succulent rosette or a cactus (by seed); pot colour `c`. */
+function smallPlant(x: number, y: number, z: number, r: number, h: number, c: string, seed: number, key: string | number) {
+  const rand = rng(seed * 7919 + 13);
+  const potH = h * 0.4;
+  const kind = Math.abs(seed) % 3;
+  const cactus = '#5d8a52';
+  return (
+    <group key={key} position={[x, y, z]}>
+      <C p={[0, potH / 2, 0]} r={r * 0.8} top={r} h={potH} c={c} rough={0.55} />
+      <C p={[0, potH - 0.004, 0]} r={r * 0.92} h={0.006} c={'#3b2c22'} rough={1} />
+      {kind === 0 && leafFan([0, potH, 0], 9, h * 0.55, h * 0.3, rand)}
+      {kind === 1 && (
+        <>
+          {leafFan([0, potH, 0], 8, r * 1.1, r * 0.6, rand, 1.0, 1.35, 'a')}
+          {leafFan([0, potH + 0.005, 0], 6, r * 0.75, r * 0.45, rand, 0.6, 0.9, 'b')}
+          <S p={[0, potH + 0.01, 0]} r={r * 0.25} c={'#8aa57a'} />
+        </>
+      )}
+      {kind === 2 && (
+        <>
+          <C p={[0, potH + h * 0.25, 0]} r={r * 0.45} h={h * 0.5} c={cactus} rough={0.8} />
+          <S p={[0, potH + h * 0.5, 0]} r={r * 0.45} c={cactus} />
+          <C p={[r * 0.55, potH + h * 0.3, 0]} r={r * 0.2} h={h * 0.22} c={cactus} />
+          <S p={[r * 0.55, potH + h * 0.41, 0]} r={r * 0.2} c={cactus} />
+          <C p={[r * 0.4, potH + h * 0.2, 0]} r={r * 0.12} h={0.04} c={cactus} rot={[0, 0, Math.PI / 2]} />
+        </>
+      )}
+    </group>
+  );
+}
+
+/** Upright books side by side from x0, `n` of them, heights varying; returns the row and where it ends. */
+function bookRow(x0: number, y: number, z: number, n: number, depth: number, k: number, key: string) {
+  let x = x0;
+  const books = Array.from({ length: n }, (_, i) => {
+    const t = 0.022 + ((i * 7 + k) % 4) * 0.006;
+    const bh = 0.17 + ((i * 5 + k) % 5) * 0.018;
+    x += t / 2;
+    const el = <RB key={i} p={[x, y + bh / 2, z]} s={[t, bh, depth]} rad={0.003} c={SPINES[(i + k) % SPINES.length]} r={0.85} />;
+    x += t / 2 + 0.002;
+    return el;
+  });
+  return { el: <group key={key}>{books}</group>, end: x };
+}
+
+/** Books lying flat, a few stacked. */
+function bookStack(x: number, y: number, z: number, n: number, k: number, key: string) {
+  return (
+    <group key={key}>
+      {Array.from({ length: n }, (_, i) => (
+        <RB key={i} p={[x, y + 0.016 + i * 0.03, z]} s={[0.2 - i * 0.02, 0.028, 0.14 - i * 0.01]} rad={0.003} c={SPINES[(i * 3 + k) % SPINES.length]} rot={[0, (i - 1) * 0.12, 0]} r={0.85} />
+      ))}
+    </group>
+  );
+}
+
+/** Candle in a glass, lit. */
+function candle(x: number, y: number, z: number, key: string) {
+  return (
+    <group key={key} position={[x, y, z]}>
+      <C p={[0, 0.04, 0]} r={0.032} h={0.08} c={'#efe6d6'} rough={0.4} />
+      <C p={[0, 0.088, 0]} r={0.004} h={0.016} c={'#ffb347'} e={'#ff9a2a'} />
+    </group>
+  );
+}
+
+/** Ceramic vase with dried pampas stems, `h` tall overall. */
+function pampasVase(x: number, y: number, z: number, h: number, c: string, key: string) {
+  const vh = h * 0.42;
+  const stems = [[-0.35, 0.2], [0.1, -0.15], [0.3, 0.25], [-0.1, 0.05], [0.0, 0.32]];
+  return (
+    <group key={key} position={[x, y, z]}>
+      <C p={[0, vh * 0.38, 0]} r={vh * 0.28} top={vh * 0.36} h={vh * 0.76} c={c} rough={0.5} />
+      <C p={[0, vh * 0.88, 0]} r={vh * 0.36} top={vh * 0.14} h={vh * 0.24} c={c} rough={0.5} />
+      {stems.map(([ax, az], i) => {
+        const L = (h - vh) * (0.55 + (i % 3) * 0.1);
+        return (
+          <group key={i} position={[0, vh, 0]} rotation={[az, 0, ax]}>
+            <C p={[0, L / 2, 0]} r={0.003} h={L} c={'#b49a6a'} seg={4} />
+            <mesh position={[0, L, 0]} scale={[h * 0.05, h * 0.14, h * 0.05]}>
+              <sphereGeometry args={[1, 10, 8]} />
+              <meshStandardMaterial color={'#e6d6b8'} roughness={1} />
+            </mesh>
+          </group>
+        );
+      })}
+    </group>
+  );
+}
+
+/** Small framed photo leaning back. */
+function photoFrame(x: number, y: number, z: number, key: string) {
+  return (
+    <group key={key} position={[x, y, z]} rotation={[-0.15, 0, 0]}>
+      <B p={[0, 0.09, 0]} s={[0.14, 0.18, 0.015]} c={'#2b2622'} />
+      <B p={[0, 0.09, 0.008]} s={[0.1, 0.14, 0.002]} c={'#c9d6c2'} r={0.4} />
+      <B p={[0, 0.07, 0.009]} s={[0.1, 0.05, 0.002]} c={'#7f9a7a'} r={0.4} />
+    </group>
+  );
+}
+
+const pottedSmall: Builder = ({ w, d, h, c, seed = 1 }) => smallPlant(0, 0, 0, Math.min(w, d) / 2, h, c, seed, 0);
+
+/** Large floor plant (monstera): big leaves on long stems out of a woven basket. */
+const monstera: Builder = ({ w, d, h, c, seed = 1 }) => {
+  const rand = rng(seed * 104729 + 7);
+  const r = Math.min(w, d) / 2;
+  const potH = Math.min(0.4, h * 0.3);
+  const n = 13;
+  return (
+    <>
+      <C p={[0, potH / 2, 0]} r={r * 0.5} top={r * 0.58} h={potH} c={c} rough={0.95} />
+      {[0.25, 0.55, 0.85].map((t) => <C key={t} p={[0, potH * t, 0]} r={r * (0.52 + t * 0.06) + 0.003} h={0.012} c={shade(c, 0.75)} />)}
+      {Array.from({ length: n }, (_, i) => {
+        const a = (i / n) * Math.PI * 2 + rand() * 0.5;
+        const tilt = 0.15 + rand() * 0.55;
+        const L = (h - potH) * (0.45 + rand() * 0.35);
+        const lw = r * (0.75 + rand() * 0.35);
+        return (
+          <group key={i} position={[0, potH, 0]} rotation={[0, a, 0]}>
+            <group rotation={[tilt, 0, 0]}>
+              <C p={[0, L / 2, 0]} r={0.006} h={L} c={'#55783f'} seg={5} />
+              <group position={[0, L, 0]} rotation={[0.25 + rand() * 0.5, 0, 0]}>
+                <Leaf l={lw * 1.15} wd={lw} c={LEAF[i % LEAF.length]} />
+              </group>
+            </group>
+          </group>
+        );
+      })}
+    </>
+  );
+};
+
+/** Plant hanging from the ceiling in a macramé hanger, trailing stems falling below the pot. */
+const hangingPlant: Builder = ({ w, d, h, c, seed = 1 }) => {
+  const rand = rng(seed * 31 + 5);
+  const r = (Math.min(w, d) / 2) * 0.6;
+  const potY = h * 0.45;
+  const potH = r * 1.1;
+  const L = h - potY - potH / 2;
+  const tilt = Math.atan2(r, L);
+  return (
+    <>
+      <C p={[0, h - 0.01, 0]} r={0.02} h={0.02} c={'#d9cbb3'} />
+      {[0, 1, 2].map((i) => (
+        <group key={i} position={[0, h, 0]} rotation={[0, (i / 3) * Math.PI * 2, 0]}>
+          <group rotation={[Math.PI - tilt, 0, 0]}>
+            <C p={[0, L / 2 / Math.cos(tilt), 0]} r={0.004} h={L / Math.cos(tilt)} c={'#e6dccb'} seg={4} />
+          </group>
+        </group>
+      ))}
+      <C p={[0, potY, 0]} r={r * 0.8} top={r} h={potH} c={c} rough={0.6} />
+      {leafFan([0, potY + potH / 2, 0], 8, r * 1.3, r * 0.7, rand, 0.9, 1.4)}
+      {trailing([0, potY + potH / 2, 0], r, 9, potY + 0.1, rand)}
+    </>
+  );
+};
+
+/** Pampas vase on its own (floor or table). */
+const pampas: Builder = ({ h, c }) => pampasVase(0, 0, 0, h, c, 'v');
+
+/** Things for a nightstand or a dresser top: a short stack of books, a lit candle on them and a small plant. */
+const tabletopDecor: Builder = ({ w, c, seed = 1 }) => (
+  <>
+    {bookStack(-w * 0.18, 0, 0, 3, seed % 5, 'b')}
+    {candle(-w * 0.18, 0.09, 0, 'c')}
+    {smallPlant(w * 0.3, 0, 0, 0.05, 0.16, c, seed, 'p')}
+  </>
+);
+
+/**
+ * Floating shelves styled like a decorator would: two wooden boards, upright books with a bookend, a trailing pothos
+ * falling over the edge, a candle, a pampas vase, a framed photo, a succulent and a stack of books.
+ */
+const decorShelf: Builder = ({ w, d, h, c, seed = 1 }) => {
+  const t = 0.035;
+  const up = h * 0.55;
+  const rand = rng(seed * 17 + 3);
+  const row = bookRow(-w / 2 + 0.03, t, 0, Math.max(4, Math.round(w * 8)), d * 0.75, seed, 'r');
+  return (
+    <>
+      <RB p={[0, t / 2, 0]} s={[w, t, d]} rad={0.006} c={c} r={0.55} />
+      <RB p={[0, up + t / 2, 0]} s={[w, t, d]} rad={0.006} c={c} r={0.55} />
+      {/* Lower board */}
+      {row.el}
+      <B p={[row.end + 0.012, t + 0.06, 0]} s={[0.02, 0.12, d * 0.6]} c={'#2b2b2b'} r={0.4} />
+      {candle(w * 0.1, t, 0, 'c1')}
+      <group position={[w / 2 - 0.09, t, 0]}>
+        <C p={[0, 0.05, 0]} r={0.05} top={0.06} h={0.1} c={'#e9e4da'} rough={0.5} />
+        {leafFan([0, 0.1, 0], 7, 0.07, 0.05, rand, 0.9, 1.4)}
+        {trailing([0, 0.1, 0], 0.05, 7, 0.38, rand)}
+      </group>
+      {/* Upper board */}
+      {photoFrame(-w / 2 + 0.1, up + t, -d * 0.1, 'ph')}
+      {smallPlant(-w * 0.12, up + t, 0, 0.045, 0.13, '#c87a55', seed + 1, 'sp')}
+      {bookStack(w * 0.12, up + t, 0, 2, seed + 2, 'bs')}
+      <S p={[w * 0.12, up + t + 0.08, 0]} r={0.025} c={'#d8cdbb'} />
+      {pampasVase(w / 2 - 0.08, up + t, 0, 0.36, '#cfc3ad', 'pv')}
+    </>
+  );
+};
+
+/** Ergonomic office chair: five-star base on casters, gas lift, padded seat, mesh back with lumbar support, armrests. */
+const ergoChair: Builder = ({ w, d, h, c }) => {
+  const seatY = 0.48;
+  const r = (Math.min(w, d) / 2) * 0.92;
+  const bh = h - seatY - 0.12;
+  const backZ = -d * 0.38;
+  return (
+    <>
+      {[0, 1, 2, 3, 4].map((i) => (
+        <group key={i} rotation={[0, (-i / 5) * Math.PI * 2, 0]}>
+          <RB p={[r / 2, 0.075, 0]} s={[r, 0.035, 0.045]} rad={0.012} c={DARK} r={0.4} />
+          <S p={[r - 0.01, 0.028, 0]} r={0.026} c={'#1b1d20'} />
+        </group>
+      ))}
+      <C p={[0, 0.085, 0]} r={0.05} h={0.05} c={DARK} />
+      <C p={[0, 0.2, 0]} r={0.04} top={0.035} h={0.18} c={DARK} />
+      <C p={[0, (0.29 + seatY - 0.08) / 2, 0]} r={0.025} h={seatY - 0.08 - 0.29} c={STEEL} m={0.8} rough={0.25} />
+      <B p={[0, seatY - 0.07, 0]} s={[0.22, 0.05, 0.22]} c={DARK} r={0.5} />
+      <RB p={[0, seatY, 0.02]} s={[w * 0.8, 0.085, d * 0.76]} rad={0.035} c={c} r={0.9} />
+      {/* Spine from the seat up to the back */}
+      <B p={[0, seatY + 0.05, backZ + 0.02]} s={[0.07, 0.22, 0.03]} c={DARK} r={0.5} />
+      <group position={[0, seatY + 0.12 + bh / 2, backZ]} rotation={[-0.1, 0, 0]}>
+        <RB p={[0, 0, 0]} s={[w * 0.7, bh, 0.045]} rad={0.04} c={DARK} r={0.5} />
+        <B p={[0, 0, 0.012]} s={[w * 0.6, bh - 0.07, 0.03]} c={shade(c, 0.85)} r={1} />
+        {Array.from({ length: 9 }, (_, i) => (
+          <B key={i} p={[0, -bh / 2 + 0.05 + (i * (bh - 0.1)) / 8, 0.029]} s={[w * 0.6, 0.004, 0.002]} c={shade(c, 0.6)} r={1} />
+        ))}
+        <RB p={[0, -bh * 0.22, 0.04]} s={[w * 0.56, 0.08, 0.04]} rad={0.02} c={c} r={0.9} />
+      </group>
+      {[-1, 1].map((sx) => (
+        <group key={sx}>
+          <B p={[sx * w * 0.41, seatY + 0.11, -0.02]} s={[0.03, 0.2, 0.05]} c={DARK} r={0.5} />
+          <RB p={[sx * w * 0.41, seatY + 0.225, 0.0]} s={[0.07, 0.03, 0.25]} rad={0.012} c={'#2a2d31'} r={0.7} />
+        </group>
+      ))}
+    </>
+  );
+};
+
 // --- Bathroom ---
 
 /** Built-in jacuzzi: tiled apron, wide deck, water, jets, headrests and a chrome spout. */
@@ -1667,7 +1970,7 @@ const rug: Builder = ({ w, d, h, c }) => <B p={[0, Math.max(h, 0.008) / 2, 0]} s
 
 const BUILDERS: Record<FurnitureModel, Builder> = {
   cama: bed, mesaNoche: cabinet(2), closet: doorsBox, comoda: chest, escritorio: desk, escritorioL: deskL,
-  sillaOficina: officeChair(false), sillaGamer: officeChair(true), monitor, torre: tower,
+  sillaOficina: ergoChair, sillaGamer: officeChair(true), monitor, torre: tower,
   tablero: panel('#c9ccd0', { c: '#fbfbf9', r: 0.2, m: 0 }), estanteria: shelves, lampara: lamp, sofa, sofaL,
   sillon: sofa, mesaCentro: coffeeTable, muebleTV: cabinet(1), televisor: tv, alfombra: rug, mesa: table, silla: chair,
   meson: counter(), estufa: stove, nevera: fridge, lavaplatos: kitchenSink, alacena: doorsBox, sanitario: toilet,
@@ -1678,6 +1981,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   repisa: collectiblesShelf, jacuzzi, toallero: towelRail, brasero: firePit, puf: pouf, jardinVertical: verticalGarden,
   vestier: dressing, luzEmpotrada: recessed, colgante: pendant, aplique: sconce, aire: airConditioner,
   canasta: basket, impresora: printer,
+  matita: pottedSmall, monstera, plantaColgante: hangingPlant, pampas, adornos: tabletopDecor, repisaDeco: decorShelf,
 };
 
 /** How bright light fittings shine by time of day (their light is lost in daylight, plain at night). */

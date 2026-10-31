@@ -82,7 +82,7 @@ const json = await page.evaluate(async (ID) => {
   put('televisor', 0.08, unitY, 270, { elevation: 1.22 });
   put('monitor', 0.3, unitY, 270);
   put('torre-pc', 0.4, unitY + 0.55, 270);
-  put('silla-gamer', 1.12, unitY, 90);
+  put('silla-oficina', 1.12, unitY, 90, { color: '#3a3d42' }); // office chair (the user's)
   // Wardrobe (1.80 × 0.60, the user's) in the front-right corner, its doors opening clear of the bed.
   // Wardrobe beside the door (the user's call, so the bed gets a nightstand on each side): the open door rests on it.
   put('closet', 1.0 + 0.9, D - 0.3, 180, { width: 1.8, depth: 0.6 });
@@ -118,11 +118,20 @@ const json = await page.evaluate(async (ID) => {
   put('alfombra', 2.1, bedY, 0, { width: 2.0, depth: 1.5, color: '#cdb89a' });
   put('cortina', 3.1, 0.06, 0, { width: 1.5 });
   put('cuadro-abstracto', W - 0.02, bedY, 90, { elevation: 1.3 });
-  put('matera', 3.75, D - 0.25);
+  put('monstera', 3.73, D - 0.27, 0, { width: 0.5, depth: 0.5, height: 1.2 });
   // A low chest of drawers at the foot of the bed to keep things on and in (asked 2026-10-31).
   put('comoda', 2.1 - 0.22, bedY, 90, { width: 1.3, depth: 0.4, height: 0.45 });
   // Shelves (asked 2026-10-31): two on the back wall between the mirror and the window, over the basket.
-  for (const el of [1.2, 1.75]) put('repisa-coleccionables', 1.95, 0.125, 0, { width: 0.8, elevation: el, color: '#6b4a32' });
+  put('repisa-decorativa', 1.95, 0.11, 0, { width: 0.8, height: 0.7, elevation: 1.2, color: '#7a5a3f' });
+
+  // Little things that bring it to life (asked 2026-10-31): plants and decor on the surfaces, a hanging plant by the
+  // window, a pampas vase in the corner by the unit.
+  put('matita', 0.3, unitY - 0.5, 0, { elevation: 0.75 }); // on the desk
+  put('matita', W - 0.2, bedY + 0.925, 0, { elevation: 0.55, color: '#c87a55' }); // nightstand by the wardrobe
+  put('adornos-mesa', W - 0.2, bedY - 0.925, 90, { elevation: 0.55 }); // nightstand under the window
+  put('adornos-mesa', 2.1 - 0.22, bedY + 0.3, 90, { elevation: 0.45, color: '#e9e4da' }); // on the chest
+  put('planta-colgante', 2.62, 0.3, 0, { elevation: 2.6 - 0.9 });
+  put('jarron-pampas', 0.65, 0.15, 0, { width: 0.22, depth: 0.22, height: 0.8 });
 
   // The open page follows the file: count the saved copy as the file's version, so the new one loads by itself.
   const origin = JSON.parse(await (await fetch(`/api/kv/origen:${ID}`)).text());
