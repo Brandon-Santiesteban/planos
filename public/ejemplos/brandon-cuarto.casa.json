@@ -10,7 +10,7 @@
       "height": 2.6,
       "walls": [
         {
-          "id": "abf0a12d-5d13-4a57-a931-4eb03e29b40e",
+          "id": "63681a8f-cbc5-4938-98be-aebc42a6e20d",
           "a": {
             "x": -0.075,
             "y": -0.075
@@ -23,7 +23,7 @@
           "height": null
         },
         {
-          "id": "e82cb62e-8c99-4d30-a5a3-1fb3eccc9f4a",
+          "id": "0fa1f50f-86ab-4ec4-b7c4-593b16ee184b",
           "a": {
             "x": 4.075,
             "y": -0.075
@@ -36,7 +36,7 @@
           "height": null
         },
         {
-          "id": "48ae8e96-135d-4e5e-88ca-2747079ecd60",
+          "id": "61bb7c1b-e6b9-4f17-9cbb-72fa9068f970",
           "a": {
             "x": -0.075,
             "y": 3.075
@@ -49,13 +49,13 @@
           "height": null
         },
         {
-          "id": "c4845061-dd6b-4594-950a-0a8e27b9b26e",
+          "id": "9eb6d02f-e085-492d-b75c-4319ec767f24",
           "a": {
-            "x": -0.075,
+            "x": 4.075,
             "y": 3.075
           },
           "b": {
-            "x": 4.075,
+            "x": -0.075,
             "y": 3.075
           },
           "thickness": 0.15,
@@ -64,18 +64,17 @@
       ],
       "openings": [
         {
-          "id": "5a65162d-2ec4-4fd1-ab9c-35c3359e8018",
-          "wallId": "c4845061-dd6b-4594-950a-0a8e27b9b26e",
+          "id": "a24eb597-6c4b-4292-8672-580df314eb94",
+          "wallId": "9eb6d02f-e085-492d-b75c-4319ec767f24",
           "kind": "door",
-          "offset": 0.575,
+          "offset": 3.575,
           "width": 0.8,
           "height": 2.1,
-          "sill": 0,
-          "flip": true
+          "sill": 0
         },
         {
-          "id": "4b587d38-1686-42b7-a2a6-a6b4a8c69fab",
-          "wallId": "abf0a12d-5d13-4a57-a931-4eb03e29b40e",
+          "id": "e465632e-48df-4760-bd90-4856a61b6c34",
+          "wallId": "63681a8f-cbc5-4938-98be-aebc42a6e20d",
           "kind": "window",
           "offset": 3.1750000000000003,
           "width": 1.2,
@@ -85,7 +84,7 @@
       ],
       "rooms": [
         {
-          "id": "6d5f736f-288b-451c-8034-8b6e1910fa0f",
+          "id": "44318344-827a-4e81-8e39-a8e64d545e89",
           "name": "Cuarto",
           "kind": "room",
           "floorMaterial": "madera",
@@ -120,7 +119,7 @@
           "height": 0.02,
           "elevation": 2.58,
           "color": "#f4f1ea",
-          "id": "2f1bce08-1cb5-481d-bcbc-8ef87902a027"
+          "id": "da5da6d4-35f2-42fd-8dc0-0755cdc08ed5"
         },
         {
           "type": "cama-doble",
@@ -132,7 +131,7 @@
           "height": 1,
           "elevation": 0,
           "color": "#d9cfc0",
-          "id": "71f8761d-96c4-45c8-9780-306732400e56"
+          "id": "68e6904b-4c5f-4820-a9f5-fbb3d59bc71b"
         },
         {
           "type": "mesa-noche",
@@ -144,7 +143,7 @@
           "height": 0.55,
           "elevation": 0,
           "color": "#b08a63",
-          "id": "50b01438-abb8-4e1d-bc15-5f762049a862"
+          "id": "5baeed7b-d655-42b1-af1f-e3b0aae5759f"
         },
         {
           "type": "centro-entretenimiento",
@@ -156,7 +155,7 @@
           "height": 1.9,
           "elevation": 0,
           "color": "#7a5a3f",
-          "id": "e54c547e-fa9a-4ef5-8437-dd7a727780cc"
+          "id": "0f5ee175-e646-47ad-ae56-12098cb01a90"
         },
         {
           "type": "televisor",
@@ -168,7 +167,7 @@
           "height": 0.72,
           "elevation": 0.5,
           "color": "#1d1f22",
-          "id": "e28bb9fa-63f3-44fe-bf00-5258872a248c"
+          "id": "8389249e-2cff-46c0-80db-0bee3d765b1a"
         },
         {
           "type": "closet",
@@ -180,11 +179,11 @@
           "height": 2.2,
           "elevation": 0,
           "color": "#eeebe5",
-          "id": "7b7f6a7a-787f-4827-b1df-808d08dcf31a"
+          "id": "670b99eb-d9f6-4023-af3f-b94cd41dd0fe"
         },
         {
           "type": "escritorio",
-          "x": 1.55,
+          "x": 1.6,
           "y": 2.65,
           "rotation": 180,
           "width": 1.2,
@@ -192,11 +191,11 @@
           "height": 0.75,
           "elevation": 0,
           "color": "#b08a63",
-          "id": "6c0d89c1-0bae-4799-82f9-9aadfcfc249c"
+          "id": "2a732a9e-4d48-4d87-ac8c-b9cafc3aaa17"
         },
         {
           "type": "monitor",
-          "x": 1.45,
+          "x": 1.5,
           "y": 2.85,
           "rotation": 180,
           "width": 0.61,
@@ -204,11 +203,11 @@
           "height": 0.45,
           "elevation": 0.75,
           "color": "#1d1f22",
-          "id": "44715ea2-1f5e-43bd-8491-5232e91c21b3"
+          "id": "4d97af14-57e2-4588-b7d2-de94563db185"
         },
         {
           "type": "torre-pc",
-          "x": 1.98,
+          "x": 2.03,
           "y": 2.7,
           "rotation": 180,
           "width": 0.22,
@@ -216,11 +215,11 @@
           "height": 0.48,
           "elevation": 0,
           "color": "#25272b",
-          "id": "a30ea5c7-ede4-45b7-8caa-bef20f95feb1"
+          "id": "50708f1a-8c52-4608-9ad0-8440a03a542a"
         },
         {
           "type": "silla-gamer",
-          "x": 1.5,
+          "x": 1.55,
           "y": 1.95,
           "rotation": 0,
           "width": 0.7,
@@ -228,11 +227,11 @@
           "height": 1.35,
           "elevation": 0,
           "color": "#2b2d31",
-          "id": "62678992-49ed-445f-936c-b21d9fc33009"
+          "id": "1376023e-1b68-4f43-9111-893b064869b2"
         },
         {
           "type": "poster-gamer",
-          "x": 1.55,
+          "x": 1.6,
           "y": 2.99,
           "rotation": 180,
           "width": 0.6,
@@ -240,11 +239,11 @@
           "height": 0.85,
           "elevation": 1.07,
           "color": "#15161a",
-          "id": "487f9aef-8d13-4945-b926-71b8a74f1f73"
+          "id": "1f227ca6-0f53-456a-969a-375f7a5700db"
         },
         {
           "type": "tira-led",
-          "x": 1.55,
+          "x": 1.6,
           "y": 2.99,
           "rotation": 180,
           "width": 1.2,
@@ -252,7 +251,7 @@
           "height": 0.02,
           "elevation": 2,
           "color": "#8a5cff",
-          "id": "40ab0bbc-54a6-4c2c-9064-cbf0ada2552d"
+          "id": "9eef5b98-a310-428f-b9ef-256db25a563a"
         },
         {
           "type": "canasta-ropa",
@@ -264,7 +263,19 @@
           "height": 0.6,
           "elevation": 0,
           "color": "#b8935f",
-          "id": "2f62d6d2-d1c7-4916-8ad9-28ca0392f1d3"
+          "id": "93fb8896-bfe9-468c-8dbd-87123b38cf36"
+        },
+        {
+          "type": "espejo-cuerpo",
+          "x": 1.15,
+          "y": 0.025,
+          "rotation": 0,
+          "width": 0.6,
+          "depth": 0.05,
+          "height": 1.7,
+          "elevation": 0.25,
+          "color": "#dfe7ee",
+          "id": "bfcbc1f5-0bf2-4045-80d5-3dbbc5cb8d29"
         }
       ],
       "background": null

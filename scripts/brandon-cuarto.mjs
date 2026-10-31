@@ -43,14 +43,13 @@ const json = await page.evaluate(async (ID) => {
   const back = ops.addWall(p, f.id, c[0], c[1], T);
   ops.addWall(p, f.id, c[1], c[2], T);
   ops.addWall(p, f.id, c[3], c[0], T);
-  // The front wall runs left → right: a door hinges at its wall's start, so this one folds back against the left wall.
-  const front = ops.addWall(p, f.id, c[3], c[2], T);
+  // The front wall runs right → left: a door hinges at its wall's start, so this one hinges on its right side.
+  const front = ops.addWall(p, f.id, c[2], c[3], T);
 
-  // Door at the front-left corner, 10 cm of wall beside it, opening into the room.
+  // Door at the front-left corner, 10 cm of wall beside it, opening into the room towards the right (the user's).
   const doorW = 0.8;
-  const door = ops.addOpening(p, f.id, front, 'door', h + 0.1 + doorW / 2);
+  const door = ops.addOpening(p, f.id, front, 'door', W + h - (0.1 + doorW / 2));
   ops.updateOpening(p, f.id, door, { width: doorW });
-  ops.toggleDoorFlip(p, f.id, door);
   // Window diagonally across: right end of the back wall (back wall runs left → right).
   const winW = 1.2;
   const win = ops.addOpening(p, f.id, back, 'window', W + h - (0.3 + winW / 2));
@@ -77,14 +76,17 @@ const json = await page.evaluate(async (ID) => {
   put('closet', W - 0.9, D - 0.3, 180, { width: 1.8, depth: 0.6 });
   // Gaming setup on the front wall between the door and the wardrobe: desk, monitor, PC tower, gaming chair (out of
   // the bed's view of the TV), LED strip and a poster over it.
-  put('escritorio', 1.55, D - 0.35, 180, { width: 1.2 });
-  put('monitor', 1.45, D - 0.15, 180);
-  put('torre-pc', 1.98, D - 0.3, 180);
-  put('silla-gamer', 1.5, D - 1.05);
-  put('poster-gamer', 1.55, D - 0.01, 180);
-  put('tira-led', 1.55, D - 0.01, 180, { width: 1.2, elevation: 2.0 });
+  // The desk butts the wardrobe, so the open door rests against its side.
+  put('escritorio', 1.6, D - 0.35, 180, { width: 1.2 });
+  put('monitor', 1.5, D - 0.15, 180);
+  put('torre-pc', 2.03, D - 0.3, 180);
+  put('silla-gamer', 1.55, D - 1.05);
+  put('poster-gamer', 1.6, D - 0.01, 180);
+  put('tira-led', 1.6, D - 0.01, 180, { width: 1.2, elevation: 2.0 });
   // Laundry basket on the back wall by the foot of the bed.
   put('canasta-ropa', 1.85, 0.25);
+  // Full-length mirror on the back wall between the entertainment centre and the basket, clear floor in front of it.
+  put('espejo-cuerpo', 1.15, 0.025);
 
   // The open page follows the file: count the saved copy as the file's version, so the new one loads by itself.
   const origin = JSON.parse(await (await fetch(`/api/kv/origen:${ID}`)).text());
