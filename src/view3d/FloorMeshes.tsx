@@ -212,7 +212,7 @@ function RoomSlab({ room, walls, selected, floorHeight, ground }: { room: Room; 
   if (room.kind === 'roof' && room.floorMaterial) {
     // A solid roof: an opaque slab with its finish on top and a fascia of its own colour, hanging down from the
     // same top level as the light sheet below.
-    const materials = [floorSurfaceMaterial(room.floorMaterial), plainMaterial(room.edgeColor ?? '#e8ebef', 0.8)];
+    const materials = [floorSurfaceMaterial(room.floorMaterial, room.floorColor), plainMaterial(room.edgeColor ?? '#e8ebef', 0.8)];
     return (
       <group>
         <mesh geometry={geometry} material={materials} rotation={[Math.PI / 2, 0, 0]} position={[0, (room.height ?? floorHeight) + 0.06, 0]} castShadow receiveShadow />
@@ -236,7 +236,7 @@ function RoomSlab({ room, walls, selected, floorHeight, ground }: { room: Room; 
   // lot) does not flicker against it (z-fighting).
   const y = room.kind === 'exterior' ? -0.012 : 0.001;
   // The slab's top UVs are plan coordinates in metres, so floor textures keep their real size.
-  const surface = room.floorMaterial ? floorSurfaceMaterial(room.floorMaterial) : null;
+  const surface = room.floorMaterial ? floorSurfaceMaterial(room.floorMaterial, room.floorColor) : null;
   return (
     <group>
       {/* Shape is in plan XY; +90° about X maps plan y to world z and extrudes downwards. */}

@@ -1,6 +1,6 @@
 // "Acabados" for walls and "Piso" / "Baranda" for rooms, shown in the properties panel.
 import { useEffect, useId, useState } from 'react';
-import { applySideToFacade, setFloorMaterial, setRailing, setRailingColor, setWallSide } from '../model/materialOps';
+import { applySideToFacade, setFloorColor, setFloorMaterial, setRailing, setRailingColor, setWallSide } from '../model/materialOps';
 import type { Floor, FloorMaterial, Project, RailingType, Room, Wall, WallFinish, WallSide } from '../model/types';
 import { useEditor } from '../store/editorStore';
 import SegmentedSwitch from '../ui/SegmentedSwitch';
@@ -147,6 +147,16 @@ export function RoomMaterials({ room }: { room: Room }) {
           onChange={(m) => edit((d, f) => setFloorMaterial(d, f, room.id, m))}
         />
       </div>
+      {room.floorMaterial && (
+        <div className="field">
+          <span className="label">Color del piso</span>
+          <ColorPicker
+            label="Color del piso"
+            value={room.floorColor ?? FLOOR_MATERIALS[room.floorMaterial].chip}
+            onPick={(c) => edit((d, f) => void setFloorColor(d, f, room.id, c))}
+          />
+        </div>
+      )}
       {room.kind === 'balcony' && (
         <>
           <div className="field">

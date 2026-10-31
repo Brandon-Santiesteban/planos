@@ -77,6 +77,8 @@ export interface Room {
   glass?: boolean;
   /** floor finish (rooms and balconies); on a roof it makes a solid, opaque slab with that finish on top. */
   floorMaterial?: FloorMaterial;
+  /** hex colour the floor finish should look (e.g. a sand porcelain); absent = the finish's own colour. */
+  floorColor?: string;
   /** roof only: hex colour of the solid slab's edge (fascia), e.g. a wooden band seen from the street. */
   edgeColor?: string;
   /** balconies only: edges (index i = points[i] → points[i+1]) left without railing, e.g. towards a driveway. */

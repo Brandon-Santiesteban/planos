@@ -63,9 +63,17 @@ export function wallFaceMaterial(finish: WallFinish, color: string): MeshStandar
 }
 
 /** A floor slab; the slab's UVs are plan coordinates in metres. */
-export function floorSurfaceMaterial(m: FloorMaterial): MeshStandardMaterial {
-  return cached(`floor|${m}`, () => new MeshStandardMaterial({
-    color: '#ffffff',
+/** Per-channel multiplier (as a colour) that turns `base` into `target`, capped at white. */
+function tintTowards(base: string, target: string): string {
+  const ch = (h: string, i: number) => parseInt(h.slice(1 + 2 * i, 3 + 2 * i), 16);
+  return `#${[0, 1, 2].map((i) => Math.min(255, Math.round((ch(target, i) / Math.max(1, ch(base, i))) * 255)).toString(16).padStart(2, '0')).join('')}`;
+}
+
+/** `color` is how the finish should look: the texture is tinted from its own colour (chip) towards it. */
+export function floorSurfaceMaterial(m: FloorMaterial, color?: string): MeshStandardMaterial {
+  const tint = color ? tintTowards(FLOOR_MATERIALS[m].chip, color) : '#ffffff';
+  return cached(`floor|${m}|${tint}`, () => new MeshStandardMaterial({
+    color: tint,
     map: texture(`floor|${m}`, () => makeFloorTexture(m)),
     roughness: FLOOR_MATERIALS[m].roughness,
   }));

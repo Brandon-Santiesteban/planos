@@ -48,6 +48,14 @@ export function setFloorMaterial(p: Project, floorId: string, roomId: string, m:
   if (r) r.floorMaterial = m;
 }
 
+export function setFloorColor(p: Project, floorId: string, roomId: string, color: string): boolean {
+  const r = roomOf(p, floorId, roomId);
+  const c = normalizeHex(color);
+  if (!r || !c) return false;
+  r.floorColor = c;
+  return true;
+}
+
 export function setRailing(p: Project, floorId: string, roomId: string, railing: RailingType): void {
   const r = roomOf(p, floorId, roomId);
   if (r) r.railing = railing;
