@@ -97,6 +97,18 @@ const chest: Builder = ({ w, d, item }) => {
   );
 };
 
+/** Light fittings from above: a circle with a cross, the usual plan sign for a light point. */
+const lightPoint: Builder = ({ w, d }) => {
+  const r = Math.min(w, d) / 2;
+  return (
+    <>
+      {circle(0, 0, r, 'c')}
+      {line(-r * 0.7, -r * 0.7, r * 0.7, r * 0.7, 'a')}
+      {line(-r * 0.7, r * 0.7, r * 0.7, -r * 0.7, 'b')}
+    </>
+  );
+};
+
 const closet: Builder = ({ w, d }) => (
   <>
     {line(-w / 2, 0, w / 2, 0)}
@@ -329,6 +341,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   matera: plant, arbol: plant, poste: plant, banca: bench, carro: car, moto,
   centroEntretenimiento: entertainment, cortina: curtain, tiraLed: flat, cuadro: flat, repisa: shelfDots, consola: box(0.03),
   jacuzzi, toallero: flat, brasero: firePit, puf: pouf, jardinVertical: shelfDots, vestier: shelfDots,
+  luzEmpotrada: lightPoint, colgante: lightPoint, aplique: lightPoint,
   porton: ({ w, d, open }) => (
     <>
       {gatePanels(w, open === true).map((pn, i) => rect(pn.x0, (pn.track === 0 ? -d / 2 : 0), pn.x1 - pn.x0, d / 2, 0, i))}

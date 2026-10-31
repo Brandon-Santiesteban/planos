@@ -4,7 +4,7 @@
 // rotation 0), so a desk at rotation 0 has its back at −y and you sit at +y.
 
 export const CATEGORIES = [
-  'Dormitorio', 'Sala', 'Comedor', 'Cocina', 'Baño', 'Oficina y setup', 'Decoración', 'Lavandería', 'Exterior', 'Rooftop',
+  'Dormitorio', 'Sala', 'Comedor', 'Cocina', 'Baño', 'Oficina y setup', 'Decoración', 'Iluminación', 'Lavandería', 'Exterior', 'Rooftop',
   'Parqueadero',
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
@@ -17,7 +17,8 @@ export type FurnitureModel =
   | 'alacena' | 'sanitario' | 'lavamanos' | 'ducha' | 'banera' | 'espejo' | 'lavadero' | 'lavadora' | 'matera'
   | 'banca' | 'carro' | 'moto' | 'piscina' | 'asoleadora' | 'sombrilla' | 'pergola' | 'bar' | 'parrilla'
   | 'jardinera' | 'arbol' | 'poste' | 'centroEntretenimiento' | 'cortina' | 'tiraLed' | 'cuadro' | 'repisa'
-  | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical' | 'porton' | 'vestier';
+  | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical' | 'porton' | 'vestier'
+  | 'luzEmpotrada' | 'colgante' | 'aplique';
 
 /** Open walk-in dressing modules (model 'vestier'): what each one holds. */
 export type Dressing = 'colgar' | 'repisas' | 'zapatos' | 'cajones';
@@ -52,6 +53,8 @@ export interface CatalogItem {
   dressing?: Dressing;
   /** chests of drawers: a framed mirror standing on top, the chest itself this tall (the rest is the mirror) */
   mirrorAbove?: number;
+  /** light fittings: it lights the room in 3D, from this height of the piece (0 bottom … 1 top), warm white */
+  light?: number;
 }
 
 const item = (
@@ -95,10 +98,15 @@ export const CATALOG: CatalogItem[] = [
   item('televisor', 'Televisor 55"', 'Sala', 'televisor', [1.23, 0.08, 0.72], '#1d1f22', { elevation: 0.5, onTop: true }),
   item('televisor-70', 'Televisor 70" (de pared)', 'Sala', 'televisor', [1.56, 0.06, 0.9], '#1d1f22', { elevation: 0.95 }),
   item('alfombra', 'Alfombra', 'Sala', 'alfombra', [2.0, 1.4, 0.01], '#c9b79c'),
-  item('lampara-pie', 'Lámpara de pie', 'Sala', 'lampara', [0.35, 0.35, 1.6], '#e9dcc3'),
+  item('lampara-pie', 'Lámpara de pie', 'Sala', 'lampara', [0.35, 0.35, 1.6], '#e9dcc3', { light: 0.9 }),
   // Wall unit: low cabinet, two shelf towers, a bridge shelf on top and a niche for the TV (a separate piece).
   item('centro-entretenimiento', 'Centro de entretenimiento', 'Sala', 'centroEntretenimiento', [2.4, 0.45, 1.9], NOGAL),
   item('consola', 'Consola de videojuegos', 'Sala', 'consola', [0.39, 0.26, 0.1], '#f2f2f0', { elevation: 0.5, onTop: true }),
+  // Iluminación: they light the 3D view (most noticeable in the evening and at night).
+  item('luz-empotrada', 'Luz empotrada (techo)', 'Iluminación', 'luzEmpotrada', [0.1, 0.1, 0.02], '#f4f1ea', { elevation: 2.58, light: 0 }),
+  item('lampara-colgante', 'Lámpara colgante', 'Iluminación', 'colgante', [0.35, 0.35, 0.9], '#2f2b28', { elevation: 1.7, light: 0.05 }),
+  item('aplique-pared', 'Aplique de pared', 'Iluminación', 'aplique', [0.16, 0.14, 0.28], '#d9c8a8', { elevation: 1.7, light: 0.5 }),
+  item('tira-led-calida', 'Tira LED cálida (luz indirecta)', 'Iluminación', 'tiraLed', [1.0, 0.02, 0.02], '#ffd29a', { elevation: 2.4, light: 0.5 }),
   // Comedor
   item('mesa-comedor-4', 'Mesa de comedor 4 puestos', 'Comedor', 'mesa', [1.2, 0.8, 0.75], ROBLE, { seats: 4 }),
   item('mesa-comedor-6', 'Mesa de comedor 6 puestos', 'Comedor', 'mesa', [1.8, 0.9, 0.75], ROBLE, { seats: 6 }),

@@ -27,7 +27,8 @@ function readBody(req: IncomingMessage): Promise<string> {
 
 /**
  * Write to a temporary file first, so a half-written project never replaces a good one. Windows refuses the rename
- * for a moment while the file is being read, so it is retried.
+ * for a moment while the file is being read, so it is retried; a file kept open for longer (the dev server's own
+ * file watcher does that on Windows) is written in place instead, once the full text is known to be on disk.
  */
 async function writeSafely(path: string, text: string) {
   const tmp = `${path}.${process.pid}.${Math.random().toString(36).slice(2)}.tmp`;
@@ -37,8 +38,14 @@ async function writeSafely(path: string, text: string) {
       return renameSync(tmp, path);
     } catch (e) {
       if (i >= 20) {
-        rmSync(tmp, { force: true });
-        throw e;
+        try {
+          writeFileSync(path, text);
+          return;
+        } catch {
+          throw e;
+        } finally {
+          rmSync(tmp, { force: true });
+        }
       }
       await new Promise((r) => setTimeout(r, 25));
     }

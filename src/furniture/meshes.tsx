@@ -10,6 +10,7 @@ import { byElevation, tiltedSize } from '../model/furnitureOps';
 import type { Floor, Furniture } from '../model/types';
 import { useEditor } from '../store/editorStore';
 import { usePalette } from '../view3d/palette';
+import { useSceneOptions } from '../view3d/sceneOptions';
 import { beginFurnitureDrag, dragFurnitureTo, type FurnitureDrag } from './actions';
 import { type CatalogItem, catalogItem, type FurnitureModel } from './catalog';
 import { gatePanels } from './gate';
@@ -190,6 +191,35 @@ const chest: Builder = ({ w, d, h, c, item }) => {
     </>
   );
 };
+
+/** Recessed ceiling light: a thin trim ring round a glowing disc, flush under the ceiling. */
+const recessed: Builder = ({ w, h, c }) => (
+  <>
+    <C p={[0, h / 2, 0]} r={w / 2} h={h} c={c} m={0.3} rough={0.4} />
+    <C p={[0, -0.001, 0]} r={w * 0.36} h={0.004} c="#fff4dc" e="#ffe2a8" />
+  </>
+);
+
+/** Pendant lamp: a cable from the ceiling (the top of the piece) to a metal shade that glows inside. */
+const pendant: Builder = ({ w, h, c }) => {
+  const shade = Math.min(0.28, h * 0.4);
+  return (
+    <>
+      <C p={[0, h - 0.01, 0]} r={0.05} h={0.02} c={c} m={0.5} />
+      <C p={[0, shade + (h - shade) / 2, 0]} r={0.004} h={h - shade} c="#222222" />
+      <C p={[0, shade / 2, 0]} r={w / 2} top={w * 0.12} h={shade} c={c} m={0.55} rough={0.35} />
+      <C p={[0, 0.01, 0]} r={w * 0.44} h={0.006} c="#fff4dc" e="#ffd79a" />
+    </>
+  );
+};
+
+/** Wall sconce: a small back plate and a glowing shade standing out from the wall. */
+const sconce: Builder = ({ w, d, h, c }) => (
+  <>
+    <B p={[0, h / 2, -d / 2 + 0.01]} s={[w * 0.5, h * 0.6, 0.02]} c="#3a3532" m={0.4} />
+    <C p={[0, h / 2, 0.01]} r={w / 2} top={w * 0.38} h={h * 0.7} c={c} e="#ffcf8a" />
+  </>
+);
 
 const doorsBox: Builder = ({ w, d, h, c }) => {
   const n = Math.max(1, Math.round(w / 0.55));
@@ -1546,8 +1576,13 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   asoleadora: lounger, sombrilla: umbrella, pergola, bar, parrilla: grill, jardinera: planter,
   centroEntretenimiento: entertainment, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
   repisa: collectiblesShelf, jacuzzi, toallero: towelRail, brasero: firePit, puf: pouf, jardinVertical: verticalGarden,
-  vestier: dressing,
+  vestier: dressing, luzEmpotrada: recessed, colgante: pendant, aplique: sconce,
 };
+
+/** How bright light fittings shine by time of day (their light is lost in daylight, plain at night). */
+const FITTING_LIGHT: Record<string, number> = { manana: 0.5, tarde: 1.6, noche: 3.2 };
+/** Each light costs the 3D view: past this many per floor the rest only glow. */
+const MAX_FITTING_LIGHTS = 24;
 
 /** The model of one piece in its local frame (no position or rotation). */
 export function FurnitureModel3D({ f }: { f: Furniture }) {
@@ -1626,6 +1661,11 @@ export default function FurnitureMeshes({ floor, elevation, selectedId }: { floo
     window.addEventListener('pointerup', up);
   };
 
+  const time = useSceneOptions((s) => s.time);
+  const lit = new Set(
+    (floor.furniture ?? []).filter((f) => catalogItem(f.type)?.light !== undefined).slice(0, MAX_FITTING_LIGHTS).map((f) => f.id),
+  );
+
   return (
     <group position={[0, elevation, 0]}>
       {byElevation(floor.furniture ?? []).map((f) => (
@@ -1637,6 +1677,15 @@ export default function FurnitureMeshes({ floor, elevation, selectedId }: { floo
           onClick={(e) => onClick(e, f)}
         >
           <Tilted f={f}><FurnitureModel3D f={f} /></Tilted>
+          {lit.has(f.id) && (
+            <pointLight
+              position={[0, f.height * (catalogItem(f.type)?.light ?? 0) - 0.03, 0]}
+              color="#ffd9a8"
+              intensity={FITTING_LIGHT[time] ?? 1}
+              distance={4.5}
+              decay={2}
+            />
+          )}
           {f.id === selectedId && <SelectionBox f={f} color={pal.selected} />}
         </group>
       ))}
