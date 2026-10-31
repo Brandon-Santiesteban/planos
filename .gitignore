@@ -5,3 +5,4 @@ test-results/
 playwright-report/
 .claude/
 tsconfig.tsbuildinfo
+biblioteca/
