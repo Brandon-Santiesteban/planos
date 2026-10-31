@@ -104,6 +104,22 @@ export function setLightOn(p: Project, floorId: string, id: string, on: boolean)
   else f.off = true;
 }
 
+/** Puts a monitor on a desk-clamp arm or back on its foot (an «arm» flag only while on the arm). */
+export function setMonitorArm(p: Project, floorId: string, id: string, arm: boolean): void {
+  const f = p.floors.find((fl) => fl.id === floorId)?.furniture.find((x) => x.id === id);
+  if (!f) return;
+  if (arm) f.arm = true;
+  else delete f.arm;
+}
+
+/** Switches a room's main ceiling light on or off (a «lightOff» flag only while it is off). */
+export function setRoomLightOn(p: Project, floorId: string, roomId: string, on: boolean): void {
+  const r = p.floors.find((fl) => fl.id === floorId)?.rooms.find((x) => x.id === roomId);
+  if (!r) return;
+  if (on) delete r.lightOff;
+  else r.lightOff = true;
+}
+
 export function setGateOpen(p: Project, floorId: string, id: string, open: boolean): void {
   const f = p.floors.find((fl) => fl.id === floorId)?.furniture.find((x) => x.id === id);
   if (f) f.open = open;

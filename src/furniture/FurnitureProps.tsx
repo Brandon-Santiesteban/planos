@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from 'react';
-import { fitToWall, setGateOpen, updateFurniture, type FurniturePatch } from '../model/furnitureOps';
+import { fitToWall, setGateOpen, setMonitorArm, updateFurniture, type FurniturePatch } from '../model/furnitureOps';
 import type { Floor } from '../model/types';
 import { formatMetres, parseLength } from '../model/units';
 import { useEditor } from '../store/editorStore';
@@ -103,6 +103,19 @@ export default function FurnitureProps({ floor, id }: { floor: Floor; id: string
             }}
           />
           {item.model === 'porton' ? 'Portón abierto' : item.model === 'tableroCorredizo' ? 'Tablero afuera' : 'Puerta corrida'}
+        </label>
+      )}
+      {item?.model === 'monitor' && (
+        <label className="toggle-linea">
+          <input
+            type="checkbox"
+            checked={f.arm === true}
+            onChange={(e) => {
+              const { apply, activeFloorId } = useEditor.getState();
+              apply((d) => setMonitorArm(d, activeFloorId, id, e.target.checked));
+            }}
+          />
+          Con brazo mecánico (sujeto a la mesa)
         </label>
       )}
       {(item?.model === 'closet' || item?.model === 'vestier') && (

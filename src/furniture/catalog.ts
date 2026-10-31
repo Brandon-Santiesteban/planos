@@ -19,7 +19,8 @@ export type FurnitureModel =
   | 'jardinera' | 'arbol' | 'poste' | 'centroEntretenimiento' | 'cortina' | 'tiraLed' | 'cuadro' | 'repisa'
   | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical' | 'porton' | 'vestier'
   | 'luzEmpotrada' | 'colgante' | 'aplique' | 'aire' | 'canasta' | 'centroEscritorio' | 'impresora'
-  | 'matita' | 'monstera' | 'plantaColgante' | 'pampas' | 'adornos' | 'repisaDeco' | 'closetTablero' | 'tableroCorredizo' | 'cornisaLed';
+  | 'matita' | 'monstera' | 'plantaColgante' | 'pampas' | 'adornos' | 'repisaDeco' | 'closetTablero' | 'tableroCorredizo' | 'cornisaLed'
+  | 'barraSonido' | 'parlante' | 'subwoofer';
 
 /** Open walk-in dressing modules (model 'vestier'): what each one holds. */
 export type Dressing = 'colgar' | 'repisas' | 'zapatos' | 'cajones';
@@ -106,6 +107,10 @@ export const CATALOG: CatalogItem[] = [
   item('mesa-centro', 'Mesa de centro', 'Sala', 'mesaCentro', [1.1, 0.6, 0.42], NOGAL),
   item('mueble-tv', 'Mueble de TV', 'Sala', 'muebleTV', [1.6, 0.4, 0.5], NOGAL),
   item('televisor', 'Televisor 55"', 'Sala', 'televisor', [1.23, 0.08, 0.72], '#1d1f22', { elevation: 0.5, onTop: true }),
+  // Home theatre: soundbar (centre and front speakers) under the TV, two surround satellites, a subwoofer.
+  item('barra-sonido', 'Barra de sonido (teatro en casa)', 'Sala', 'barraSonido', [1.1, 0.1, 0.07], '#232428', { elevation: 1.05 }),
+  item('parlante-pared', 'Parlante envolvente de pared', 'Sala', 'parlante', [0.13, 0.12, 0.22], '#232428', { elevation: 1.8 }),
+  item('subwoofer', 'Subwoofer', 'Sala', 'subwoofer', [0.3, 0.32, 0.34], '#232428'),
   item('televisor-70', 'Televisor 70" (de pared)', 'Sala', 'televisor', [1.56, 0.06, 0.9], '#1d1f22', { elevation: 0.95 }),
   item('alfombra', 'Alfombra', 'Sala', 'alfombra', [2.0, 1.4, 0.01], '#c9b79c'),
   item('lampara-pie', 'Lámpara de pie', 'Sala', 'lampara', [0.35, 0.35, 1.6], '#e9dcc3', { light: 0.9 }),
@@ -241,7 +246,10 @@ const SYNONYMS: Record<string, string> = {
   alfombra: 'tapete',
   cuadro: 'arte pintura',
   escritorio: 'mesa trabajo',
-  monitor: 'pantalla',
+  monitor: 'pantalla brazo soporte',
+  barraSonido: 'teatro en casa home theater sonido parlante bocina',
+  parlante: 'teatro en casa home theater sonido bocina altavoz envolvente surround',
+  subwoofer: 'teatro en casa home theater bajo bocina altavoz woofer',
   torre: 'pc computador',
   carro: 'auto coche',
   piscina: 'alberca',

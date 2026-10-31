@@ -352,6 +352,9 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   tableroCorredizo: ({ w, d, open }) => <>{line(-w / 2, 0, w / 2, 0)}{rect(open ? 0 : -w / 2, -d / 2, w / 2, d * 0.6)}</>,
   matita: pouf, monstera: plant, plantaColgante: plant, pampas: pouf, adornos: box(0.03), repisaDeco: shelfDots,
   impresora: ({ w, d }) => <>{rect(-w / 2 + 0.03, -d / 2 + 0.03, w - 0.06, d - 0.12)}{line(-w * 0.3, d / 2 - 0.04, w * 0.3, d / 2 - 0.04)}</>,
+  barraSonido: ({ w, d }) => rect(-w / 2, -d / 2, w, d, 0.02),
+  parlante: ({ w, d }) => <>{rect(-w / 2, -d / 2 + 0.02, w, d - 0.02, 0.01)}{line(-w * 0.3, d / 2, w * 0.3, d / 2)}</>,
+  subwoofer: ({ w, d }) => <>{rect(-w / 2, -d / 2, w, d, 0.015)}{line(-w * 0.35, d / 2 - 0.02, w * 0.35, d / 2 - 0.02)}</>,
   canasta: ({ w, d }) => <>{circle(0, 0, Math.min(w, d) / 2)}{circle(0, 0, Math.min(w, d) * 0.35, 'c')}</>,
   porton: ({ w, d, open }) => (
     <>

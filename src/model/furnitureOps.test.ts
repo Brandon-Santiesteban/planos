@@ -1,7 +1,7 @@
 import { createEmptyProject } from './defaults';
 import {
   addFurniture, deleteFurniture, duplicateFurniture, furnitureCorners, furnitureFromCatalog, moveFurniture,
-  dropElevation, isStacked, piecesOnTop, pointInFurniture, rotateFurniture, snapFlushToWall, snapToWalls, stackElevation, tiltedSize, updateFurniture, setFurnitureColor, fitToWall, squareUp, setLightOn,
+  dropElevation, isStacked, piecesOnTop, pointInFurniture, rotateFurniture, snapFlushToWall, snapToWalls, stackElevation, tiltedSize, updateFurniture, setFurnitureColor, fitToWall, squareUp, setLightOn, setRoomLightOn,
 } from './furnitureOps';
 import { addOpening, addWall } from './ops';
 import type { Furniture, Wall } from './types';
@@ -235,4 +235,13 @@ test('a light fitting can be switched off and on again', () => {
   expect(floor().furniture[0].off).toBe(true);
   setLightOn(p, f, id, true);
   expect(floor().furniture[0].off).toBeUndefined();
+});
+
+test('a room\'s main ceiling light switches off and back on', () => {
+  const { p, f, floor } = setup();
+  floor().rooms.push({ id: 'r1', name: 'Cuarto', kind: 'room', points: [{ x: 0, y: 0 }, { x: 4, y: 0 }, { x: 4, y: 3 }, { x: 0, y: 3 }] });
+  setRoomLightOn(p, f, 'r1', false);
+  expect(floor().rooms[0].lightOff).toBe(true);
+  setRoomLightOn(p, f, 'r1', true);
+  expect(floor().rooms[0].lightOff).toBeUndefined();
 });

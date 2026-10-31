@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { catalogItem } from '../furniture/catalog';
-import { setLightOn } from '../model/furnitureOps';
+import { setLightOn, setRoomLightOn } from '../model/furnitureOps';
 import { useEditor } from '../store/editorStore';
 import Icon from '../ui/Icon';
 
@@ -13,6 +13,8 @@ export default function LightsPanel() {
   const floor = useEditor((s) => s.project.floors.find((f) => f.id === s.activeFloorId));
   const selectedId = useEditor((s) => (s.selection?.kind === 'furniture' ? s.selection.id : null));
   const lights = (floor?.furniture ?? []).filter((f) => catalogItem(f.type)?.light !== undefined);
+  // Every room has a main ceiling light in its middle (drawn by the 3D view, not a piece of furniture).
+  const rooms = (floor?.rooms ?? []).filter((r) => r.kind === 'room');
   // Grouped by kind, each kind numbered in plan order (top to bottom, left to right), so «Luz empotrada 2» is stable.
   const label = (type: string) => catalogItem(type)!.name.replace(/\s*\(.*\)$/, '');
   const count = new Map<string, number>();
@@ -28,9 +30,16 @@ export default function LightsPanel() {
     const { apply, activeFloorId } = useEditor.getState();
     apply((d) => setLightOn(d, activeFloorId, id, on));
   };
+  const toggleRoom = (id: string, on: boolean) => {
+    const { apply, activeFloorId } = useEditor.getState();
+    apply((d) => setRoomLightOn(d, activeFloorId, id, on));
+  };
   const all = (on: boolean) => {
     const { apply, activeFloorId } = useEditor.getState();
-    apply((d) => lights.forEach((f) => setLightOn(d, activeFloorId, f.id, on)));
+    apply((d) => {
+      rooms.forEach((r) => setRoomLightOn(d, activeFloorId, r.id, on));
+      lights.forEach((f) => setLightOn(d, activeFloorId, f.id, on));
+    });
   };
   return (
     <div className="luces">
@@ -46,8 +55,17 @@ export default function LightsPanel() {
               <button type="button" className="btn-texto" onClick={() => all(false)}>Ninguna</button>
             </span>
           </div>
-          {named.length === 0 && <p className="hint">No hay luces en esta planta. Agrégalas desde Muebles → Iluminación.</p>}
+          {named.length === 0 && rooms.length === 0 && <p className="hint">No hay luces en esta planta. Agrégalas desde Muebles → Iluminación.</p>}
           <ul>
+            {rooms.map((r) => (
+              <li key={r.id}>
+                <label>
+                  <input type="checkbox" checked={!r.lightOff} onChange={(e) => toggleRoom(r.id, e.target.checked)} />
+                  <span className="muestra" style={{ background: r.lightOff ? 'transparent' : '#ffd08a' }} />
+                  <span>Luz principal{rooms.length > 1 ? ` · ${r.name}` : ''}</span>
+                </label>
+              </li>
+            ))}
             {named.map(({ f, name }) => (
               <li key={f.id} className={f.id === selectedId ? 'activa' : undefined}>
                 <label>

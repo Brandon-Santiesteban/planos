@@ -82,8 +82,13 @@ const json = await page.evaluate(async (ID) => {
   const unitY = 1.09;
   put('centro-escritorio', 0.4, unitY, 270, { width: 2.18, depth: 0.8, height: 2.4 }); // desk 80 cm deep (the user's)
   put('televisor-70', 0.085, unitY, 270, { elevation: 1.22 }); // 70" (the user's)
-  put('monitor', 0.3, unitY, 270);
+  put('monitor', 0.3, unitY, 270, { arm: true }); // on a mechanical arm clamped to the desk (the user's)
   put('torre-pc', 0.4, unitY + 0.55, 270);
+  // Home theatre (the user's): soundbar under the TV, a surround speaker each side of the headboard (you watch from the
+  // bed), the subwoofer on the floor under the desk by the wall.
+  put('barra-sonido', 0.09, unitY, 270, { width: 1.2, elevation: 1.1 });
+  for (const sy of [-1, 1]) put('parlante-pared', W - 0.06, bedY + sy * 0.62, 90, { elevation: 1.85 });
+  put('subwoofer', 0.2, unitY + 0.62, 90);
   put('silla-oficina', 1.12, unitY, 90, { color: '#3a3d42' }); // office chair (the user's)
   // Wardrobe (1.80 × 0.60, the user's) in the front-right corner, its doors opening clear of the bed.
   // Wardrobe beside the door (the user's call, so the bed gets a nightstand on each side): the open door rests on it.
@@ -115,7 +120,8 @@ const json = await page.evaluate(async (ID) => {
   for (const sy of [-1, 1]) put('lampara-colgante', W - 0.22, bedY + sy * 0.95);
   // Downlights where light is needed: over the desk and chair, in front of the wardrobe, on the shelves; none over the
   // bed (no glare lying down: the pendants and the headboard glow light it).
-  for (const [lx, ly] of [[1.3, 0.75], [1.3, 1.9], [2.5, 2.1], [2.0, 0.55]]) put('luz-empotrada', lx, ly, 0, { elevation: 2.58 });
+  // Four downlights in a rectangle centred on the main light in the middle of the room (symmetric, the user's).
+  for (const lx of [1.2, 2.8]) for (const ly of [0.75, 2.25]) put('luz-empotrada', lx, ly, 0, { elevation: 2.58 });
   // Setup neons, warm yellow to start with like the rest: behind the TV and under the desk top.
   put('tira-led', 0.05, unitY, 270, { width: 1.5, elevation: 1.67, color: WARM });
   put('tira-led', 0.75, unitY, 270, { width: 1.35, elevation: 0.7, color: WARM });

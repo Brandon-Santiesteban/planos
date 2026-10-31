@@ -75,7 +75,8 @@ function S({ p, r, c, sc }: { p: V3; r: number; c: string; sc?: V3 }) {
 
 /** `seed` is stable per piece (from its id): trees use it to vary their shape and greens. */
 /** `off`: a light fitting switched off (the room lights are off in 3D): no glow. */
-type P = { w: number; d: number; h: number; c: string; item?: CatalogItem; seed?: number; open?: boolean; off?: boolean };
+/** `arm`: a monitor held by a desk-clamp arm. */
+type P = { w: number; d: number; h: number; c: string; item?: CatalogItem; seed?: number; open?: boolean; off?: boolean; arm?: boolean };
 type Builder = (p: P) => ReactElement;
 
 const METAL = '#5a5f66';
@@ -113,15 +114,22 @@ const bed: Builder = (p) => {
       <B p={[0, h / 2, -d / 2 + 0.01]} s={[w + 0.1, h, 0.02]} c={wood} r={0.6} />
       {[-1, 1].map((sx) => <B key={sx} p={[sx * (w / 2 + 0.04), h / 2, -d / 2 + (s + 0.06) / 2]} s={[0.02, h, s + 0.06]} c={wood} r={0.6} />)}
       <RB p={[0, h + 0.015, -d / 2 + (s + 0.06) / 2]} s={[w + 0.12, 0.03, s + 0.06]} rad={0.006} c={wood} r={0.5} />
+      {/* Warm LED strips along the lower edge of the frame (both sides and the foot), each in an aluminium channel */}
+      {[-1, 1].map((sx) => (
+        <group key={`led${sx}`}>
+          <B p={[sx * (w / 2 - 0.012), 0.116, s / 2]} s={[0.02, 0.008, d - s]} c={STEEL} m={0.6} r={0.35} />
+          <Neon p={[sx * (w / 2 - 0.012), 0.111, s / 2]} s={[0.012, 0.003, d - s - 0.01]} c={p.off ? '#e8e4dc' : '#ffd9a6'} k={p.off ? 0 : 1.6} />
+        </group>
+      ))}
+      <B p={[0, 0.116, d / 2 - 0.012]} s={[w - 0.04, 0.008, 0.02]} c={STEEL} m={0.6} r={0.35} />
+      <Neon p={[0, 0.111, d / 2 - 0.012]} s={[w - 0.05, 0.003, 0.012]} c={p.off ? '#e8e4dc' : '#ffd9a6'} k={p.off ? 0 : 1.6} />
       {!p.off && (
         <>
           <Neon p={[0, h + 0.034, -d / 2 + 0.025]} s={[w, 0.005, 0.01]} c={'#ffd9a6'} k={1.2} />
           <Glow p={[0, h + 0.3, -d / 2 + 0.003]} s={[w + 0.5, 0.6]} c={'#ffcf8a'} o={0.45} />
-          {/* Warm LED hidden under the frame, washing the floor round the bed */}
-          {[-1, 1].map((sx) => <Neon key={sx} p={[sx * (w / 2 - 0.07), 0.1, s / 2]} s={[0.01, 0.006, d - s - 0.2]} c={'#ffd9a6'} k={1.4} />)}
-          <Neon p={[0, 0.1, d / 2 - 0.07]} s={[w - 0.14, 0.006, 0.01]} c={'#ffd9a6'} k={1.4} />
-          {[-1, 1].map((sx) => <Glow key={`g${sx}`} p={[sx * (w / 2), 0.016, s / 2]} s={[0.7, d - s]} c={'#ffc277'} o={0.9} rot={[-Math.PI / 2, 0, 0]} />)}
-          <Glow p={[0, 0.016, d / 2]} s={[w, 0.7]} c={'#ffc277'} o={0.9} rot={[-Math.PI / 2, 0, 0]} />
+          {/* The light the strips cast on the floor along the edges */}
+          {[-1, 1].map((sx) => <Glow key={`g${sx}`} p={[sx * (w / 2 + 0.05), 0.016, s / 2]} s={[0.5, d - s + 0.2]} c={'#ffc277'} o={0.9} rot={[-Math.PI / 2, 0, 0]} />)}
+          <Glow p={[0, 0.016, d / 2 + 0.05]} s={[w + 0.2, 0.5]} c={'#ffc277'} o={0.9} rot={[-Math.PI / 2, 0, 0]} />
         </>
       )}
       <group position={[0, 0, s / 2]}>{bedCore({ ...p, d: d - s })}</group>
@@ -337,14 +345,97 @@ const officeChair = (tall: boolean): Builder => ({ w, d, h, c }) => {
   );
 };
 
-const monitor: Builder = ({ w, d, h, c }) => {
+/** Round bar from `a` to `b` (arms, rods). */
+function Rod({ a, b, r, c, m = 0.5 }: { a: V3; b: V3; r: number; c: string; m?: number }) {
+  const v = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
+  const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), v.clone().normalize());
+  return (
+    <mesh position={[(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2]} quaternion={q} castShadow>
+      <cylinderGeometry args={[r, r, v.length(), 12]} />
+      <meshStandardMaterial color={c} roughness={0.35} metalness={m} />
+    </mesh>
+  );
+}
+
+/**
+ * Monitor; with `arm` it floats on an articulated gas-spring arm clamped to the back edge of the desk (a pole, two
+ * jointed segments, the VESA plate), raised a little and free of the foot, so the desk top stays clear.
+ */
+const monitor: Builder = ({ w, d, h, c, arm }) => {
   const screenH = Math.min(h * 0.82, w * 0.6);
+  if (arm) {
+    const sc = h - screenH / 2 + 0.08;
+    const zs = 0.02;
+    const zc = -d / 2 - 0.1;
+    const j1: V3 = [0, 0.3, zc];
+    const el: V3 = [w / 2 + 0.04, 0.42, zc + 0.03];
+    const v: V3 = [0, sc, zs - 0.06];
+    const metal = '#2b2d31';
+    return (
+      <>
+        {/* Clamp gripping the desk top (above and below it) */}
+        <B p={[0, 0.03, zc]} s={[0.07, 0.06, 0.09]} c={metal} m={0.5} r={0.35} />
+        <B p={[0, -0.055, zc]} s={[0.06, 0.015, 0.08]} c={metal} m={0.5} r={0.35} />
+        <B p={[0, -0.015, zc - 0.04]} s={[0.06, 0.09, 0.012]} c={metal} m={0.5} r={0.35} />
+        <C p={[0, -0.075, zc]} r={0.012} h={0.03} c={STEEL} m={0.6} rough={0.3} />
+        {/* Pole and its collar */}
+        <C p={[0, 0.06 + (j1[1] - 0.06) / 2, zc]} r={0.017} h={j1[1] - 0.06} c={metal} m={0.5} rough={0.35} />
+        <C p={j1} r={0.026} h={0.04} c={metal} m={0.5} rough={0.35} />
+        {/* Two jointed segments, each a main bar with the gas spring under it */}
+        <Rod a={j1} b={el} r={0.016} c={metal} />
+        <Rod a={[j1[0], j1[1] - 0.025, j1[2]]} b={[el[0], el[1] - 0.025, el[2]]} r={0.007} c={STEEL} m={0.7} />
+        <S p={el} r={0.024} c={metal} />
+        <Rod a={el} b={v} r={0.015} c={metal} />
+        <Rod a={[el[0], el[1] - 0.025, el[2]]} b={[v[0], v[1] - 0.025, v[2]]} r={0.007} c={STEEL} m={0.7} />
+        {/* Tilt knuckle and VESA plate on the back of the screen */}
+        <S p={v} r={0.022} c={metal} />
+        <B p={[0, sc, zs - 0.035]} s={[0.1, 0.1, 0.014]} c={metal} m={0.5} r={0.35} />
+        <B p={[0, sc, zs]} s={[w, screenH, 0.03]} c={c} r={0.7} />
+        <B p={[0, sc, zs + 0.016]} s={[w - 0.02, screenH - 0.02, 0.002]} c={'#1f3346'} r={0.85} e={'#203a55'} />
+      </>
+    );
+  }
   return (
     <>
       <B p={[0, 0.008, 0]} s={[Math.min(0.25, w * 0.4), 0.016, Math.min(0.18, d)]} c={DARK} />
       <B p={[0, (h - screenH / 2) / 2, -d * 0.2]} s={[0.04, h - screenH / 2, 0.03]} c={DARK} />
       <B p={[0, h - screenH / 2, -d * 0.1]} s={[w, screenH, 0.03]} c={c} r={0.7} />
       <B p={[0, h - screenH / 2, -d * 0.1 + 0.016]} s={[w - 0.02, screenH - 0.02, 0.002]} c={'#1f3346'} r={0.85} e={'#203a55'} />
+    </>
+  );
+};
+
+/** Soundbar: a slim rounded body with a fabric front and a status light (under the TV). */
+const soundbar: Builder = ({ w, d, h, c }) => (
+  <>
+    <RB p={[0, h / 2, 0]} s={[w, h, d]} rad={Math.min(h, d) * 0.45} c={c} r={0.5} />
+    <RB p={[0, h / 2, d / 2 - 0.005]} s={[w - 0.05, h * 0.72, 0.012]} rad={0.005} c={shade(c, 0.7)} r={1} />
+    <B p={[w * 0.42, h * 0.2, d / 2 + 0.003]} s={[0.012, 0.004, 0.002]} c={'#ffffff'} e={'#9fd3ff'} />
+  </>
+);
+
+/** Satellite speaker on a wall bracket (surround): tweeter over woofer. */
+const speaker: Builder = ({ w, d, h, c }) => (
+  <>
+    <B p={[0, h * 0.5, -d / 2 + 0.01]} s={[0.04, 0.06, 0.02]} c={DARK} m={0.5} r={0.4} />
+    <RB p={[0, h / 2, 0.01]} s={[w, h, d - 0.02]} rad={0.012} c={c} r={0.55} />
+    <C p={[0, h * 0.7, d / 2 + 0.002]} r={w * 0.17} h={0.006} c={'#3b3d41'} rot={[Math.PI / 2, 0, 0]} m={0.4} rough={0.4} />
+    <C p={[0, h * 0.34, d / 2 + 0.002]} r={w * 0.36} h={0.006} c={'#2a2c30'} rot={[Math.PI / 2, 0, 0]} rough={0.9} />
+    <C p={[0, h * 0.34, d / 2 + 0.006]} r={w * 0.1} h={0.006} c={'#4a4c50'} rot={[Math.PI / 2, 0, 0]} m={0.4} rough={0.4} />
+  </>
+);
+
+/** Subwoofer: a cube on four feet, a big front driver and a power light. */
+const subwoofer: Builder = ({ w, d, h, c }) => {
+  const body = h - 0.02;
+  const r = Math.min(w, body) * 0.37;
+  return (
+    <>
+      {[-1, 1].flatMap((sx) => [-1, 1].map((sz) => <C key={`${sx}${sz}`} p={[sx * (w / 2 - 0.04), 0.01, sz * (d / 2 - 0.04)]} r={0.018} h={0.02} c={DARK} />))}
+      <RB p={[0, 0.02 + body / 2, 0]} s={[w, body, d]} rad={0.015} c={c} r={0.5} />
+      <C p={[0, 0.02 + body / 2, d / 2 + 0.003]} r={r} h={0.008} c={'#2a2c30'} rot={[Math.PI / 2, 0, 0]} rough={0.9} />
+      <C p={[0, 0.02 + body / 2, d / 2 + 0.008]} r={r * 0.28} h={0.006} c={'#3a3c40'} rot={[Math.PI / 2, 0, 0]} m={0.4} rough={0.4} />
+      <B p={[0, h - 0.03, d / 2 + 0.002]} s={[0.012, 0.004, 0.002]} c={'#ffffff'} e={'#7fd17f'} />
     </>
   );
 };
@@ -2158,7 +2249,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   asoleadora: lounger, sombrilla: umbrella, pergola, bar, parrilla: grill, jardinera: planter,
   centroEntretenimiento: entertainment, centroEscritorio: deskEntertainment, closetTablero: whiteboardCloset, tableroCorredizo: pullOutBoard, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
   repisa: collectiblesShelf, jacuzzi, toallero: towelRail, brasero: firePit, puf: pouf, jardinVertical: verticalGarden,
-  vestier: dressing, luzEmpotrada: recessed, colgante: pendant, aplique: sconce, aire: airConditioner, cornisaLed: cornice,
+  vestier: dressing, luzEmpotrada: recessed, colgante: pendant, aplique: sconce, aire: airConditioner, barraSonido: soundbar, parlante: speaker, subwoofer, cornisaLed: cornice,
   canasta: basket, impresora: printer,
   matita: pottedSmall, monstera, plantaColgante: hangingPlant, pampas, adornos: tabletopDecor, repisaDeco: decorShelf,
 };
@@ -2175,7 +2266,7 @@ export function FurnitureModel3D({ f }: { f: Furniture }) {
   const build = item ? BUILDERS[item.model] : null;
   const neon = useSceneOptions((s) => s.lights === 'neon');
   const off = item?.light !== undefined && (f.off === true || (neon && !item.ambient));
-  return build ? build({ w: f.width, d: f.depth, h: f.height, c, item, seed: hashSeed(f.id), open: f.open, off }) : <B p={[0, f.height / 2, 0]} s={[f.width, f.height, f.depth]} c={c} />;
+  return build ? build({ w: f.width, d: f.depth, h: f.height, c, item, seed: hashSeed(f.id), open: f.open, off, arm: f.arm }) : <B p={[0, f.height / 2, 0]} s={[f.width, f.height, f.depth]} c={c} />;
 }
 
 function SelectionBox({ f, color }: { f: Furniture; color: string }) {

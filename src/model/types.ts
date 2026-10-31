@@ -79,6 +79,8 @@ export interface Room {
   floorMaterial?: FloorMaterial;
   /** hex colour the floor finish should look (e.g. a sand porcelain); absent = the finish's own colour. */
   floorColor?: string;
+  /** rooms: their main ceiling light (in the middle) switched off, chosen in «Luces» in the 3D view */
+  lightOff?: boolean;
   /** roof only: hex colour of the solid slab's edge (fascia), e.g. a wooden band seen from the street. */
   edgeColor?: string;
   /** balconies only: edges (index i = points[i] → points[i+1]) left without railing, e.g. towards a driveway. */
@@ -111,6 +113,8 @@ export interface Furniture {
   open?: boolean;
   /** light fittings: switched off (chosen in «Luces» in the 3D view) */
   off?: boolean;
+  /** monitors: held by an articulated arm clamped to the desk instead of standing on their foot */
+  arm?: boolean;
 }
 
 export interface Background {

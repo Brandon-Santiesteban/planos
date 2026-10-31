@@ -8,14 +8,14 @@ const BELOW_CEILING = 0.25;
 
 export type RoomLight = { x: number; y: number; z: number; roomId: string };
 
-/** A warm ceiling light in the middle of every (non-balcony) room of the visible floors. */
+/** A warm ceiling light in the middle of every (non-balcony) room of the visible floors, unless switched off. */
 export function roomLights(p: Project, visibleFloorIds: string[]): RoomLight[] {
   const out: RoomLight[] = [];
   for (const f of p.floors) {
     if (!visibleFloorIds.includes(f.id)) continue;
     const y = floorElevation(p, f.id) + f.height - BELOW_CEILING;
     for (const r of f.rooms) {
-      if (r.kind !== 'room') continue;
+      if (r.kind !== 'room' || r.lightOff) continue;
       const c = polygonCentroid(r.points);
       out.push({ x: c.x, y, z: c.y, roomId: r.id });
     }
