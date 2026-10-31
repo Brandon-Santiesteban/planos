@@ -92,7 +92,7 @@ export default function FurnitureProps({ floor, id }: { floor: Floor; id: string
           {item && <span className="hint">{item.category}</span>}
         </div>
       </div>
-      {item?.model === 'porton' && (
+      {(item?.model === 'porton' || item?.model === 'closetTablero') && (
         <label className="toggle-linea">
           <input
             type="checkbox"
@@ -102,7 +102,7 @@ export default function FurnitureProps({ floor, id }: { floor: Floor; id: string
               apply((d) => setGateOpen(d, activeFloorId, id, e.target.checked));
             }}
           />
-          Portón abierto
+          {item.model === 'porton' ? 'Portón abierto' : 'Puerta del tablero corrida'}
         </label>
       )}
       {(item?.model === 'closet' || item?.model === 'vestier') && (

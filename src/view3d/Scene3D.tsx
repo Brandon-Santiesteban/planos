@@ -11,7 +11,7 @@ import FloorMeshes from './FloorMeshes';
 import FurnitureMeshes from '../furniture/meshes';
 import { usePalette } from './palette';
 import { outdoorLights, roomLights } from './roomLights';
-import { type TimeOfDay, useSceneOptions } from './sceneOptions';
+import { type TimeOfDay, useSceneOptions, type RoomLighting } from './sceneOptions';
 import SegmentedSwitch from '../ui/SegmentedSwitch';
 import WalkControls from '../walk/WalkControls';
 import { WalkButton, WalkHint } from '../walk/WalkOverlay';
@@ -117,7 +117,7 @@ export default function Scene3D() {
   useEffect(() => () => useWalk.getState().set({ walking: false }), []);
   const activeIndex = Math.max(0, project.floors.findIndex((f) => f.id === activeFloorId));
   const visible = project.floors.filter((_, i) => i <= activeIndex || showUpperFloors || walking);
-  const { grass, time } = useSceneOptions();
+  const { grass, time, lights: lighting } = useSceneOptions();
   const visibleIds = visible.map((f) => f.id).join();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const lights = useMemo(() => roomLights(project, visible.map((f) => f.id)), [project, visibleIds]);
@@ -139,7 +139,7 @@ export default function Scene3D() {
         <SkyLights time={time} north={project.north} cx={frame.cx} cz={frame.cy} />
         <Ground grass={grass} color={pal.floor} cx={frame.cx} cz={frame.cy} />
         {!grass && <gridHelper key={pal.line} args={[60, 60, pal.line, pal.line]} position={[frame.cx, -0.025, frame.cy]} />}
-        <RoomLights lights={lights} time={time} />
+        {lighting === 'on' && <RoomLights lights={lights} time={time} />}
         <OutdoorLights lights={outside} time={time} />
         {visible.map((f) => (
           <FloorMeshes key={f.id} floor={f} elevation={floorElevation(project, f.id)} selectedId={selection?.id ?? null} />
@@ -181,6 +181,13 @@ export default function Scene3D() {
           value={time}
           options={[{ value: 'manana', label: 'Mañana' }, { value: 'tarde', label: 'Tarde' }, { value: 'noche', label: 'Noche' }]}
           onChange={(t) => useSceneOptions.getState().set({ time: t })}
+        />
+        <SegmentedSwitch<RoomLighting>
+          label="Luces"
+          value={lighting}
+          options={[{ value: 'on', label: 'Encendidas' }, { value: 'neon', label: 'Solo neón' }]}
+          // Lights off only shows at night: switching them off turns the evening on.
+          onChange={(l) => useSceneOptions.getState().set(l === 'neon' ? { lights: l, time: 'noche' } : { lights: l })}
         />
         <WalkButton />
         <RenderButtons />

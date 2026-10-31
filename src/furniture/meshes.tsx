@@ -74,7 +74,8 @@ function S({ p, r, c, sc }: { p: V3; r: number; c: string; sc?: V3 }) {
 }
 
 /** `seed` is stable per piece (from its id): trees use it to vary their shape and greens. */
-type P = { w: number; d: number; h: number; c: string; item?: CatalogItem; seed?: number; open?: boolean };
+/** `off`: a light fitting switched off (the room lights are off in 3D): no glow. */
+type P = { w: number; d: number; h: number; c: string; item?: CatalogItem; seed?: number; open?: boolean; off?: boolean };
 type Builder = (p: P) => ReactElement;
 
 const METAL = '#5a5f66';
@@ -203,31 +204,31 @@ const airConditioner: Builder = ({ w, d, h, c }) => (
 );
 
 /** Recessed ceiling light: a thin trim ring round a glowing disc, flush under the ceiling. */
-const recessed: Builder = ({ w, h, c }) => (
+const recessed: Builder = ({ w, h, c, off }) => (
   <>
     <C p={[0, h / 2, 0]} r={w / 2} h={h} c={c} m={0.3} rough={0.4} />
-    <C p={[0, -0.001, 0]} r={w * 0.36} h={0.004} c="#fff4dc" e="#ffe2a8" />
+    <C p={[0, -0.001, 0]} r={w * 0.36} h={0.004} c="#fff4dc" e={off ? undefined : "#ffe2a8"} />
   </>
 );
 
 /** Pendant lamp: a cable from the ceiling (the top of the piece) to a metal shade that glows inside. */
-const pendant: Builder = ({ w, h, c }) => {
+const pendant: Builder = ({ w, h, c, off }) => {
   const shade = Math.min(0.28, h * 0.4);
   return (
     <>
       <C p={[0, h - 0.01, 0]} r={0.05} h={0.02} c={c} m={0.5} />
       <C p={[0, shade + (h - shade) / 2, 0]} r={0.004} h={h - shade} c="#222222" />
       <C p={[0, shade / 2, 0]} r={w / 2} top={w * 0.12} h={shade} c={c} m={0.55} rough={0.35} />
-      <C p={[0, 0.01, 0]} r={w * 0.44} h={0.006} c="#fff4dc" e="#ffd79a" />
+      <C p={[0, 0.01, 0]} r={w * 0.44} h={0.006} c="#fff4dc" e={off ? undefined : "#ffd79a"} />
     </>
   );
 };
 
 /** Wall sconce: a small back plate and a glowing shade standing out from the wall. */
-const sconce: Builder = ({ w, d, h, c }) => (
+const sconce: Builder = ({ w, d, h, c, off }) => (
   <>
     <B p={[0, h / 2, -d / 2 + 0.01]} s={[w * 0.5, h * 0.6, 0.02]} c="#3a3532" m={0.4} />
-    <C p={[0, h / 2, 0.01]} r={w / 2} top={w * 0.38} h={h * 0.7} c={c} e="#ffcf8a" />
+    <C p={[0, h / 2, 0.01]} r={w / 2} top={w * 0.38} h={h * 0.7} c={c} e={off ? undefined : "#ffcf8a"} />
   </>
 );
 
@@ -453,11 +454,11 @@ const dressing: Builder = ({ w, d, h, c, item }) => {
   );
 };
 
-const lamp: Builder = ({ w, h, c }) => (
+const lamp: Builder = ({ w, h, c, off }) => (
   <>
     <C p={[0, 0.015, 0]} r={w * 0.4} h={0.03} c={DARK} />
     <C p={[0, h / 2, 0]} r={0.012} h={h - 0.3} c={METAL} m={0.6} />
-    <C p={[0, h - 0.15, 0]} r={w / 2} top={w * 0.36} h={0.3} c={c} e={'#ffcf8a'} />
+    <C p={[0, h - 0.15, 0]} r={w / 2} top={w * 0.36} h={0.3} c={c} e={off ? undefined : '#ffcf8a'} />
   </>
 );
 
@@ -1021,12 +1022,13 @@ function Neon({ p, s, c, k = 2.2, rot }: { p: V3; s: V3; c: string; k?: number; 
 }
 
 /** LED strip on a wall (back at −z): the strip and the light it washes on the wall. */
-const ledStrip: Builder = ({ w, d, h, c }) => (
-  <>
-    <Neon p={[0, h / 2, 0]} s={[w, h, d]} c={c} />
-    <Glow p={[0, h / 2, -d / 2 + 0.002]} s={[w + 0.6, 1.0]} c={c} o={0.8} />
-  </>
-);
+const ledStrip: Builder = ({ w, d, h, c, off }) =>
+  off ? <B p={[0, h / 2, 0]} s={[w, h, d]} c={'#d9d6d0'} r={0.5} /> : (
+    <>
+      <Neon p={[0, h / 2, 0]} s={[w, h, d]} c={c} />
+      <Glow p={[0, h / 2, -d / 2 + 0.002]} s={[w + 0.6, 1.0]} c={c} o={0.8} />
+    </>
+  );
 
 // --- Entertainment centre ---
 
@@ -1106,61 +1108,155 @@ const entertainment: Builder = ({ w, d, h, c }) => {
 };
 
 /**
- * Entertainment centre and desk in one: two shelf towers with closed bases at desk height, a deep desk top between them,
- * a slatted back above it for a wall-mounted TV, and a bridge shelf on top with a warm light strip under it.
+ * Entertainment centre and desk in one, styled like a fitted unit: matte black plinth, wooden carcass with rounded
+ * edges, two slim towers of open shelves (books, plants, a candle, a vase) lit from the front by warm LED, closed
+ * drawers under them at desk height, a deep rounded desk top with a cable grommet and a drawer, a slatted wooden wall
+ * behind the TV, and a bridge on top: an open shelf with decor over a lit niche.
  */
-const deskEntertainment: Builder = ({ w, d, h, c }) => {
-  const tw = Math.min(0.4, w / 6);
-  const td = Math.min(0.45, d);
+const deskEntertainment: Builder = ({ w, d, h, c, seed = 1 }) => {
+  const tw = Math.min(0.32, w / 7);
+  const td = Math.min(0.38, d);
   const tz = -d / 2 + td / 2;
   const desk = 0.75;
-  const bridge = Math.min(0.3, h * 0.14);
-  const t = 0.025;
+  const bridge = Math.min(0.26, h * 0.11);
+  const t = 0.022;
   const nw = w - 2 * tw;
-  const back = shade(c, 0.7);
-  const nShelves = 3;
-  const step = (h - desk) / nShelves;
-  const slats = Math.max(4, Math.round(nw / 0.07));
+  const back = shade(c, 0.62);
+  const black = '#26272a';
+  const led = '#ffd9a6';
+  const shelves = 4;
+  const step = (h - bridge - desk - 0.02) / shelves;
+  const slats = Math.max(6, Math.round(nw / 0.06));
+  const rand = rng(seed * 13 + 1);
+  /** What stands on shelf `i` of tower `side`: books, a plant, a candle with books, a vase, a trailing plant. */
+  const decor = (x: number, y: number, i: number, side: number) => {
+    const k = (i + (side > 0 ? 2 : 0)) % 5;
+    const key = `d${side}${i}`;
+    if (k === 0) return bookRow(x - tw / 2 + t + 0.02, y, tz, 5, td * 0.7, i + side, key).el;
+    if (k === 1) return smallPlant(x, y, tz, 0.055, 0.17, '#e9e4da', seed + i + side, key);
+    if (k === 2) return <group key={key}>{bookStack(x, y, tz, 2, i, 'b')}{candle(x, y + 0.06, tz, 'c')}</group>;
+    if (k === 3) return pampasVase(x, y, tz, Math.min(0.34, step - 0.04), '#cfc3ad', key);
+    return (
+      <group key={key} position={[x, y, tz]}>
+        <C p={[0, 0.045, 0]} r={0.045} top={0.055} h={0.09} c={'#c87a55'} rough={0.5} />
+        {leafFan([0, 0.09, 0], 6, 0.06, 0.045, rand, 0.9, 1.4)}
+        {trailing([0, 0.09, 0], 0.05, 6, Math.min(0.3, step), rand)}
+      </group>
+    );
+  };
   return (
     <>
       {[-1, 1].map((sx) => {
         const cx = sx * (w / 2 - tw / 2);
         return (
           <group key={sx}>
-            <B p={[cx - tw / 2 + t / 2, h / 2, tz]} s={[t, h, td]} c={c} />
-            <B p={[cx + tw / 2 - t / 2, h / 2, tz]} s={[t, h, td]} c={c} />
-            <B p={[cx, h / 2, -d / 2 + 0.01]} s={[tw - 2 * t, h, 0.02]} c={back} />
-            <B p={[cx, desk / 2, tz]} s={[tw - 2 * t, desk, td - 0.02]} c={c} />
-            {[0, 1].map((i) => (
-              <group key={i}>
-                <B p={[cx, desk * (0.25 + i * 0.5), tz + td / 2 - 0.004]} s={[tw - 2 * t - 0.02, desk / 2 - 0.03, 0.01]} c={shade(c, 1.08)} />
-                <B p={[cx, desk * (0.25 + i * 0.5) + desk / 4 - 0.06, tz + td / 2 + 0.008]} s={[0.12, 0.012, 0.012]} c={METAL} m={0.6} r={0.4} />
-              </group>
+            {/* Recessed black plinth, side panels, back, closed base with two push drawers */}
+            <B p={[cx, 0.04, tz - 0.01]} s={[tw - 0.03, 0.08, td - 0.05]} c={black} r={0.6} />
+            <RB p={[cx - tw / 2 + t / 2, h / 2 + 0.04, tz]} s={[t, h - 0.08, td]} rad={0.006} c={c} r={0.55} />
+            <RB p={[cx + tw / 2 - t / 2, h / 2 + 0.04, tz]} s={[t, h - 0.08, td]} rad={0.006} c={c} r={0.55} />
+            <B p={[cx, h / 2 + 0.04, -d / 2 + 0.008]} s={[tw - 2 * t, h - 0.08, 0.016]} c={back} />
+            <B p={[cx, (desk + 0.08) / 2, tz]} s={[tw - 2 * t, desk - 0.08, td - 0.02]} c={c} />
+            {[0, 1].map((i) => {
+              const dy = 0.08 + (desk - 0.08) * (0.25 + i * 0.5);
+              return (
+                <group key={i}>
+                  <RB p={[cx, dy, tz + td / 2 - 0.006]} s={[tw - 2 * t - 0.012, (desk - 0.08) / 2 - 0.012, 0.018]} rad={0.004} c={shade(c, 1.06)} r={0.5} />
+                  <B p={[cx, dy + (desk - 0.08) / 4 - 0.02, tz + td / 2 + 0.004]} s={[tw * 0.5, 0.008, 0.006]} c={black} r={0.4} />
+                </group>
+              );
+            })}
+            {/* Open shelves, each lit from its front edge, with decor */}
+            {Array.from({ length: shelves }, (_, i) => {
+              const y = desk + step * (i + 1);
+              return <RB key={`s${i}`} p={[cx, y - t / 2, tz]} s={[tw - 2 * t, t, td - 0.02]} rad={0.004} c={c} r={0.55} />;
+            })}
+            {Array.from({ length: shelves }, (_, i) => (
+              <Neon key={`l${i}`} p={[cx, desk + step * (i + 1) - t - 0.003, tz + td / 2 - 0.03]} s={[tw - 2 * t - 0.02, 0.004, 0.01]} c={led} k={1.1} />
             ))}
-            {Array.from({ length: nShelves }, (_, i) => (
-              <B key={i} p={[cx, desk + step * (i + 1) - t / 2, tz]} s={[tw - 2 * t, t, td - 0.02]} c={c} />
-            ))}
-            {Array.from({ length: nShelves - 1 }, (_, i) => shelfDecor(cx, desk + step * i, tz, tw / 2 - t, i + (sx > 0 ? 1 : 0)))}
+            {Array.from({ length: shelves }, (_, i) => decor(cx, desk + step * i + (i === 0 ? 0.002 : 0), i, sx))}
           </group>
         );
       })}
-      {/* Desk top between the towers, a drawer under its front and a modesty panel at the back */}
-      <B p={[0, desk - 0.018, 0]} s={[nw, 0.036, d]} c={c} />
-      <B p={[0, desk - 0.08, d / 2 - 0.22]} s={[0.6, 0.09, 0.4]} c={c} />
-      <B p={[0, desk - 0.08, d / 2 - 0.016]} s={[0.58, 0.07, 0.008]} c={shade(c, 1.08)} />
-      <B p={[0, desk / 2, -d / 2 + 0.02]} s={[nw, desk - 0.04, 0.02]} c={back} />
-      {/* Slatted back above the desk, where the TV hangs */}
-      <B p={[0, (desk + h - bridge) / 2, -d / 2 + 0.008]} s={[nw, h - bridge - desk, 0.016]} c={shade(c, 0.45)} />
+      {/* Desk top between the towers: rounded, with a cable grommet, a slim drawer and a modesty panel */}
+      <RB p={[0, desk - 0.02, 0]} s={[nw + 0.01, 0.04, d]} rad={0.012} c={c} r={0.5} />
+      <C p={[nw / 2 - 0.12, desk + 0.0005, -d / 2 + 0.1]} r={0.03} h={0.002} c={black} />
+      <RB p={[0, desk - 0.075, d / 2 - 0.23]} s={[0.6, 0.07, 0.42]} rad={0.006} c={c} r={0.55} />
+      <B p={[0, desk - 0.075, d / 2 - 0.018]} s={[0.56, 0.05, 0.006]} c={shade(c, 1.06)} r={0.5} />
+      <B p={[0, desk - 0.1, d / 2 - 0.014]} s={[0.3, 0.006, 0.006]} c={black} />
+      <B p={[0, desk / 2, -d / 2 + 0.02]} s={[nw, desk - 0.08, 0.02]} c={back} />
+      {/* Slatted wooden wall behind the TV */}
+      <B p={[0, (desk + h - bridge) / 2, -d / 2 + 0.008]} s={[nw, h - bridge - desk, 0.016]} c={black} />
       {Array.from({ length: slats }, (_, i) => (
-        <B key={`s${i}`} p={[-nw / 2 + (nw * (i + 0.5)) / slats, (desk + h - bridge) / 2, -d / 2 + 0.024]} s={[nw / slats - 0.018, h - bridge - desk, 0.016]} c={back} />
+        <RB key={`sl${i}`} p={[-nw / 2 + (nw * (i + 0.5)) / slats, (desk + h - bridge) / 2, -d / 2 + 0.03]} s={[nw / slats - 0.016, h - bridge - desk, 0.028]} rad={0.004} c={back} r={0.7} />
       ))}
-      {/* Bridge shelf on top with a warm light strip under it */}
-      <B p={[0, h - bridge + t / 2, tz]} s={[nw, t, td]} c={c} />
-      <B p={[0, h - t / 2, tz]} s={[nw, t, td]} c={c} />
+      {/* Bridge: lit underside, open shelf with decor, top board */}
+      <RB p={[0, h - bridge + t / 2, tz]} s={[nw + 0.01, t, td]} rad={0.004} c={c} r={0.55} />
+      <RB p={[0, h - t / 2, tz]} s={[w, t, td + 0.01]} rad={0.006} c={c} r={0.55} />
       <B p={[0, h - bridge / 2, -d / 2 + 0.01]} s={[nw, bridge, 0.02]} c={back} />
-      <Neon p={[0, h - bridge - 0.004, tz + td / 2 - 0.05]} s={[nw - 0.1, 0.006, 0.012]} c={'#ffd9a6'} k={1.2} />
-      {shelfDecor(-nw * 0.3, h - bridge + t, tz, 0.1, 0)}
-      {shelfDecor(nw * 0.3, h - bridge + t, tz, 0.1, 2)}
+      <Neon p={[0, h - bridge - 0.004, tz + td / 2 - 0.04]} s={[nw - 0.06, 0.005, 0.012]} c={led} k={1.4} />
+      {bookRow(-nw / 2 + 0.06, h - bridge + t, tz, 7, td * 0.7, seed, 'br').el}
+      {smallPlant(-nw * 0.05, h - bridge + t, tz, 0.05, 0.16, '#d9cbb3', seed + 5, 'bp')}
+      {candle(nw * 0.15, h - bridge + t, tz, 'bc')}
+      {bookStack(nw * 0.33, h - bridge + t, tz, 2, seed, 'bs')}
+    </>
+  );
+};
+
+/**
+ * Wardrobe with two sliding doors whose fronts are a white writable board (aluminium frame, a marker ledge with
+ * markers and an eraser, a to-do list written on it). `open`: the front door slid over the other, showing the hanging
+ * rail and shelves inside.
+ */
+const whiteboardCloset: Builder = ({ w, d, h, c, open }) => {
+  const t = 0.022;
+  const dh = h - 0.12;
+  const dw = w / 2 + 0.02;
+  const front = d / 2 - 0.015;
+  const rear = d / 2 - 0.05;
+  const xA = open ? w / 4 - 0.01 : -w / 4 + 0.01;
+  const board = '#fbfbf9';
+  const door = (x: number, z: number, key: string, note: boolean) => (
+    <group key={key} position={[x, 0.07 + dh / 2, z]}>
+      <B p={[0, 0, 0]} s={[dw, dh, 0.022]} c={STEEL} m={0.6} r={0.3} />
+      <B p={[0, 0, 0.0115]} s={[dw - 0.03, dh - 0.03, 0.002]} c={board} r={0.12} />
+      <B p={[0, -dh / 2 + 0.95, 0.03]} s={[dw * 0.6, 0.015, 0.05]} c={STEEL} m={0.6} r={0.3} />
+      {[['#1d4ed8', -0.12], ['#dc2626', -0.06], ['#111111', 0.0]].map(([col, mx]) => (
+        <C key={col as string} p={[(mx as number) - 0.05, -dh / 2 + 0.965, 0.035]} r={0.008} h={0.12} c={col as string} rot={[0, 0, Math.PI / 2]} />
+      ))}
+      <B p={[0.12, -dh / 2 + 0.975, 0.035]} s={[0.12, 0.03, 0.045]} c={'#3a3d42'} r={0.8} />
+      {note && (
+        <group position={[0, 0.35, 0.0125]}>
+          <B p={[-0.1, 0.22, 0]} s={[0.36, 0.012, 0.001]} c={'#1d4ed8'} r={0.9} />
+          {[0, 1, 2, 3].map((i) => (
+            <group key={i}>
+              <B p={[-0.25, 0.1 - i * 0.09, 0]} s={[0.03, 0.03, 0.001]} c={'#111111'} r={0.9} />
+              <B p={[-0.08 + (i % 2) * 0.02, 0.1 - i * 0.09, 0]} s={[0.28 - (i % 3) * 0.06, 0.008, 0.001]} c={'#2b2b2b'} r={0.9} />
+            </group>
+          ))}
+          <B p={[-0.25, 0.1, 0.0005]} s={[0.022, 0.006, 0.001]} c={'#dc2626'} r={0.9} rot={[0, 0, 0.8]} />
+        </group>
+      )}
+    </group>
+  );
+  return (
+    <>
+      {/* Carcass */}
+      <B p={[-w / 2 + t / 2, h / 2, -0.02]} s={[t, h, d - 0.04]} c={c} />
+      <B p={[w / 2 - t / 2, h / 2, -0.02]} s={[t, h, d - 0.04]} c={c} />
+      <B p={[0, h - t / 2, -0.02]} s={[w, t, d - 0.04]} c={c} />
+      <B p={[0, 0.035, -0.02]} s={[w - 2 * t, 0.07, d - 0.04]} c={shade(c, 0.6)} />
+      <B p={[0, h / 2, -d / 2 + 0.008]} s={[w - 2 * t, h, 0.016]} c={shade(c, 0.85)} />
+      {/* Inside: hanging rail with clothes on the left, shelves on the right */}
+      <C p={[-w / 4, h - 0.32, -0.05]} r={0.012} h={w / 2 - 0.06} c={STEEL} m={0.7} rot={[0, 0, Math.PI / 2]} />
+      {Array.from({ length: 7 }, (_, i) => (
+        <RB key={i} p={[-w / 2 + 0.1 + i * ((w / 2 - 0.16) / 6), h - 0.32 - 0.45, -0.05]} s={[0.04, 0.85 - (i % 3) * 0.15, d * 0.7]} rad={0.015} c={['#3e4a55', '#e3d9c6', '#a4553d', '#5d6b5a', '#c9b38f', '#2b2b2b', '#7a5c45'][i]} r={0.95} />
+      ))}
+      {[0.45, 0.9, 1.35, 1.8].map((y) => <B key={y} p={[w / 4, y, -0.05]} s={[w / 2 - 0.04, t, d * 0.75]} c={c} />)}
+      {/* Top track and the two board doors */}
+      <B p={[0, h - 0.04, d / 2 - 0.03]} s={[w, 0.03, 0.06]} c={STEEL} m={0.6} r={0.3} />
+      <B p={[0, 0.06, d / 2 - 0.03]} s={[w, 0.012, 0.06]} c={STEEL} m={0.6} r={0.3} />
+      {door(w / 4 - 0.01, rear, 'b', false)}
+      {door(xA, front, 'a', true)}
     </>
   );
 };
@@ -1977,7 +2073,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   lavamanos: basin, ducha: shower, banera: tub, espejo: mirror,
   porton: slidingGate, lavadero: washtub, lavadora: washer, matera: plant, arbol: tree, poste: streetLamp, banca: bench, carro: car, moto, piscina: pool,
   asoleadora: lounger, sombrilla: umbrella, pergola, bar, parrilla: grill, jardinera: planter,
-  centroEntretenimiento: entertainment, centroEscritorio: deskEntertainment, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
+  centroEntretenimiento: entertainment, centroEscritorio: deskEntertainment, closetTablero: whiteboardCloset, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
   repisa: collectiblesShelf, jacuzzi, toallero: towelRail, brasero: firePit, puf: pouf, jardinVertical: verticalGarden,
   vestier: dressing, luzEmpotrada: recessed, colgante: pendant, aplique: sconce, aire: airConditioner,
   canasta: basket, impresora: printer,
@@ -1994,7 +2090,8 @@ export function FurnitureModel3D({ f }: { f: Furniture }) {
   const item = catalogItem(f.type);
   const c = f.color ?? item?.color ?? '#b08a63';
   const build = item ? BUILDERS[item.model] : null;
-  return build ? build({ w: f.width, d: f.depth, h: f.height, c, item, seed: hashSeed(f.id), open: f.open }) : <B p={[0, f.height / 2, 0]} s={[f.width, f.height, f.depth]} c={c} />;
+  const off = useSceneOptions((s) => s.lights === 'neon') && item?.light !== undefined && !item.ambient;
+  return build ? build({ w: f.width, d: f.depth, h: f.height, c, item, seed: hashSeed(f.id), open: f.open, off }) : <B p={[0, f.height / 2, 0]} s={[f.width, f.height, f.depth]} c={c} />;
 }
 
 function SelectionBox({ f, color }: { f: Furniture; color: string }) {
@@ -2023,8 +2120,15 @@ export default function FurnitureMeshes({ floor, elevation, selectedId }: { floo
   };
 
   const time = useSceneOptions((s) => s.time);
+  const neonOnly = useSceneOptions((s) => s.lights === 'neon');
   const lit = new Set(
-    (floor.furniture ?? []).filter((f) => catalogItem(f.type)?.light !== undefined).slice(0, MAX_FITTING_LIGHTS).map((f) => f.id),
+    (floor.furniture ?? [])
+      .filter((f) => {
+        const item = catalogItem(f.type);
+        return item?.light !== undefined && (!neonOnly || item.ambient);
+      })
+      .slice(0, MAX_FITTING_LIGHTS)
+      .map((f) => f.id),
   );
 
   return (

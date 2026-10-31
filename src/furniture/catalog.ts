@@ -19,7 +19,7 @@ export type FurnitureModel =
   | 'jardinera' | 'arbol' | 'poste' | 'centroEntretenimiento' | 'cortina' | 'tiraLed' | 'cuadro' | 'repisa'
   | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical' | 'porton' | 'vestier'
   | 'luzEmpotrada' | 'colgante' | 'aplique' | 'aire' | 'canasta' | 'centroEscritorio' | 'impresora'
-  | 'matita' | 'monstera' | 'plantaColgante' | 'pampas' | 'adornos' | 'repisaDeco';
+  | 'matita' | 'monstera' | 'plantaColgante' | 'pampas' | 'adornos' | 'repisaDeco' | 'closetTablero';
 
 /** Open walk-in dressing modules (model 'vestier'): what each one holds. */
 export type Dressing = 'colgar' | 'repisas' | 'zapatos' | 'cajones';
@@ -56,6 +56,8 @@ export interface CatalogItem {
   mirrorAbove?: number;
   /** light fittings: it lights the room in 3D, from this height of the piece (0 bottom … 1 top), warm white */
   light?: number;
+  /** ambient light (neon strips, a lit unit): it stays on when the room lights are switched off in 3D */
+  ambient?: boolean;
 }
 
 const item = (
@@ -82,6 +84,7 @@ export const CATALOG: CatalogItem[] = [
   item('cama-sencilla', 'Cama sencilla', 'Dormitorio', 'cama', [1.0, 1.9, 0.95], LINO),
   item('mesa-noche', 'Mesa de noche', 'Dormitorio', 'mesaNoche', [0.45, 0.4, 0.55], ROBLE),
   item('closet', 'Clóset', 'Dormitorio', 'closet', [1.2, 0.6, 2.2], BLANCO),
+  item('closet-tablero', 'Clóset con puertas corredizas de tablero blanco', 'Dormitorio', 'closetTablero', [1.8, 0.6, 2.2], NOGAL),
   item('vestier-colgar', 'Vestier: módulo para colgar', 'Dormitorio', 'vestier', [1.0, 0.55, 2.4], NOGAL_CLARO, { dressing: 'colgar' }),
   item('vestier-repisas', 'Vestier: repisas', 'Dormitorio', 'vestier', [0.7, 0.55, 2.4], NOGAL_CLARO, { dressing: 'repisas' }),
   item('vestier-zapatos', 'Vestier: zapatero y bolsos', 'Dormitorio', 'vestier', [0.7, 0.55, 2.4], NOGAL_CLARO, { dressing: 'zapatos' }),
@@ -138,9 +141,9 @@ export const CATALOG: CatalogItem[] = [
   item('tablero-blanco', 'Tablero blanco', 'Oficina y setup', 'tablero', [1.2, 0.03, 0.9], '#fbfbf9', { elevation: 0.9 }),
   item('estanteria', 'Estantería', 'Oficina y setup', 'estanteria', [0.8, 0.35, 1.8], ROBLE),
   // A thin glowing strip; its colour is the light's colour.
-  item('tira-led', 'Tira LED neón (color a elegir)', 'Oficina y setup', 'tiraLed', [1.0, 0.02, 0.02], '#8a5cff', { elevation: 1.0, light: 0.5 }),
+  item('tira-led', 'Tira LED neón (color a elegir)', 'Oficina y setup', 'tiraLed', [1.0, 0.02, 0.02], '#8a5cff', { elevation: 1.0, light: 0.5, ambient: true }),
   item('impresora', 'Impresora', 'Oficina y setup', 'impresora', [0.42, 0.36, 0.22], '#e9e9e6', { elevation: 0.75, onTop: true }),
-  item('centro-escritorio', 'Centro de entretenimiento con escritorio', 'Oficina y setup', 'centroEscritorio', [2.15, 0.8, 2.2], NOGAL),
+  item('centro-escritorio', 'Centro de entretenimiento con escritorio', 'Oficina y setup', 'centroEscritorio', [2.18, 0.8, 2.4], NOGAL, { light: 0.9, ambient: true }),
   item('poster-gamer', 'Póster gamer', 'Oficina y setup', 'cuadro', [0.6, 0.02, 0.85], '#15161a', { elevation: 1.07, art: 'gamer' }),
   // Decoración (wall pieces hang with their centre at about 1,5 m)
   item('cuadro-paisaje', 'Cuadro paisaje', 'Decoración', 'cuadro', [1.0, 0.04, 0.7], '#e9e4da', { elevation: 1.15, art: 'paisaje' }),

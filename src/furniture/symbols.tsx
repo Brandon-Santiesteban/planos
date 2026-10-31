@@ -347,6 +347,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   }, cortina: curtain, tiraLed: flat, cuadro: flat, repisa: shelfDots, consola: box(0.03),
   jacuzzi, toallero: flat, brasero: firePit, puf: pouf, jardinVertical: shelfDots, vestier: shelfDots,
   luzEmpotrada: lightPoint, colgante: lightPoint, aplique: lightPoint, aire: flat,
+  closetTablero: closet,
   matita: pouf, monstera: plant, plantaColgante: plant, pampas: pouf, adornos: box(0.03), repisaDeco: shelfDots,
   impresora: ({ w, d }) => <>{rect(-w / 2 + 0.03, -d / 2 + 0.03, w - 0.06, d - 0.12)}{line(-w * 0.3, d / 2 - 0.04, w * 0.3, d / 2 - 0.04)}</>,
   canasta: ({ w, d }) => <>{circle(0, 0, Math.min(w, d) / 2)}{circle(0, 0, Math.min(w, d) * 0.35, 'c')}</>,

@@ -77,15 +77,16 @@ const json = await page.evaluate(async (ID) => {
   // Entertainment centre and gaming desk in one unit on the left wall, facing the bed (the user's call, to save
   // space): the 55" TV hangs over the desk, monitor and PC tower on it, the gaming chair in front. It stops short of
   // the door's swing.
-  const unitY = 1.075;
-  put('centro-escritorio', 0.4, unitY, 270, { width: 2.15, depth: 0.8, height: 2.3 }); // desk 80 cm deep (the user's)
-  put('televisor', 0.08, unitY, 270, { elevation: 1.22 });
+  const unitY = 1.09;
+  put('centro-escritorio', 0.4, unitY, 270, { width: 2.18, depth: 0.8, height: 2.4 }); // desk 80 cm deep (the user's)
+  put('televisor-70', 0.085, unitY, 270, { elevation: 1.22 }); // 70" (the user's)
   put('monitor', 0.3, unitY, 270);
   put('torre-pc', 0.4, unitY + 0.55, 270);
   put('silla-oficina', 1.12, unitY, 90, { color: '#3a3d42' }); // office chair (the user's)
   // Wardrobe (1.80 × 0.60, the user's) in the front-right corner, its doors opening clear of the bed.
   // Wardrobe beside the door (the user's call, so the bed gets a nightstand on each side): the open door rests on it.
-  put('closet', 1.0 + 0.9, D - 0.3, 180, { width: 1.8, depth: 0.6 });
+  // Its two sliding doors are a big white board to write on (asked 2026-10-31); slide them in Propiedades.
+  put('closet-tablero', 1.0 + 0.9, D - 0.3, 180, { width: 1.8, depth: 0.6 });
   // Printer (asked 2026-10-31) on a small cabinet in the front-right corner, paper kept inside, a gaming poster over it.
   const printerX = 3.15;
   put('comoda', printerX, D - 0.225, 180, { width: 0.6, depth: 0.45, height: 0.75 });
@@ -110,7 +111,7 @@ const json = await page.evaluate(async (ID) => {
   for (const sy of [-1, 1]) put('lampara-colgante', W - 0.22, bedY + sy * 0.925);
   for (const lx of [1.3, 2.9]) put('luz-empotrada', lx, D / 2);
   // Setup neons, warm yellow to start with like the rest: behind the TV, under the desk top and over the poster.
-  put('tira-led', 0.015, unitY, 270, { width: 1.3, elevation: 1.55, color: WARM });
+  put('tira-led', 0.05, unitY, 270, { width: 1.5, elevation: 1.67, color: WARM });
   put('tira-led', 0.75, unitY, 270, { width: 1.35, elevation: 0.7, color: WARM });
   put('tira-led', printerX, D - 0.015, 180, { width: 0.8, elevation: 2.0, color: WARM });
 
