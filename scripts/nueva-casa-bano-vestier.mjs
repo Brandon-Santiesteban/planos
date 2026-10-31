@@ -168,8 +168,10 @@ const json = await page.evaluate(async (ID) => {
   // a row along the right wall, and shelves on the front wall beside the user's mirror.
   const D = 0.55;
   const inner = R - D; // where the right-hand row starts
-  const leftTop = Y + T / 2 + entrance + T / 2;
-  put('vestier-colgar', walk.x0 + D / 2, leftTop + 0.5, 270, { width: 1.0 });
+  // No gaps: the left module runs from the door frame to the front row, the rows meet in the corners.
+  const leftTop = Y + T / 2 + entrance + 0.02;
+  const leftLen = walk.y1 - D - leftTop;
+  put('vestier-colgar', walk.x0 + D / 2, leftTop + leftLen / 2, 270, { width: leftLen });
   let y = walk.y0;
   for (const [type, w] of [['vestier-colgar', 1], ['vestier-cajones', 0.71], ['vestier-zapatos', 0.7]]) {
     put(type, R - D / 2, y + w / 2, 90);
@@ -199,6 +201,14 @@ const json = await page.evaluate(async (ID) => {
   put('matera-alta', 0.22, G - 0.32, 0, { color: '#e8e4dc' });
   put('matera', A - 0.12, G - 0.32, 0, { color: '#e8e4dc' });
   for (const lx of [0.3, A - 0.35, tableX]) put('aplique-pared', lx, G - 0.075 - 0.07, 180, { elevation: 1.9 });
+
+  // Entertainment centre with the 70" TV on the TV partition, facing the bed (it replaces the TV console).
+  const inBedroom = (m) => m.x > 0 && m.x < A && m.y > G && m.y < 6.15;
+  f.furniture = f.furniture.filter((m) => !(inBedroom(m) && ['mueble-tv', 'televisor-70', 'televisor', 'centro-entretenimiento'].includes(m.type)));
+  const tvY = (G + 0.075 + Y) / 2;
+  const centreD = 0.45;
+  put('centro-entretenimiento', A - T / 2 - centreD / 2, tvY, 90, { width: 2.48, depth: centreD });
+  put('televisor-70', A - T / 2 - 0.05, tvY, 90, { elevation: 0.62 });
 
   // Bedroom lighting: recessed lights, pendants over the nightstands, warm LED cove over the headboard.
   for (const [lx, ly] of [[1.0, 1.8], [2.4, 1.8], [1.0, 4.0], [2.4, 4.0], [2.4, 5.3]]) put('luz-empotrada', lx, ly);
