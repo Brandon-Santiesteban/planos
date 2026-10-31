@@ -7,6 +7,7 @@ import type { LibraryEntry } from '../persistence/library';
 import { adoptFile, fetchText, linkFor } from '../persistence/openFromUrl';
 import { parseProject } from '../persistence/projectFile';
 import { renameProject } from '../persistence/rename';
+import { canShare, PUBLIC_SITE, publicLink, shareProject } from '../persistence/share';
 import { useEditor } from '../store/editorStore';
 import { askConfirm } from './Dialog';
 import { isEditableTarget } from './keys';
@@ -39,14 +40,19 @@ const floorsLabel = (n: number) => `${n} ${n === 1 ? 'planta' : 'plantas'}`;
 /** The link that always opens the latest version of a project file. */
 export const shareLink = (file: string) => `${location.origin}${location.pathname}${linkFor(file)}`;
 
-async function copyLink(file: string) {
-  const url = shareLink(file);
+async function copyText(url: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(url);
-    notify({ kind: 'ok', text: 'Enlace copiado', detail: url });
+    return true;
   } catch {
     prompt('Copia el enlace', url);
+    return false;
   }
+}
+
+async function copyLink(file: string) {
+  const url = canShare ? shareLink(file) : publicLink(file);
+  if (await copyText(url)) notify({ kind: 'ok', text: 'Enlace copiado', detail: url });
 }
 
 /** Loads a project only to draw its preview, once the card is on screen. */
@@ -115,6 +121,7 @@ export default function ProjectsDialog({ onOpenFile }: { onOpenFile: () => void 
   const [catalog, setCatalog] = useState<CatalogEntry[] | null>(null);
   const [entries, setEntries] = useState<LibraryEntry[] | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
+  const [sharing, setSharing] = useState<string | null>(null);
 
   const refresh = () => {
     void loadCatalog().then(setCatalog);
@@ -182,6 +189,42 @@ export default function ProjectsDialog({ onOpenFile }: { onOpenFile: () => void 
     }
   };
 
+  const share = async (id: string, name: string) => {
+    setSharing(id);
+    try {
+      const r = await shareProject(id);
+      const copied = await copyText(r.link);
+      if (r.published && PUBLIC_SITE) {
+        notify({
+          kind: 'ok',
+          text: `«${name}» compartido${copied ? ': enlace copiado' : ''}`,
+          detail: `${r.link}\nEn un minuto el enlace muestra esta versión. Si cambias algo, vuelve a Compartir para actualizarlo.`,
+        });
+      } else if (r.published) {
+        notify({ kind: 'warn', text: `«${name}» se publicó en GitHub, pero falta el sitio público para el enlace fijo`, detail: r.link });
+      } else {
+        notify({ kind: 'error', text: `No se pudo publicar «${name}»`, detail: r.error });
+      }
+      refresh();
+    } catch (err) {
+      notify({ kind: 'error', text: `No se pudo compartir «${name}»`, detail: (err as Error).message });
+    } finally {
+      setSharing(null);
+    }
+  };
+
+  const shareButton = (id: string, name: string) => canShare && (
+    <button
+      className="btn btn-chico"
+      onClick={() => void share(id, name)}
+      disabled={sharing !== null}
+      aria-label={`Compartir ${name}`}
+      title="Publica esta versión (con tus cambios) en su enlace fijo y copia el enlace"
+    >
+      <Icon name="share" size={16} />{sharing === id ? 'Publicando…' : 'Compartir'}
+    </button>
+  );
+
   const startNew = () => {
     useEditor.getState().loadProject(createEmptyProject());
     close();
@@ -219,12 +262,15 @@ export default function ProjectsDialog({ onOpenFile }: { onOpenFile: () => void 
                       <RenameForm name={c.name} onCancel={() => setEditing(null)} onSave={(n) => rename(c.id, c.name, n, c.file)} />
                     ) : (
                       <div className="ficha-acciones">
-                        <button className="btn btn-chico" onClick={() => copyLink(c.file)} title={shareLink(c.file)}>
+                        {shareButton(c.id, c.name)}
+                        <button className="btn btn-chico" onClick={() => copyLink(c.file)} title={canShare ? shareLink(c.file) : publicLink(c.file)}>
                           <Icon name="copy" size={16} />Copiar enlace
                         </button>
-                        <button className="btn btn-chico" onClick={() => setEditing(c.file)} title="Cambiar nombre" aria-label={`Cambiar nombre de ${c.name}`}>
-                          <Icon name="edit" size={16} />Nombre
-                        </button>
+                        {canShare && (
+                          <button className="btn btn-chico" onClick={() => setEditing(c.file)} title="Cambiar nombre" aria-label={`Cambiar nombre de ${c.name}`}>
+                            <Icon name="edit" size={16} />Nombre
+                          </button>
+                        )}
                       </div>
                     )}
                   </article>
@@ -252,6 +298,7 @@ export default function ProjectsDialog({ onOpenFile }: { onOpenFile: () => void 
                       <RenameForm name={e.name} onCancel={() => setEditing(null)} onSave={(n) => rename(e.id, e.name, n)} />
                     ) : (
                       <div className="ficha-acciones">
+                        {shareButton(e.id, e.name)}
                         <button className="btn btn-chico" onClick={() => setEditing(e.id)} title="Cambiar nombre" aria-label={`Cambiar nombre de ${e.name}`}>
                           <Icon name="edit" size={16} />Nombre
                         </button>

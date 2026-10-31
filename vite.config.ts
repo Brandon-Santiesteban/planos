@@ -1,6 +1,8 @@
 /// <reference types="vitest/config" />
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { execFile } from 'node:child_process';
 import type { IncomingMessage } from 'node:http';
+import { promisify } from 'node:util';
 import { basename, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, type Plugin } from 'vite';
@@ -8,6 +10,9 @@ import react from '@vitejs/plugin-react';
 
 const PUBLIC = fileURLToPath(new URL('./public', import.meta.url));
 const EJEMPLOS = join(PUBLIC, 'ejemplos');
+const ROOT = fileURLToPath(new URL('.', import.meta.url));
+/** Browser tests run with --mode e2e: they never publish anything. */
+let E2E = false;
 /** The user's projects, saved on this PC whatever link or computer they draw from. */
 let BIBLIOTECA = fileURLToPath(new URL('./biblioteca', import.meta.url));
 
@@ -69,6 +74,37 @@ function catalogo() {
     .sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
+const run = promisify(execFile);
+const git = (...args: string[]) => run('git', args, { cwd: ROOT });
+
+/** File name for a project shared for the first time: its name without accents, never another project's file. */
+function freeFile(id: string | undefined, name: string): string {
+  const base = name.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'proyecto';
+  for (let n = 1; ; n++) {
+    const file = `ejemplos/${base}${n > 1 ? `-${n}` : ''}.casa.json`;
+    const path = join(PUBLIC, file);
+    if (!existsSync(path)) return file;
+    try {
+      if ((JSON.parse(readFileSync(path, 'utf8')) as { id?: string }).id === id) return file;
+    } catch {
+      // unreadable: take another name
+    }
+  }
+}
+
+/**
+ * Publishes a project file: a commit with only that file, pushed to GitHub on the current branch and on main, which
+ * the public site deploys (the app code committed so far goes along).
+ */
+async function publish(path: string, name: string) {
+  const rel = relative(ROOT, path).replaceAll('\\', '/');
+  await git('add', '--', rel);
+  const changed = await git('diff', '--cached', '--quiet', '--', rel).then(() => false, () => true);
+  if (changed) await git('commit', '-m', `Compartir «${name}»`, '--', rel);
+  await git('push', 'origin', 'HEAD');
+  await git('push', 'origin', 'HEAD:main');
+}
+
 /** Serves /ejemplos/catalogo.json and tells the open pages when a project file changes, so they update by themselves. */
 /** Changes whenever the app's code does (dev server). */
 let appVersion = Date.now().toString(36);
@@ -78,6 +114,7 @@ function ejemplos(): Plugin {
     name: 'ejemplos',
     config(_c, { mode }) {
       // Browser tests (npm run e2e) get an empty folder of their own, never the user's projects.
+      E2E = mode === 'e2e';
       if (mode === 'e2e') {
         BIBLIOTECA = fileURLToPath(new URL('./test-results/biblioteca-e2e', import.meta.url));
         rmSync(BIBLIOTECA, { recursive: true, force: true });
@@ -154,6 +191,28 @@ function ejemplos(): Plugin {
               return t;
             });
             res.end(text);
+          } catch {
+            res.statusCode = 500;
+            res.end();
+          }
+        })();
+      });
+      // «Compartir»: writes the project as a file of the app (its own file if it already has one) and publishes it,
+      // so its fixed link on the public site shows this version. Answers { file, published, error? }.
+      server.middlewares.use('/api/compartir', (req, res) => {
+        void (async () => {
+          try {
+            if (req.method !== 'POST' || E2E) return void (res.statusCode = 403, res.end());
+            const { file, text } = JSON.parse(await readBody(req)) as { file?: string; text: string };
+            const project = JSON.parse(text) as { id?: string; name?: string };
+            const name = project.name?.trim() || 'Proyecto';
+            const target = file && /^ejemplos\/[\w.-]+\.casa\.json$/.test(file) ? file : freeFile(project.id, name);
+            const path = join(PUBLIC, target);
+            await queued(path, () => writeSafely(path, JSON.stringify(project, null, 2)));
+            let error: string | undefined;
+            await queued('git', () => publish(path, name)).catch((e: Error) => void (error = e.message.split('\n').slice(-3).join(' ')));
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ file: target, published: !error, error }));
           } catch {
             res.statusCode = 500;
             res.end();

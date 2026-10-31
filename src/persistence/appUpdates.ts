@@ -14,7 +14,7 @@ const loaded = () => document.querySelector<HTMLMetaElement>('meta[name="app-ver
  */
 export function startAppUpdates({ lib }: { lib: Library }): () => void {
   let mine = loaded();
-  if (!mine) return () => {}; // a built copy (npm run build) has no live version to follow
+  if (!mine || !import.meta.env.DEV) return () => {}; // a built copy (the public site) has no live version to follow
   let offered: string | null = null;
   let stopped = false;
 
