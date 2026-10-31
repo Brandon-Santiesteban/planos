@@ -305,6 +305,18 @@ const tower: Builder = ({ w, d, h, c }) => (
   </>
 );
 
+/** Printer: a body with a dark scanner lid, paper standing up at the back, an output tray and a small lit screen. */
+const printer: Builder = ({ w, d, h, c }) => (
+  <>
+    <B p={[0, h * 0.42, 0]} s={[w, h * 0.84, d]} c={c} r={0.5} />
+    <B p={[0, h * 0.92, -0.01]} s={[w - 0.02, h * 0.16, d - 0.04]} c={shade(c, 0.35)} r={0.4} />
+    <B p={[0, h + 0.05, -d / 2 + 0.03]} s={[w * 0.55, 0.12, 0.004]} c={'#fbfbf8'} rot={[-0.35, 0, 0]} />
+    <B p={[0, h * 0.3, d / 2 + 0.04]} s={[w * 0.6, 0.012, 0.09]} c={shade(c, 0.6)} />
+    <B p={[0, h * 0.42, d / 2 + 0.002]} s={[w * 0.65, 0.012, 0.004]} c={'#1d1f22'} />
+    <B p={[w * 0.3, h * 0.66, d / 2 + 0.002]} s={[0.06, 0.035, 0.004]} c={'#9fd3ff'} e={'#4aa3ff'} />
+  </>
+);
+
 const panel = (frame: string, face: { c?: string; r: number; m: number }): Builder => ({ w, d, h, c }) => (
   <>
     <B p={[0, h / 2, 0]} s={[w, h, d]} c={frame} m={0.5} r={0.4} />
@@ -1095,7 +1107,7 @@ const entertainment: Builder = ({ w, d, h, c }) => {
 
 /**
  * Entertainment centre and desk in one: two shelf towers with closed bases at desk height, a deep desk top between them,
- * a slatted back above it for a wall-mounted TV, and a bridge shelf on top with a purple light strip under it.
+ * a slatted back above it for a wall-mounted TV, and a bridge shelf on top with a warm light strip under it.
  */
 const deskEntertainment: Builder = ({ w, d, h, c }) => {
   const tw = Math.min(0.4, w / 6);
@@ -1142,11 +1154,11 @@ const deskEntertainment: Builder = ({ w, d, h, c }) => {
       {Array.from({ length: slats }, (_, i) => (
         <B key={`s${i}`} p={[-nw / 2 + (nw * (i + 0.5)) / slats, (desk + h - bridge) / 2, -d / 2 + 0.024]} s={[nw / slats - 0.018, h - bridge - desk, 0.016]} c={back} />
       ))}
-      {/* Bridge shelf on top with a purple light strip under it */}
+      {/* Bridge shelf on top with a warm light strip under it */}
       <B p={[0, h - bridge + t / 2, tz]} s={[nw, t, td]} c={c} />
       <B p={[0, h - t / 2, tz]} s={[nw, t, td]} c={c} />
       <B p={[0, h - bridge / 2, -d / 2 + 0.01]} s={[nw, bridge, 0.02]} c={back} />
-      <Neon p={[0, h - bridge - 0.004, tz + td / 2 - 0.05]} s={[nw - 0.1, 0.006, 0.012]} c={'#a77bff'} k={1.6} />
+      <Neon p={[0, h - bridge - 0.004, tz + td / 2 - 0.05]} s={[nw - 0.1, 0.006, 0.012]} c={'#ffd9a6'} k={1.2} />
       {shelfDecor(-nw * 0.3, h - bridge + t, tz, 0.1, 0)}
       {shelfDecor(nw * 0.3, h - bridge + t, tz, 0.1, 2)}
     </>
@@ -1665,7 +1677,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   centroEntretenimiento: entertainment, centroEscritorio: deskEntertainment, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
   repisa: collectiblesShelf, jacuzzi, toallero: towelRail, brasero: firePit, puf: pouf, jardinVertical: verticalGarden,
   vestier: dressing, luzEmpotrada: recessed, colgante: pendant, aplique: sconce, aire: airConditioner,
-  canasta: basket,
+  canasta: basket, impresora: printer,
 };
 
 /** How bright light fittings shine by time of day (their light is lost in daylight, plain at night). */
@@ -1724,7 +1736,7 @@ export default function FurnitureMeshes({ floor, elevation, selectedId }: { floo
           {lit.has(f.id) && (
             <pointLight
               position={[0, f.height * (catalogItem(f.type)?.light ?? 0) - 0.03, 0]}
-              color="#ffd9a8"
+              color={catalogItem(f.type)?.model === 'tiraLed' ? (f.color ?? catalogItem(f.type)!.color) : '#ffd9a8'}
               intensity={FITTING_LIGHT[time] ?? 1}
               distance={4.5}
               decay={2}

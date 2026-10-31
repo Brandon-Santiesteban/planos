@@ -18,7 +18,7 @@ export type FurnitureModel =
   | 'banca' | 'carro' | 'moto' | 'piscina' | 'asoleadora' | 'sombrilla' | 'pergola' | 'bar' | 'parrilla'
   | 'jardinera' | 'arbol' | 'poste' | 'centroEntretenimiento' | 'cortina' | 'tiraLed' | 'cuadro' | 'repisa'
   | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical' | 'porton' | 'vestier'
-  | 'luzEmpotrada' | 'colgante' | 'aplique' | 'aire' | 'canasta' | 'centroEscritorio';
+  | 'luzEmpotrada' | 'colgante' | 'aplique' | 'aire' | 'canasta' | 'centroEscritorio' | 'impresora';
 
 /** Open walk-in dressing modules (model 'vestier'): what each one holds. */
 export type Dressing = 'colgar' | 'repisas' | 'zapatos' | 'cajones';
@@ -137,7 +137,8 @@ export const CATALOG: CatalogItem[] = [
   item('tablero-blanco', 'Tablero blanco', 'Oficina y setup', 'tablero', [1.2, 0.03, 0.9], '#fbfbf9', { elevation: 0.9 }),
   item('estanteria', 'Estantería', 'Oficina y setup', 'estanteria', [0.8, 0.35, 1.8], ROBLE),
   // A thin glowing strip; its colour is the light's colour.
-  item('tira-led', 'Tira LED', 'Oficina y setup', 'tiraLed', [1.0, 0.02, 0.02], '#8a5cff', { elevation: 1.0 }),
+  item('tira-led', 'Tira LED neón (color a elegir)', 'Oficina y setup', 'tiraLed', [1.0, 0.02, 0.02], '#8a5cff', { elevation: 1.0, light: 0.5 }),
+  item('impresora', 'Impresora', 'Oficina y setup', 'impresora', [0.42, 0.36, 0.22], '#e9e9e6', { elevation: 0.75, onTop: true }),
   item('centro-escritorio', 'Centro de entretenimiento con escritorio', 'Oficina y setup', 'centroEscritorio', [2.15, 0.8, 2.2], NOGAL),
   item('poster-gamer', 'Póster gamer', 'Oficina y setup', 'cuadro', [0.6, 0.02, 0.85], '#15161a', { elevation: 1.07, art: 'gamer' }),
   // Decoración (wall pieces hang with their centre at about 1,5 m)

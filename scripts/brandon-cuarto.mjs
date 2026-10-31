@@ -61,7 +61,6 @@ const json = await page.evaluate(async (ID) => {
     points: [{ x: 0, y: 0 }, { x: W, y: 0 }, { x: W, y: D }, { x: 0, y: D }],
   });
   const put = (type, x, y, rotation = 0, extra = {}) => fo.addFurniture(p, f.id, { ...fo.furnitureFromCatalog(type, { x, y }, rotation), ...extra });
-  put('luz-empotrada', W / 2, D / 2);
 
   // Furniture (asked 2026-10-31): double bed, wardrobe, entertainment centre and gaming desk in one piece, a laundry
   // basket and a full-length mirror; the way from the door kept clear.
@@ -81,11 +80,38 @@ const json = await page.evaluate(async (ID) => {
   // Wardrobe (1.80 × 0.60, the user's) in the front-right corner, its doors opening clear of the bed.
   put('closet', W - 0.9, D - 0.3, 180, { width: 1.8, depth: 0.6 });
   // The front wall between the door and the wardrobe stays free; a gaming poster on it.
-  put('poster-gamer', 1.6, D - 0.01, 180);
+  put('poster-gamer', 1.4, D - 0.01, 180);
+  // Printer (asked 2026-10-31) on a small cabinet against that wall, under the poster, paper kept inside.
+  put('comoda', 1.4, D - 0.225, 180, { width: 0.6, depth: 0.45, height: 0.75 });
+  put('impresora', 1.4, D - 0.25, 180);
   // Laundry basket on the back wall by the foot of the bed.
   put('canasta-ropa', 1.85, 0.25);
   // Full-length mirror on the back wall between the entertainment centre and the basket, clear floor in front of it.
   put('espejo-cuerpo', 1.15, 0.025);
+
+  // Lighting (asked 2026-10-31): warm yellow everywhere for a cosy room, mostly indirect.
+  //   - cove of warm LED all round the ceiling (indirect light washing the walls);
+  //   - warm LED behind the headboard, a pendant over the nightstand, two warm downlights;
+  //   - the setup's neons are «Tira LED neón» pieces: pick any colour in Propiedades and they light in it.
+  const WARM = '#ffc56b';
+  const cove = 2.45;
+  put('tira-led-calida', W / 2, 0.03, 0, { width: W - 0.2, elevation: cove, color: WARM });
+  put('tira-led-calida', W / 2, D - 0.03, 180, { width: W - 0.2, elevation: cove, color: WARM });
+  put('tira-led-calida', 0.03, D / 2, 270, { width: D - 0.2, elevation: cove, color: WARM });
+  put('tira-led-calida', W - 0.03, D / 2, 90, { width: D - 0.2, elevation: cove, color: WARM });
+  put('tira-led-calida', W - 0.02, bedY, 90, { width: 1.5, elevation: 1.05, color: WARM });
+  put('lampara-colgante', W - 0.22, 0.225);
+  for (const lx of [1.3, 2.9]) put('luz-empotrada', lx, D / 2);
+  // Setup neons, warm yellow to start with like the rest: behind the TV, under the desk top and over the poster.
+  put('tira-led', 0.015, unitY, 270, { width: 1.3, elevation: 1.55, color: WARM });
+  put('tira-led', 0.75, unitY, 270, { width: 1.35, elevation: 0.7, color: WARM });
+  put('tira-led', 1.4, D - 0.015, 180, { width: 0.8, elevation: 2.0, color: WARM });
+
+  // Decoration: a rug under the foot of the bed, a curtain on the window, a picture over the headboard, a plant.
+  put('alfombra', 2.1, bedY, 0, { width: 2.0, depth: 1.5, color: '#cdb89a' });
+  put('cortina', 3.1, 0.06, 0, { width: 1.6 });
+  put('cuadro-abstracto', W - 0.02, bedY, 90, { elevation: 1.3 });
+  put('matera', 1.95, D - 0.3);
 
   // The open page follows the file: count the saved copy as the file's version, so the new one loads by itself.
   const origin = JSON.parse(await (await fetch(`/api/kv/origen:${ID}`)).text());
