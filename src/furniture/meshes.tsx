@@ -1093,6 +1093,66 @@ const entertainment: Builder = ({ w, d, h, c }) => {
   );
 };
 
+/**
+ * Entertainment centre and desk in one: two shelf towers with closed bases at desk height, a deep desk top between them,
+ * a slatted back above it for a wall-mounted TV, and a bridge shelf on top with a purple light strip under it.
+ */
+const deskEntertainment: Builder = ({ w, d, h, c }) => {
+  const tw = Math.min(0.4, w / 6);
+  const td = Math.min(0.45, d);
+  const tz = -d / 2 + td / 2;
+  const desk = 0.75;
+  const bridge = Math.min(0.3, h * 0.14);
+  const t = 0.025;
+  const nw = w - 2 * tw;
+  const back = shade(c, 0.7);
+  const nShelves = 3;
+  const step = (h - desk) / nShelves;
+  const slats = Math.max(4, Math.round(nw / 0.07));
+  return (
+    <>
+      {[-1, 1].map((sx) => {
+        const cx = sx * (w / 2 - tw / 2);
+        return (
+          <group key={sx}>
+            <B p={[cx - tw / 2 + t / 2, h / 2, tz]} s={[t, h, td]} c={c} />
+            <B p={[cx + tw / 2 - t / 2, h / 2, tz]} s={[t, h, td]} c={c} />
+            <B p={[cx, h / 2, -d / 2 + 0.01]} s={[tw - 2 * t, h, 0.02]} c={back} />
+            <B p={[cx, desk / 2, tz]} s={[tw - 2 * t, desk, td - 0.02]} c={c} />
+            {[0, 1].map((i) => (
+              <group key={i}>
+                <B p={[cx, desk * (0.25 + i * 0.5), tz + td / 2 - 0.004]} s={[tw - 2 * t - 0.02, desk / 2 - 0.03, 0.01]} c={shade(c, 1.08)} />
+                <B p={[cx, desk * (0.25 + i * 0.5) + desk / 4 - 0.06, tz + td / 2 + 0.008]} s={[0.12, 0.012, 0.012]} c={METAL} m={0.6} r={0.4} />
+              </group>
+            ))}
+            {Array.from({ length: nShelves }, (_, i) => (
+              <B key={i} p={[cx, desk + step * (i + 1) - t / 2, tz]} s={[tw - 2 * t, t, td - 0.02]} c={c} />
+            ))}
+            {Array.from({ length: nShelves - 1 }, (_, i) => shelfDecor(cx, desk + step * i, tz, tw / 2 - t, i + (sx > 0 ? 1 : 0)))}
+          </group>
+        );
+      })}
+      {/* Desk top between the towers, a drawer under its front and a modesty panel at the back */}
+      <B p={[0, desk - 0.018, 0]} s={[nw, 0.036, d]} c={c} />
+      <B p={[0, desk - 0.08, d / 2 - 0.22]} s={[0.6, 0.09, 0.4]} c={c} />
+      <B p={[0, desk - 0.08, d / 2 - 0.016]} s={[0.58, 0.07, 0.008]} c={shade(c, 1.08)} />
+      <B p={[0, desk / 2, -d / 2 + 0.02]} s={[nw, desk - 0.04, 0.02]} c={back} />
+      {/* Slatted back above the desk, where the TV hangs */}
+      <B p={[0, (desk + h - bridge) / 2, -d / 2 + 0.008]} s={[nw, h - bridge - desk, 0.016]} c={shade(c, 0.45)} />
+      {Array.from({ length: slats }, (_, i) => (
+        <B key={`s${i}`} p={[-nw / 2 + (nw * (i + 0.5)) / slats, (desk + h - bridge) / 2, -d / 2 + 0.024]} s={[nw / slats - 0.018, h - bridge - desk, 0.016]} c={back} />
+      ))}
+      {/* Bridge shelf on top with a purple light strip under it */}
+      <B p={[0, h - bridge + t / 2, tz]} s={[nw, t, td]} c={c} />
+      <B p={[0, h - t / 2, tz]} s={[nw, t, td]} c={c} />
+      <B p={[0, h - bridge / 2, -d / 2 + 0.01]} s={[nw, bridge, 0.02]} c={back} />
+      <Neon p={[0, h - bridge - 0.004, tz + td / 2 - 0.05]} s={[nw - 0.1, 0.006, 0.012]} c={'#a77bff'} k={1.6} />
+      {shelfDecor(-nw * 0.3, h - bridge + t, tz, 0.1, 0)}
+      {shelfDecor(nw * 0.3, h - bridge + t, tz, 0.1, 2)}
+    </>
+  );
+};
+
 /** Console lying flat: white shell, black core and a blue light line. */
 const console_: Builder = ({ w, d, h, c }) => (
   <>
@@ -1602,7 +1662,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   lavamanos: basin, ducha: shower, banera: tub, espejo: mirror,
   porton: slidingGate, lavadero: washtub, lavadora: washer, matera: plant, arbol: tree, poste: streetLamp, banca: bench, carro: car, moto, piscina: pool,
   asoleadora: lounger, sombrilla: umbrella, pergola, bar, parrilla: grill, jardinera: planter,
-  centroEntretenimiento: entertainment, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
+  centroEntretenimiento: entertainment, centroEscritorio: deskEntertainment, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
   repisa: collectiblesShelf, jacuzzi, toallero: towelRail, brasero: firePit, puf: pouf, jardinVertical: verticalGarden,
   vestier: dressing, luzEmpotrada: recessed, colgante: pendant, aplique: sconce, aire: airConditioner,
   canasta: basket,

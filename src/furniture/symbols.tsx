@@ -339,7 +339,12 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   mesa: table, silla: chair, meson: counter, estufa: stove, nevera: fridge, lavaplatos: kitchenSink, alacena: doors(),
   sanitario: toilet, lavamanos: sink, ducha: shower, banera: tub, espejo: flat, lavadero: washtub, lavadora: washer,
   matera: plant, arbol: plant, poste: plant, banca: bench, carro: car, moto,
-  centroEntretenimiento: entertainment, cortina: curtain, tiraLed: flat, cuadro: flat, repisa: shelfDots, consola: box(0.03),
+  centroEntretenimiento: entertainment,
+  centroEscritorio: ({ w, d }) => {
+    const tw = Math.min(0.4, w / 6);
+    const td = Math.min(0.45, d);
+    return <>{rect(-w / 2, -d / 2, tw, td, 0, 'l')}{rect(w / 2 - tw, -d / 2, tw, td, 0, 'r')}{line(-w / 2 + tw, -d / 2 + 0.05, w / 2 - tw, -d / 2 + 0.05)}</>;
+  }, cortina: curtain, tiraLed: flat, cuadro: flat, repisa: shelfDots, consola: box(0.03),
   jacuzzi, toallero: flat, brasero: firePit, puf: pouf, jardinVertical: shelfDots, vestier: shelfDots,
   luzEmpotrada: lightPoint, colgante: lightPoint, aplique: lightPoint, aire: flat,
   canasta: ({ w, d }) => <>{circle(0, 0, Math.min(w, d) / 2)}{circle(0, 0, Math.min(w, d) * 0.35, 'c')}</>,

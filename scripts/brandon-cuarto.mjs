@@ -63,26 +63,25 @@ const json = await page.evaluate(async (ID) => {
   const put = (type, x, y, rotation = 0, extra = {}) => fo.addFurniture(p, f.id, { ...fo.furnitureFromCatalog(type, { x, y }, rotation), ...extra });
   put('luz-empotrada', W / 2, D / 2);
 
-  // Furniture (asked 2026-10-31): double bed, wardrobe, gaming setup, entertainment centre and a laundry basket, the
-  // way from the door kept clear and nothing between the bed and the TV.
+  // Furniture (asked 2026-10-31): double bed, wardrobe, entertainment centre and gaming desk in one piece, a laundry
+  // basket and a full-length mirror; the way from the door kept clear.
   // Double bed with its head on the right wall, towards the back (the window beside it), a nightstand behind it.
   const bedY = 1.15;
   put('cama-doble', W - 0.95, bedY, 90);
   put('mesa-noche', W - 0.2, 0.225, 90);
-  // Entertainment centre on the left wall facing the bed, with a 55" TV in its niche; it stops short of the door's leaf.
-  put('centro-entretenimiento', 0.225, 1.1, 270, { width: 2.1, depth: 0.45 });
-  put('televisor', 0.08, 1.1, 270);
+  // Entertainment centre and gaming desk in one unit on the left wall, facing the bed (the user's call, to save
+  // space): the 55" TV hangs over the desk, monitor and PC tower on it, the gaming chair in front. It stops short of
+  // the door's swing.
+  const unitY = 1.075;
+  put('centro-escritorio', 0.3, unitY, 270, { width: 2.15, depth: 0.6, height: 2.3 });
+  put('televisor', 0.08, unitY, 270, { elevation: 1.22 });
+  put('monitor', 0.22, unitY, 270);
+  put('torre-pc', 0.3, unitY + 0.55, 270);
+  put('silla-gamer', 1.05, unitY, 90);
   // Wardrobe (1.80 × 0.60, the user's) in the front-right corner, its doors opening clear of the bed.
   put('closet', W - 0.9, D - 0.3, 180, { width: 1.8, depth: 0.6 });
-  // Gaming setup on the front wall between the door and the wardrobe: desk, monitor, PC tower, gaming chair (out of
-  // the bed's view of the TV), LED strip and a poster over it.
-  // The desk butts the wardrobe, so the open door rests against its side.
-  put('escritorio', 1.6, D - 0.35, 180, { width: 1.2 });
-  put('monitor', 1.5, D - 0.15, 180);
-  put('torre-pc', 2.03, D - 0.3, 180);
-  put('silla-gamer', 1.55, D - 1.05);
+  // The front wall between the door and the wardrobe stays free; a gaming poster on it.
   put('poster-gamer', 1.6, D - 0.01, 180);
-  put('tira-led', 1.6, D - 0.01, 180, { width: 1.2, elevation: 2.0 });
   // Laundry basket on the back wall by the foot of the bed.
   put('canasta-ropa', 1.85, 0.25);
   // Full-length mirror on the back wall between the entertainment centre and the basket, clear floor in front of it.

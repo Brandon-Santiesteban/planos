@@ -18,7 +18,7 @@ export type FurnitureModel =
   | 'banca' | 'carro' | 'moto' | 'piscina' | 'asoleadora' | 'sombrilla' | 'pergola' | 'bar' | 'parrilla'
   | 'jardinera' | 'arbol' | 'poste' | 'centroEntretenimiento' | 'cortina' | 'tiraLed' | 'cuadro' | 'repisa'
   | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical' | 'porton' | 'vestier'
-  | 'luzEmpotrada' | 'colgante' | 'aplique' | 'aire' | 'canasta';
+  | 'luzEmpotrada' | 'colgante' | 'aplique' | 'aire' | 'canasta' | 'centroEscritorio';
 
 /** Open walk-in dressing modules (model 'vestier'): what each one holds. */
 export type Dressing = 'colgar' | 'repisas' | 'zapatos' | 'cajones';
@@ -138,6 +138,7 @@ export const CATALOG: CatalogItem[] = [
   item('estanteria', 'Estantería', 'Oficina y setup', 'estanteria', [0.8, 0.35, 1.8], ROBLE),
   // A thin glowing strip; its colour is the light's colour.
   item('tira-led', 'Tira LED', 'Oficina y setup', 'tiraLed', [1.0, 0.02, 0.02], '#8a5cff', { elevation: 1.0 }),
+  item('centro-escritorio', 'Centro de entretenimiento con escritorio', 'Oficina y setup', 'centroEscritorio', [2.15, 0.6, 2.2], NOGAL),
   item('poster-gamer', 'Póster gamer', 'Oficina y setup', 'cuadro', [0.6, 0.02, 0.85], '#15161a', { elevation: 1.07, art: 'gamer' }),
   // Decoración (wall pieces hang with their centre at about 1,5 m)
   item('cuadro-paisaje', 'Cuadro paisaje', 'Decoración', 'cuadro', [1.0, 0.04, 0.7], '#e9e4da', { elevation: 1.15, art: 'paisaje' }),
