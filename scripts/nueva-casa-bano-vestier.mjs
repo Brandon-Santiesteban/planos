@@ -66,10 +66,18 @@ const json = await page.evaluate(async (ID) => {
   const win = ops.addOpening(p, f.id, backWall, 'window', 5.475);
   if (win) ops.updateOpening(p, f.id, win, { width: 0.9, height: 0.45, sill: 1.85 });
   const lot = p.site ?? { x: -0.775, y: -1.025, width: 7 };
-  f.rooms = f.rooms.filter((r) => r.name !== 'Jardín privado');
+  // A wooden deck along the house (1 m) and the lawn to the back fence; no fence between the two (open edges).
+  const gx0 = -0.075;
+  const gx1 = lot.x + lot.width;
+  const deckY = G - 1.075;
+  f.rooms = f.rooms.filter((r) => r.name !== 'Jardín privado' && r.name !== 'Deck del jardín');
   f.rooms.push({
-    id: newId(), name: 'Jardín privado', kind: 'balcony', floorMaterial: 'cesped', railing: 'celosia',
-    points: [{ x: -0.075, y: lot.y }, { x: lot.x + lot.width, y: lot.y }, { x: lot.x + lot.width, y: G - 0.075 }, { x: -0.075, y: G - 0.075 }],
+    id: newId(), name: 'Jardín privado', kind: 'balcony', floorMaterial: 'cesped', railing: 'celosia', openEdges: [2],
+    points: [{ x: gx0, y: lot.y }, { x: gx1, y: lot.y }, { x: gx1, y: deckY }, { x: gx0, y: deckY }],
+  });
+  f.rooms.push({
+    id: newId(), name: 'Deck del jardín', kind: 'balcony', floorMaterial: 'madera', railing: 'celosia', openEdges: [0],
+    points: [{ x: gx0, y: deckY }, { x: gx1, y: deckY }, { x: gx1, y: G - 0.075 }, { x: gx0, y: G - 0.075 }],
   });
 
   // Walls: the TV partition from the bedroom's back wall, and the bathroom wall across; earlier partitions go.
@@ -131,6 +139,24 @@ const json = await page.evaluate(async (ID) => {
   }
   put('vestier-repisas', (walk.x0 + 1.2 + inner) / 2, walk.y1 - D / 2, 180, { width: inner - walk.x0 - 1.2 });
   for (const ly of [walk.y0 + 0.9, walk.y0 + 1.7]) put('luz-empotrada', (walk.x0 + inner) / 2, ly);
+
+  // Garden decoration (the user's reference photo): planters and a small tree on the lawn, a vertical garden on the
+  // side fence, a reading corner of two wicker armchairs and a low table on the deck behind the bathroom (the glass
+  // door stays clear), tall pots beside the door and warm sconces on the house wall.
+  const inGarden = (m) => m.y < G - 0.075 && m.y > lot.y && m.x > gx0 - 0.1 && m.x < gx1 + 0.1;
+  f.furniture = f.furniture.filter((m) => !inGarden(m));
+  put('jardinera', 1.0, lot.y + 0.2, 0, { color: '#d8d2c8' });
+  put('jardinera', 2.85, lot.y + 0.2, 0, { color: '#d8d2c8' });
+  put('arbol-pequeno', gx1 - 0.75, lot.y + 0.5, 0, { width: 1.4, depth: 1.4, height: 3.0 });
+  put('arbusto', 4.4, lot.y + 0.35, 0, { width: 0.7, depth: 0.7, height: 0.8 });
+  put('jardin-vertical', gx0 + 0.06, -0.1, 270, { width: 1.6 });
+  put('sillon-exterior', 4.2, G - 0.5, 180, { color: '#b5895a' });
+  put('sillon-exterior', 5.55, G - 0.5, 180, { color: '#b5895a' });
+  put('mesa-centro', 4.875, G - 0.55, 0, { width: 0.5, depth: 0.5, height: 0.45, color: '#c9c3b8' });
+  put('matera-alta', 0.22, G - 0.32, 0, { color: '#e8e4dc' });
+  put('matera', 3.2, G - 0.32, 0, { color: '#e8e4dc' });
+  put('matera', gx1 - 0.3, G - 0.32, 0, { color: '#e8e4dc' });
+  for (const lx of [0.3, 3.15, 4.875]) put('aplique-pared', lx, G - 0.075 - 0.07, 180, { elevation: 1.9 });
 
   // Bedroom lighting: recessed lights, pendants over the nightstands, warm LED cove over the headboard.
   for (const [lx, ly] of [[1.0, 1.8], [2.6, 1.8], [1.0, 4.0], [2.6, 4.0], [2.6, 5.3]]) put('luz-empotrada', lx, ly);

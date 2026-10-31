@@ -34,18 +34,14 @@ test('the number of lights is capped so the 3D view stays smooth', () => {
   expect(roomLights(p, [g])).toHaveLength(MAX_ROOM_LIGHTS);
 });
 
-test('outdoor areas (balconies, fenced garden) get warm ambient lights at their open corners', () => {
+test('a garden on the ground gets a warm post at each corner and no soffit light floating over it', () => {
   const p = createEmptyProject();
   const g = p.floors[0].id;
   const id = addRoom(p, g, [{ x: 0, y: 3 }, { x: 4, y: 3 }, { x: 4, y: 4.2 }, { x: 0, y: 4.2 }], 'Antejardín')!;
   setRoomKind(p, g, id, 'balcony');
   const lights = outdoorLights(p, [g]);
-  // one soffit light in the middle plus a garden post at each corner
-  expect(lights.filter((l) => l.kind === 'soffit')).toHaveLength(1);
+  expect(lights.filter((l) => l.kind === 'soffit')).toHaveLength(0);
   expect(lights.filter((l) => l.kind === 'post')).toHaveLength(4);
-  const soffit = lights.find((l) => l.kind === 'soffit')!;
-  expect(soffit.x).toBeCloseTo(2);
-  expect(soffit.z).toBeCloseTo(3.6);
 });
 
 test('upper balconies get a soffit light but no garden posts', () => {

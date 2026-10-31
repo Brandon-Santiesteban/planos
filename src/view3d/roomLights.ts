@@ -30,8 +30,8 @@ const POST_HEIGHT = 0.45;
 const POST_INSET = 0.15;
 
 /**
- * Warm ambient lights outside: a soffit/wall light over every balcony or fenced garden,
- * plus short garden posts at the corners of the ones on the ground.
+ * Warm ambient lights outside: a soffit/wall light over every balcony up on a floor, and short garden posts at the
+ * corners of the gardens on the ground.
  */
 export function outdoorLights(p: Project, visibleFloorIds: string[]): OutdoorLight[] {
   const out: OutdoorLight[] = [];
@@ -41,8 +41,11 @@ export function outdoorLights(p: Project, visibleFloorIds: string[]): OutdoorLig
     for (const r of f.rooms) {
       if (r.kind !== 'balcony') continue;
       const c = polygonCentroid(r.points);
-      out.push({ x: c.x, y: base + SOFFIT_HEIGHT, z: c.y, kind: 'soffit', key: `${r.id}-s` });
-      if (base > 0) continue;
+      // Up on a balcony a soffit light; a garden on the ground has no ceiling for it (it floated in the air), only posts.
+      if (base > 0) {
+        out.push({ x: c.x, y: base + SOFFIT_HEIGHT, z: c.y, kind: 'soffit', key: `${r.id}-s` });
+        continue;
+      }
       r.points.forEach((q, i) => {
         const dx = c.x - q.x;
         const dy = c.y - q.y;
