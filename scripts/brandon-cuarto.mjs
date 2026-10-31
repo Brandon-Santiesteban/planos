@@ -66,10 +66,12 @@ const json = await page.evaluate(async (ID) => {
 
   // Furniture (asked 2026-10-31): double bed, wardrobe and a gaming setup, the way from the door kept clear.
   // Double bed with its head on the right wall, nightstands either side; the window is beside it on the back wall.
-  put('cama-doble', W - 0.95, D / 2, 90);
-  for (const sy of [-1, 1]) put('mesa-noche', W - 0.2, D / 2 + sy * 0.95, 90);
-  // Wardrobe on the front wall, just right of the door's swing.
-  put('closet', 1.55, D - 0.3, 180);
+  // It sits towards the back so the wardrobe's doors have room in front of them.
+  const bedY = 1.15;
+  put('cama-doble', W - 0.95, bedY, 90);
+  for (const sy of [-1, 1]) put('mesa-noche', W - 0.2, bedY + sy * 0.95, 90);
+  // Wardrobe (1.80 × 0.60, the user's) on the front wall, just right of the door's swing.
+  put('closet', 0.95 + 0.9, D - 0.3, 180, { width: 1.8, depth: 0.6 });
   // Gaming setup in the back-left corner: desk on the back wall, monitor and PC tower on it, LED strip and a poster.
   put('escritorio', 0.85, 0.35);
   put('monitor', 0.75, 0.15);
