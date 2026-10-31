@@ -64,21 +64,27 @@ const json = await page.evaluate(async (ID) => {
   const put = (type, x, y, rotation = 0, extra = {}) => fo.addFurniture(p, f.id, { ...fo.furnitureFromCatalog(type, { x, y }, rotation), ...extra });
   put('luz-empotrada', W / 2, D / 2);
 
-  // Furniture (asked 2026-10-31): double bed, wardrobe and a gaming setup, the way from the door kept clear.
-  // Double bed with its head on the right wall, nightstands either side; the window is beside it on the back wall.
-  // It sits towards the back so the wardrobe's doors have room in front of them.
+  // Furniture (asked 2026-10-31): double bed, wardrobe, gaming setup, entertainment centre and a laundry basket, the
+  // way from the door kept clear and nothing between the bed and the TV.
+  // Double bed with its head on the right wall, towards the back (the window beside it), a nightstand behind it.
   const bedY = 1.15;
   put('cama-doble', W - 0.95, bedY, 90);
-  for (const sy of [-1, 1]) put('mesa-noche', W - 0.2, bedY + sy * 0.95, 90);
-  // Wardrobe (1.80 × 0.60, the user's) on the front wall, just right of the door's swing.
-  put('closet', 0.95 + 0.9, D - 0.3, 180, { width: 1.8, depth: 0.6 });
-  // Gaming setup in the back-left corner: desk on the back wall, monitor and PC tower on it, LED strip and a poster.
-  put('escritorio', 0.85, 0.35);
-  put('monitor', 0.75, 0.15);
-  put('torre-pc', 1.38, 0.3);
-  put('silla-gamer', 0.8, 1.05, 180);
-  put('tira-led', 0.85, 0.01, 0, { width: 1.4, elevation: 1.3 });
-  put('poster-gamer', 0.01, 0.9, 270);
+  put('mesa-noche', W - 0.2, 0.225, 90);
+  // Entertainment centre on the left wall facing the bed, with a 55" TV in its niche; it stops short of the door's leaf.
+  put('centro-entretenimiento', 0.225, 1.1, 270, { width: 2.1, depth: 0.45 });
+  put('televisor', 0.08, 1.1, 270);
+  // Wardrobe (1.80 × 0.60, the user's) in the front-right corner, its doors opening clear of the bed.
+  put('closet', W - 0.9, D - 0.3, 180, { width: 1.8, depth: 0.6 });
+  // Gaming setup on the front wall between the door and the wardrobe: desk, monitor, PC tower, gaming chair (out of
+  // the bed's view of the TV), LED strip and a poster over it.
+  put('escritorio', 1.55, D - 0.35, 180, { width: 1.2 });
+  put('monitor', 1.45, D - 0.15, 180);
+  put('torre-pc', 1.98, D - 0.3, 180);
+  put('silla-gamer', 1.5, D - 1.05);
+  put('poster-gamer', 1.55, D - 0.01, 180);
+  put('tira-led', 1.55, D - 0.01, 180, { width: 1.2, elevation: 2.0 });
+  // Laundry basket on the back wall by the foot of the bed.
+  put('canasta-ropa', 1.85, 0.25);
 
   // The open page follows the file: count the saved copy as the file's version, so the new one loads by itself.
   const origin = JSON.parse(await (await fetch(`/api/kv/origen:${ID}`)).text());

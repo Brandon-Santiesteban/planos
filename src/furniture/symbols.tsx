@@ -342,6 +342,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   centroEntretenimiento: entertainment, cortina: curtain, tiraLed: flat, cuadro: flat, repisa: shelfDots, consola: box(0.03),
   jacuzzi, toallero: flat, brasero: firePit, puf: pouf, jardinVertical: shelfDots, vestier: shelfDots,
   luzEmpotrada: lightPoint, colgante: lightPoint, aplique: lightPoint, aire: flat,
+  canasta: ({ w, d }) => <>{circle(0, 0, Math.min(w, d) / 2)}{circle(0, 0, Math.min(w, d) * 0.35, 'c')}</>,
   porton: ({ w, d, open }) => (
     <>
       {gatePanels(w, open === true).map((pn, i) => rect(pn.x0, (pn.track === 0 ? -d / 2 : 0), pn.x1 - pn.x0, d / 2, 0, i))}

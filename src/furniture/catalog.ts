@@ -18,7 +18,7 @@ export type FurnitureModel =
   | 'banca' | 'carro' | 'moto' | 'piscina' | 'asoleadora' | 'sombrilla' | 'pergola' | 'bar' | 'parrilla'
   | 'jardinera' | 'arbol' | 'poste' | 'centroEntretenimiento' | 'cortina' | 'tiraLed' | 'cuadro' | 'repisa'
   | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical' | 'porton' | 'vestier'
-  | 'luzEmpotrada' | 'colgante' | 'aplique' | 'aire';
+  | 'luzEmpotrada' | 'colgante' | 'aplique' | 'aire' | 'canasta';
 
 /** Open walk-in dressing modules (model 'vestier'): what each one holds. */
 export type Dressing = 'colgar' | 'repisas' | 'zapatos' | 'cajones';
@@ -150,6 +150,7 @@ export const CATALOG: CatalogItem[] = [
   // Lavandería
   item('lavadero', 'Lavadero', 'Lavandería', 'lavadero', [0.7, 0.6, 0.85], '#c9c6c0'),
   item('lavadora', 'Lavadora', 'Lavandería', 'lavadora', [0.6, 0.65, 0.95], LOZA),
+  item('canasta-ropa', 'Canasta de ropa sucia', 'Lavandería', 'canasta', [0.42, 0.42, 0.6], '#b8935f'),
   // Exterior
   item('matera', 'Matera con planta', 'Exterior', 'matera', [0.45, 0.45, 1.0], '#a0522d'),
   item('banca', 'Banca de exterior', 'Exterior', 'banca', [1.2, 0.45, 0.45], '#9a7650'),
@@ -197,6 +198,7 @@ const SYNONYMS: Record<string, string> = {
   comoda: 'cajonera cajones',
   semanario: 'cajonera cajones comoda',
   closet: 'armario ropero guardarropa',
+  canasta: 'cesto ropa sucia lavanderia',
   vestier: 'closet armario ropero walk-in',
   sanitario: 'inodoro wc',
   lavamanos: 'lavabo',

@@ -1413,6 +1413,24 @@ const pouf: Builder = ({ w, d, h, c }) => {
   );
 };
 
+/** Laundry basket: a woven wicker drum with darker bands, two hand holes and some clothes heaped at the top. */
+const basket: Builder = ({ w, d, h, c }) => {
+  const r = Math.min(w, d) / 2;
+  return (
+    <>
+      <C p={[0, h / 2, 0]} r={r} top={r * 0.92} h={h} c={c} rough={1} seg={24} />
+      {[0.15, 0.4, 0.65, 0.97].map((t) => (
+        <C key={t} p={[0, h * t, 0]} r={r * (1 - t * 0.08) + 0.004} h={0.025} c={shade(c, 0.72)} seg={24} />
+      ))}
+      {[-1, 1].map((s) => (
+        <B key={s} p={[s * r * 0.95, h * 0.85, 0]} s={[0.02, 0.035, r * 0.6]} c={shade(c, 0.4)} />
+      ))}
+      <S p={[r * 0.2, h, 0]} r={r * 0.55} c={'#5b7fa6'} sc={[1, 0.35, 0.9]} />
+      <S p={[-r * 0.3, h + 0.01, r * 0.15]} r={r * 0.45} c={'#e8e2d6'} sc={[1, 0.4, 1]} />
+    </>
+  );
+};
+
 /** Vertical garden: a frame on the wall covered with leafy clusters of several greens and a few flowers. */
 const verticalGarden: Builder = ({ w, d, h, c }) => {
   const cols = Math.max(3, Math.round(w / 0.13));
@@ -1587,6 +1605,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   centroEntretenimiento: entertainment, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
   repisa: collectiblesShelf, jacuzzi, toallero: towelRail, brasero: firePit, puf: pouf, jardinVertical: verticalGarden,
   vestier: dressing, luzEmpotrada: recessed, colgante: pendant, aplique: sconce, aire: airConditioner,
+  canasta: basket,
 };
 
 /** How bright light fittings shine by time of day (their light is lost in daylight, plain at night). */
