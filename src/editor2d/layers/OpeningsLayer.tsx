@@ -22,6 +22,22 @@ function OpeningSymbol({ wall, o, selected }: { wall: Wall; o: Opening; selected
       </g>
     );
   }
+  if (o.glass) {
+    // Sliding glass door: two panels overlapping in the middle, one on each side of the wall's centre line.
+    const q = wall.thickness / 4;
+    const mid = o.width / 2;
+    const at = (t: number, off: number) => add(add(wall.a, scale(d, o.offset - o.width / 2 + t)), scale(n, off));
+    const p1 = [at(0, q), at(mid + 0.05, q)];
+    const p2 = [at(mid - 0.05, -q), at(o.width, -q)];
+    return (
+      <g className={cls} data-id={o.id}>
+        <polygon className="opening-gap" points={pts(gap)} />
+        <line className="window-glass" x1={start.x} y1={start.y} x2={end.x} y2={end.y} />
+        <line className="door-leaf" x1={p1[0].x} y1={p1[0].y} x2={p1[1].x} y2={p1[1].y} />
+        <line className="door-leaf" x1={p2[0].x} y1={p2[0].y} x2={p2[1].x} y2={p2[1].y} />
+      </g>
+    );
+  }
   // Door: leaf hinged at the start, opening towards +normal (−normal when flipped), with a 90° swing arc.
   const side = o.flip ? scale(n, -1) : n;
   const tip = add(add(start, scale(side, half)), scale(side, o.width));
