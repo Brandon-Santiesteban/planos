@@ -1,4 +1,4 @@
-import { snapToGrid } from '../../geometry/snap';
+import { alongAxis, snapToGrid, straighten } from '../../geometry/snap';
 import { dist, sub } from '../../geometry/vec';
 import { projectOntoWall } from '../../geometry/walls';
 import { deleteFurniture } from '../../model/furnitureOps';
@@ -101,14 +101,20 @@ export function createSelectTool(): ToolHandler {
       const d = drag;
       if (d.kind === 'furniture') {
         const s0 = d.drag.start;
-        dragFurnitureTo(d.drag, { x: s0.x + p.x - downAt.x, y: s0.y + p.y - downAt.y }, ctx.state.snapping && !ctx.altKey);
+        const by = sub(p, downAt);
+        const move = ctx.shiftKey ? alongAxis(by) : by;
+        dragFurnitureTo(d.drag, { x: s0.x + move.x, y: s0.y + move.y }, ctx.state.snapping && !ctx.altKey);
       } else if (d.kind === 'endpoint') {
         const wall = floor.walls.find((w) => w.id === d.wallId);
         if (!wall) return;
-        const to = snapForTool(p, ctx, [], wall[d.end], MOVE_STEP).point;
+        const snapped = snapForTool(p, ctx, [], wall[d.end], MOVE_STEP);
+        // The wall stays straight (Shift: in steps of 45°), unless the end lands on another wall's corner.
+        const other = wall[d.end === 'a' ? 'b' : 'a'];
+        const to = snapped.kind === 'endpoint' && !ctx.shiftKey ? snapped.point : straighten(other, snapped.point, ctx.shiftKey);
         store.apply((draft) => void setJoints(draft, floorId, d.joints, to), { record: false });
       } else if (d.kind === 'wall') {
         let total = sub(p, downAt);
+        if (ctx.shiftKey) total = alongAxis(total); // Shift: only sideways or only up and down
         if (ctx.state.snapping && !ctx.altKey) total = snapToGrid(total, MOVE_STEP);
         const step = sub(total, d.applied);
         if (step.x === 0 && step.y === 0) return;

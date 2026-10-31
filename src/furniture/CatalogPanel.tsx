@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { formatMetres } from '../model/units';
 import Icon from '../ui/Icon';
 import { CATALOG, CATEGORIES, type CatalogItem, searchCatalog } from './catalog';
@@ -7,9 +7,16 @@ import { FurnitureSymbol } from './symbols';
 
 export const sizeLabel = (w: number, d: number) => `${formatMetres(w).replace(' m', '')} × ${formatMetres(d)}`;
 
-/** Small top view of a catalog piece, fitted in a square. */
+/**
+ * Picture of a catalog piece: its 3D model in colour (public/muebles, made by scripts/miniaturas-muebles.mjs), or
+ * its top view while there is no picture.
+ */
 export function Thumb({ item, size = 44 }: { item: CatalogItem; size?: number }) {
+  const [missing, setMissing] = useState(false);
   const span = Math.max(item.width, item.depth) * 1.25;
+  if (!missing) {
+    return <img className="mueble-foto" src={`/muebles/${item.id}.png`} width={size} height={size} alt="" loading="lazy" onError={() => setMissing(true)} />;
+  }
   return (
     <svg className="mueble-miniatura" width={size} height={size} viewBox={`${-span / 2} ${-span / 2} ${span} ${span}`} aria-hidden="true">
       <FurnitureSymbol item={item} w={item.width} d={item.depth} />
@@ -65,7 +72,7 @@ export default function CatalogPanel() {
               data-testid={`mueble-${i.id}`}
               onClick={() => usePlacement.setState({ itemId: itemId === i.id ? null : i.id, rotation: 0 })}
             >
-              <Thumb item={i} />
+              <Thumb item={i} size={84} />
               <span className="nombre">{i.name}</span>
               <span className="medida">{sizeLabel(i.width, i.depth)}</span>
             </button>

@@ -42,6 +42,12 @@ test('the raised pool sits on the floor and is about 3 × 2,4 × 1,1 m', () => {
   expect(catalogItem('piscina')).toMatchObject({ category: 'Rooftop', width: 3, depth: 2.4, height: 1.1, elevation: 0 });
 });
 
+test('search knows the usual other words: «tv» finds the televisions and their console', () => {
+  expect(searchCatalog('tv').map((i) => i.id)).toEqual(expect.arrayContaining(['televisor', 'televisor-70', 'mueble-tv']));
+  expect(searchCatalog('tele').map((i) => i.id)).toEqual(expect.arrayContaining(['televisor', 'televisor-70']));
+  expect(searchCatalog('inodoro').map((i) => i.id)).toEqual(['sanitario']);
+});
+
 test('search ignores accents and case, and can be limited to a category', () => {
   expect(searchCatalog('BANO').length).toBe(0); // "baño" is a category, not an item name
   expect(searchCatalog('banera').map((i) => i.id)).toEqual(['banera']);

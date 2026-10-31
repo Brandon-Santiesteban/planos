@@ -181,10 +181,53 @@ export function catalogItem(id: string): CatalogItem | undefined {
 
 const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
-/** Items whose name contains every word of `query` (accents and case ignored), optionally in one category. */
+/** Other words people search with, by a word of the piece's name. */
+const SYNONYMS: Record<string, string> = {
+  televisor: 'tv tele television pantalla smart',
+  sofa: 'mueble sala couch',
+  comoda: 'cajonera cajones',
+  semanario: 'cajonera cajones comoda',
+  closet: 'armario ropero guardarropa',
+  vestier: 'closet armario ropero walk-in',
+  sanitario: 'inodoro wc',
+  lavamanos: 'lavabo',
+  estufa: 'cocina fogon horno',
+  nevera: 'refrigerador heladera frigorifico',
+  lavaplatos: 'fregadero',
+  meson: 'encimera barra',
+  ducha: 'regadera',
+  banera: 'tina',
+  lampara: 'luz',
+  tira: 'luz led',
+  matera: 'planta maceta',
+  jardinera: 'planta',
+  arbol: 'planta',
+  alfombra: 'tapete',
+  cuadro: 'arte pintura',
+  escritorio: 'mesa trabajo',
+  monitor: 'pantalla',
+  torre: 'pc computador',
+  carro: 'auto coche',
+  piscina: 'alberca',
+  parrilla: 'asador bbq',
+};
+
+/** Name plus the words people may search it by. */
+const searchText = (i: CatalogItem) => {
+  const name = fold(i.name);
+  const extra = Object.entries(SYNONYMS).filter(([w]) => name.includes(w)).map(([, s]) => s);
+  return [name, ...extra].join(' ');
+};
+
+/**
+ * Items whose name, or a usual other word for them («tv» for a televisor), contains every word of `query`
+ * (accents and case ignored), optionally in one category.
+ */
 export function searchCatalog(query: string, category?: Category | null): CatalogItem[] {
   const words = fold(query).split(/\s+/).filter(Boolean);
-  return CATALOG.filter(
-    (i) => (!category || i.category === category) && words.every((w) => fold(i.name).includes(w)),
-  );
+  return CATALOG.filter((i) => {
+    if (category && i.category !== category) return false;
+    const text = searchText(i);
+    return words.every((w) => text.includes(w));
+  });
 }

@@ -1,4 +1,4 @@
-import { snapAngle } from '../../geometry/snap';
+import { straighten } from '../../geometry/snap';
 import { add, dist, normalize, scale, sub } from '../../geometry/vec';
 import { addWall } from '../../model/ops';
 import { parseLength } from '../../model/units';
@@ -20,9 +20,10 @@ export function createWallTool(): ToolHandler {
   let typed = '';
 
   function target(p: Vec2, ctx: ToolContext): Vec2 {
-    let q = snapForTool(p, ctx).point;
-    if (start && ctx.shiftKey) q = snapAngle(start, q, 45);
-    return q;
+    const s = snapForTool(p, ctx);
+    // Straight walls: Shift locks to steps of 45°, and a few degrees off horizontal or vertical is put straight.
+    if (!start || (s.kind === 'endpoint' && !ctx.shiftKey)) return s.point;
+    return straighten(start, s.point, ctx.shiftKey);
   }
 
   function commit(end: Vec2) {
