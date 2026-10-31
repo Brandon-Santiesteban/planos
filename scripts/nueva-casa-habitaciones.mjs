@@ -4,7 +4,8 @@
 //   - private bathroom across the end on the wall between the two rooms, back to back with the other one so they
 //     share the plumbing: shower in the outer corner under a high window, WC in the middle, basin with mirror by the
 //     corridor wall; door from the bedroom;
-//   - bedroom: double bed with its head on the bathroom wall, two nightstands, air conditioner high on the outer wall;
+//   - bedroom: double bed with its head on the outer wall, nightstands either side, the way to the bathroom clear,
+//     air conditioner high on the corridor wall;
 //   - door from the corridor; window: Habitación 1 on the outer side, Habitación 2 to the patio;
 //   - the corridor opens to the patio at its end, so the rooms can be reached.
 // Writes public/ejemplos/nueva-casa.casa.json; the open page shows it by itself.
@@ -104,16 +105,18 @@ const json = await page.evaluate(async (ID) => {
     put('luz-empotrada', 3.3, yy(0.8));
     if (outer) opening(outer, 'window', { x: XR, y: yy(0.5) }, { width: 0.6, height: 0.45, sill: 1.85 });
 
-    // Bedroom: double bed against the bathroom wall, nightstands, air conditioner on the outer wall.
-    const bedY = yy(1.65 + 0.95);
-    const bedX = 3.8;
-    put('cama-doble', bedX, bedY, away);
-    for (const sx of [-1, 1]) {
-      put('mesa-noche', bedX + sx * (0.7 + 0.25), yy(1.65 + 0.2), away);
-      put('lampara-colgante', bedX + sx * (0.7 + 0.25), yy(1.65 + 0.25), 0);
+    // Bedroom: the double bed with its head on the outer wall, in the middle of the bedroom, nightstands either side;
+    // the way from the room door to the bathroom door stays clear. Air conditioner high on the corridor wall, facing
+    // the bed.
+    const midD = (1.65 + L) / 2;
+    const bedY = yy(midD);
+    put('cama-doble', x1 - 0.95, bedY, 90);
+    for (const sy of [-1, 1]) {
+      put('mesa-noche', x1 - 0.2, bedY + sy * (0.7 + 0.25), 90);
+      put('lampara-colgante', x1 - 0.25, bedY + sy * (0.7 + 0.25), 0);
     }
-    put('aire-acondicionado', x1 - 0.115, yy(1.65 + 1.25), 90, { elevation: 2.15 });
-    for (const d of [1.65 + 0.75, L - 0.9]) put('luz-empotrada', 3.75, yy(d));
+    put('aire-acondicionado', x0 + 0.115, bedY, 270, { elevation: 2.15 });
+    for (const d of [midD - 0.8, midD + 0.8]) put('luz-empotrada', 3.4, yy(d));
     // Door from the corridor near the bedroom's open end, opening into the room.
     const door = opening(corridorWall, 'door', { x: C, y: yy(L - 0.6) }, { width: 0.8 });
     if (!atEnd) ops.toggleDoorFlip(p, f.id, door);
@@ -123,7 +126,7 @@ const json = await page.evaluate(async (ID) => {
       f.openings = f.openings.filter((o) => o.wallId !== patioWall.id || o.kind !== 'window');
       opening(patioWall, 'window', { x: 3.9, y: y1 + 0.075 }, { width: 1.5, height: 1.2, sill: 1.0 });
     } else if (outer) {
-      opening(outer, 'window', { x: XR, y: yy((1.65 + 1.9 + L) / 2) }, { width: 1.2, height: 1.2, sill: 1.0 });
+      opening(outer, 'window', { x: XR, y: yy(midD) }, { width: 1.2, height: 0.9, sill: 1.3 }); // over the headboard
     }
   }
 
