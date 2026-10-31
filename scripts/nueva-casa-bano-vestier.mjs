@@ -1,7 +1,7 @@
 // Nueva casa — master bedroom, bathroom and walk-in (asked 2026-10-31), on top of the user's own saved version
 // (biblioteca/). Fifth layout, the user's sketch:
-//   - a private garden 2 m deep behind the bedroom: its back wall with the glass sliding door moves 1 m in, closed by
-//     the bathroom, the lot lines and a 2 m fence;
+//   - a private garden 2 m deep across the whole back of the house: the back wall (glass sliding door, the bathroom's
+//     high window) moves 1 m in; closed by the house, the lot lines and a 2 m fence on the side strip;
 //   - to the right of the TV partition (x 3.51), a compact en-suite bathroom at the back (2.54 × 2.54 m), entered from
 //     the walk-in: double basin with mirror facing the door, shower under a high window, WC by the door;
 //   - the walk-in in front of it, modules in a C (against the bathroom wall, the right wall and the front wall with the
@@ -38,37 +38,38 @@ const json = await page.evaluate(async (ID) => {
   const room = f.rooms.find((x) => x.name === 'Habitación 15');
   if (!room) throw new Error('No está la Habitación 15');
   const T = 0.05; // the user's drywall partitions are 5 cm
-  const A = 3.51; // TV partition (from the bedroom's back wall to y 4.5)
-  const Y = 2.64; // wall between the bathroom (behind) and the walk-in (in front)
+  const A = 3.51; // TV partition (from the back wall to y 4.5)
   const R = 6.075; // inner face of the right outer wall
-  const G = 1.0; // the bedroom's back wall, moved in so the garden behind it is 2 m deep (to the lot line at −1.025)
+  const G = 1.0; // the house's back wall, moved in so the garden behind it is 2 m deep (to the lot line at −1.025)
+  const Y = G + 2.64; // wall between the bathroom (behind) and the walk-in (in front)
 
-  // Private garden behind the bedroom: the bedroom's back wall (with the glass sliding door) moves 1 m in; the
-  // bathroom keeps the old back line, so the garden is closed by the bathroom, the lot lines and a 2 m fence.
-  if (!f.rooms.some((r) => r.name === 'Jardín privado')) {
-    const back = f.walls.find((w) => Math.abs(w.a.y) < 0.01 && Math.abs(w.b.y) < 0.01 && Math.min(w.a.x, w.b.x) < 0.01 && Math.max(w.a.x, w.b.x) > 6.1);
-    const left = f.walls.find((w) => Math.abs(w.a.x) < 0.01 && Math.abs(w.b.x) < 0.01 && Math.min(w.a.y, w.b.y) < 0.01 && Math.max(w.a.y, w.b.y) > 6);
-    if (!back || !left) throw new Error('No encontré los muros de atrás del dormitorio');
-    const glass = f.openings.find((o) => o.wallId === back.id && o.glass);
-    ops.deleteWall(p, f.id, back.id);
-    if (left.a.y < left.b.y) left.a = { x: 0, y: G };
-    else left.b = { x: 0, y: G };
-    const bedBack = ops.addWall(p, f.id, { x: 0, y: G }, { x: A, y: G }, 0.15);
-    const door = ops.addOpening(p, f.id, bedBack, 'door', glass?.offset ?? 1.72);
-    if (!door) throw new Error('La puerta de vidrio no cupo');
-    ops.updateOpening(p, f.id, door, { width: glass?.width ?? 2.3, height: glass?.height ?? 2.1 });
-    ops.setDoorGlass(p, f.id, door, true);
-    ops.addWall(p, f.id, { x: A, y: 0 }, { x: A, y: G }, 0.15);
-    ops.addWall(p, f.id, { x: A, y: 0 }, { x: 6.15, y: 0 }, 0.15);
-    const lot = p.site ?? { x: -0.775, y: -1.025 };
-    // A point on the edge along the bedroom wall where the house ends, so only the bit past it gets a fence.
-    f.rooms.push({
-      id: newId(), name: 'Jardín privado', kind: 'balcony', floorMaterial: 'cesped', railing: 'celosia',
-      points: [
-        { x: lot.x, y: lot.y }, { x: A - 0.075, y: lot.y }, { x: A - 0.075, y: G - 0.075 }, { x: -0.075, y: G - 0.075 }, { x: lot.x, y: G - 0.075 },
-      ],
-    });
+  // Private garden across the whole back of the house: the back wall (glass sliding door, the bathroom's high window)
+  // moves 1 m in. The garden is closed by the house, the lot lines and a 2 m fence on the side strip.
+  const atBack = (w) => Math.abs(w.a.y - w.b.y) < 0.01 && w.a.y > -0.01 && w.a.y < G + 0.01 && !w.kind;
+  const glass = f.openings.find((o) => o.glass && f.walls.some((w) => w.id === o.wallId && atBack(w)));
+  const glassX = glass ? (() => { const w = f.walls.find((x) => x.id === glass.wallId); return Math.min(w.a.x, w.b.x) + glass.offset; })() : 1.72;
+  const stub = (w) => !w.kind && Math.abs(w.a.x - A) < 0.01 && Math.abs(w.b.x - A) < 0.01 && Math.max(w.a.y, w.b.y) <= G + 0.01;
+  for (const w of f.walls.filter((w) => atBack(w) || stub(w))) ops.deleteWall(p, f.id, w.id);
+  for (const x of [0, 6.15]) {
+    const side = f.walls.find((w) => Math.abs(w.a.x - x) < 0.01 && Math.abs(w.b.x - x) < 0.01 && Math.min(w.a.y, w.b.y) < G + 0.01 && Math.max(w.a.y, w.b.y) > 6);
+    if (!side) throw new Error('No encontré un muro lateral del dormitorio');
+    if (side.a.y < side.b.y) side.a = { x, y: G };
+    else side.b = { x, y: G };
   }
+  const backWall = ops.addWall(p, f.id, { x: 0, y: G }, { x: 6.15, y: G }, 0.15);
+  const glassDoor = ops.addOpening(p, f.id, backWall, 'door', glassX);
+  if (!glassDoor) throw new Error('La puerta de vidrio no cupo');
+  ops.updateOpening(p, f.id, glassDoor, { width: glass?.width ?? 2.3, height: glass?.height ?? 2.1 });
+  ops.setDoorGlass(p, f.id, glassDoor, true);
+  // High window in the bathroom's back wall, over the shower: light and air, no view in.
+  const win = ops.addOpening(p, f.id, backWall, 'window', 5.475);
+  if (win) ops.updateOpening(p, f.id, win, { width: 0.9, height: 0.45, sill: 1.85 });
+  const lot = p.site ?? { x: -0.775, y: -1.025, width: 7 };
+  f.rooms = f.rooms.filter((r) => r.name !== 'Jardín privado');
+  f.rooms.push({
+    id: newId(), name: 'Jardín privado', kind: 'balcony', floorMaterial: 'cesped', railing: 'celosia',
+    points: [{ x: -0.075, y: lot.y }, { x: lot.x + lot.width, y: lot.y }, { x: lot.x + lot.width, y: G - 0.075 }, { x: -0.075, y: G - 0.075 }],
+  });
 
   // Walls: the TV partition from the bedroom's back wall, and the bathroom wall across; earlier partitions go.
   const drywall = f.walls.filter((w) => w.kind === 'drywall' && Math.min(w.a.x, w.b.x) > A + 0.1 && Math.max(w.a.x, w.b.x) < 6.15 && Math.max(w.a.y, w.b.y) < 6.15);
@@ -85,16 +86,8 @@ const json = await page.evaluate(async (ID) => {
   if (!bathDoor) throw new Error('La puerta del baño no cupo');
   ops.updateOpening(p, f.id, bathDoor, { width: 0.75 });
   ops.toggleDoorFlip(p, f.id, bathDoor);
-  // High window in the bathroom's back wall, over the shower: light and air, no view in.
-  const bathBack = f.walls.find((w) => Math.abs(w.a.y) < 0.01 && Math.abs(w.b.y) < 0.01 && Math.min(w.a.x, w.b.x) > A - 0.01);
-  if (bathBack) {
-    f.openings = f.openings.filter((o) => o.wallId !== bathBack.id);
-    const win = ops.addOpening(p, f.id, bathBack.id, 'window', 5.475 - Math.min(bathBack.a.x, bathBack.b.x));
-    if (win) ops.updateOpening(p, f.id, win, { width: 0.9, height: 0.45, sill: 1.85 });
-  }
-
   // Rooms: the bedroom, the bathroom behind (ceramic floor) and the walk-in in front (wood), open to the bedroom.
-  const bath = { x0: A + T / 2, x1: R, y0: 0.075, y1: Y - T / 2 };
+  const bath = { x0: A + T / 2, x1: R, y0: G + 0.075, y1: Y - T / 2 };
   const walk = { x0: A + T / 2, x1: R, y0: Y + T / 2, y1: 6.075 };
   room.points = [{ x: 0.075, y: G + 0.075 }, { x: A - T / 2, y: G + 0.075 }, { x: A - T / 2, y: 6.075 }, { x: 0.075, y: 6.075 }];
   const rect = (b) => [{ x: b.x0, y: b.y0 }, { x: b.x1, y: b.y0 }, { x: b.x1, y: b.y1 }, { x: b.x0, y: b.y1 }];
@@ -115,9 +108,9 @@ const json = await page.evaluate(async (ID) => {
   put('espejo', 4.2, bath.y0 + 0.015, 0, { width: 1.2, height: 0.9, elevation: 1.1 });
   put('tira-led-calida', 4.2, bath.y0 + 0.03, 0, { width: 1.1, elevation: 2.05 });
   put('ducha', R - 0.6, bath.y0 + 0.65, 0, { width: 1.2, depth: 1.3 });
-  put('sanitario', R - 0.35, 2.0, 90);
-  put('toallero', bath.x0 + 0.06, 1.6, 270);
-  for (const [lx, ly] of [[4.3, 1.5], [R - 0.6, bath.y0 + 0.65]]) put('luz-empotrada', lx, ly);
+  put('sanitario', R - 0.35, bath.y1 - 0.6, 90);
+  put('toallero', bath.x0 + 0.06, bath.y0 + 1.5, 270);
+  for (const [lx, ly] of [[4.3, bath.y0 + 1.4], [R - 0.6, bath.y0 + 0.65]]) put('luz-empotrada', lx, ly);
 
   // Walk-in in a C open to the bedroom: a hanging module beside the bathroom door, a row along the right wall, and
   // the chest of drawers with its mirror plus shelves against the front wall.
@@ -125,7 +118,7 @@ const json = await page.evaluate(async (ID) => {
   const inner = R - D; // where the right-hand row starts
   put('vestier-colgar', walk.x0 + 0.39, walk.y0 + D / 2, 0, { width: 0.78 });
   let y = walk.y0;
-  for (const [type, w] of [['vestier-colgar', 1], ['vestier-cajones', 1], ['vestier-repisas', 0.7], ['vestier-zapatos', 0.7]]) {
+  for (const [type, w] of [['vestier-colgar', 1], ['vestier-cajones', 0.71], ['vestier-zapatos', 0.7]]) {
     put(type, R - D / 2, y + w / 2, 90);
     y += w;
   }
@@ -133,7 +126,7 @@ const json = await page.evaluate(async (ID) => {
     Object.assign(m, { rotation: 180, x: walk.x0 + m.width / 2, y: walk.y1 - m.depth / 2 });
   }
   put('vestier-repisas', (walk.x0 + 1.2 + inner) / 2, walk.y1 - D / 2, 180, { width: inner - walk.x0 - 1.2 });
-  for (const ly of [3.9, 4.9]) put('luz-empotrada', (walk.x0 + inner) / 2, ly);
+  for (const ly of [walk.y0 + 0.9, walk.y0 + 1.7]) put('luz-empotrada', (walk.x0 + inner) / 2, ly);
 
   // Bedroom lighting: recessed lights, pendants over the nightstands, warm LED cove over the headboard.
   for (const [lx, ly] of [[1.0, 1.8], [2.6, 1.8], [1.0, 4.0], [2.6, 4.0], [2.6, 5.3]]) put('luz-empotrada', lx, ly);
