@@ -11,6 +11,8 @@ import FloorMeshes from './FloorMeshes';
 import FurnitureMeshes from '../furniture/meshes';
 import { usePalette } from './palette';
 import { outdoorLights, roomLights } from './roomLights';
+import Icon from '../ui/Icon';
+import LightsPanel from './LightsPanel';
 import { type TimeOfDay, useSceneOptions, type RoomLighting } from './sceneOptions';
 import SegmentedSwitch from '../ui/SegmentedSwitch';
 import WalkControls from '../walk/WalkControls';
@@ -117,7 +119,7 @@ export default function Scene3D() {
   useEffect(() => () => useWalk.getState().set({ walking: false }), []);
   const activeIndex = Math.max(0, project.floors.findIndex((f) => f.id === activeFloorId));
   const visible = project.floors.filter((_, i) => i <= activeIndex || showUpperFloors || walking);
-  const { grass, time, lights: lighting } = useSceneOptions();
+  const { grass, time, lights: lighting, doorsClosed } = useSceneOptions();
   const visibleIds = visible.map((f) => f.id).join();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const lights = useMemo(() => roomLights(project, visible.map((f) => f.id)), [project, visibleIds]);
@@ -142,7 +144,7 @@ export default function Scene3D() {
         {lighting === 'on' && <RoomLights lights={lights} time={time} />}
         <OutdoorLights lights={outside} time={time} />
         {visible.map((f) => (
-          <FloorMeshes key={f.id} floor={f} elevation={floorElevation(project, f.id)} selectedId={selection?.id ?? null} />
+          <FloorMeshes key={f.id} floor={f} elevation={floorElevation(project, f.id)} selectedId={selection?.id ?? null} ceilings={walking && f.id === project.floors[project.floors.length - 1].id} />
         ))}
         {visible.map((f) => <FurnitureMeshes key={`m${f.id}`} floor={f} elevation={floorElevation(project, f.id)} selectedId={selection?.id ?? null} />)}
         {walking ? <WalkControls /> : (
@@ -189,6 +191,10 @@ export default function Scene3D() {
           // Lights off only shows at night: switching them off turns the evening on.
           onChange={(l) => useSceneOptions.getState().set(l === 'neon' ? { lights: l, time: 'noche' } : { lights: l })}
         />
+        <button type="button" className="btn btn-chico" aria-pressed={doorsClosed} onClick={() => useSceneOptions.getState().set({ doorsClosed: !doorsClosed })}>
+          <Icon name="door" size={16} />{doorsClosed ? 'Abrir puertas' : 'Cerrar puertas'}
+        </button>
+        <LightsPanel />
         <WalkButton />
         <RenderButtons />
       </div>

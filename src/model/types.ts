@@ -109,6 +109,8 @@ export interface Furniture {
   color?: string;
   /** gates: open (leaves slid aside) or closed */
   open?: boolean;
+  /** light fittings: switched off (chosen in «Luces» in the 3D view) */
+  off?: boolean;
 }
 
 export interface Background {

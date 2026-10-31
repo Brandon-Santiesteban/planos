@@ -10,6 +10,7 @@ import { applyMetricUVs, wallEndExtension } from '../materials/wallFaces';
 import type { Floor, RailingType, Room, Vec2, Wall } from '../model/types';
 import { MirrorFace } from '../furniture/meshes';
 import { usePalette } from './palette';
+import { useSceneOptions } from './sceneOptions';
 import StairsMesh from './StairsMesh';
 import { railingEdges } from './railingEdges';
 import { wallPieces } from './wallPieces';
@@ -127,10 +128,13 @@ const DOOR_OPEN = (70 * Math.PI) / 180;
 /** A wooden door leaf with a handle, hinged at the opening's start and swung like its 2D symbol (towards the
  * wall's +normal, −normal when flipped). */
 function DoorLeaf({ wall, d, offset, width, height, flip }: { wall: Wall; d: Vec2; offset: number; width: number; height: number; flip?: boolean }) {
+  // «Cerrar puertas» in the 3D bar: the leaf shut in the middle of the wall.
+  const closed = useSceneOptions((s) => s.doorsClosed);
   const n = { x: -d.y, y: d.x };
   const side = flip ? scale(n, -1) : n;
-  const hinge = add(add(wall.a, scale(d, offset - width / 2)), scale(side, wall.thickness / 2));
-  const dir = add(scale(d, Math.cos(DOOR_OPEN)), scale(side, Math.sin(DOOR_OPEN)));
+  const hinge = add(add(wall.a, scale(d, offset - width / 2)), scale(side, closed ? 0 : wall.thickness / 2));
+  const angle = closed ? 0 : DOOR_OPEN;
+  const dir = add(scale(d, Math.cos(angle)), scale(side, Math.sin(angle)));
   const leaf = width - 0.02;
   const c = add(hinge, scale(dir, leaf / 2));
   const knob = add(hinge, scale(dir, leaf - 0.08));
@@ -260,7 +264,17 @@ function RoomSlab({ room, walls, selected, floorHeight, ground }: { room: Room; 
   );
 }
 
-export default function FloorMeshes({ floor, elevation, selectedId }: { floor: Floor; elevation: number; selectedId: string | null }) {
+/** A room's ceiling seen from inside (walking on the top floor, where no slab above closes it). */
+function Ceiling({ room, height }: { room: Room; height: number }) {
+  const geometry = useMemo(() => new THREE.ShapeGeometry(new THREE.Shape(room.points.map((p) => new THREE.Vector2(p.x, p.y)))), [room.points]);
+  return (
+    <mesh geometry={geometry} rotation={[Math.PI / 2, 0, 0]} position={[0, height - 0.002, 0]} castShadow receiveShadow>
+      <meshStandardMaterial color="#f4f1ea" roughness={0.9} side={THREE.DoubleSide} />
+    </mesh>
+  );
+}
+
+export default function FloorMeshes({ floor, elevation, selectedId, ceilings }: { floor: Floor; elevation: number; selectedId: string | null; ceilings?: boolean }) {
   useMaterialLibrary();
   // Ground floor (elevation 0): a balcony there is a front garden, where a celosía becomes a 2 m fence.
   const ground = elevation <= 1e-6;
@@ -268,6 +282,7 @@ export default function FloorMeshes({ floor, elevation, selectedId }: { floor: F
     <group position={[0, elevation, 0]}>
       {floor.rooms.map((r) => <RoomSlab key={r.id} room={r} walls={floor.walls} selected={r.id === selectedId} floorHeight={floor.height} ground={ground} />)}
       {floor.walls.map((w) => <WallMesh key={w.id} wall={w} floor={floor} selected={w.id === selectedId} />)}
+      {ceilings && floor.rooms.filter((r) => r.kind === 'room').map((r) => <Ceiling key={`c${r.id}`} room={r} height={floor.height} />)}
     </group>
   );
 }

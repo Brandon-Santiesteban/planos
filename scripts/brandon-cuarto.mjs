@@ -56,9 +56,10 @@ const json = await page.evaluate(async (ID) => {
   const doorW = 0.8;
   const door = ops.addOpening(p, f.id, front, 'door', W + h - (0.1 + doorW / 2));
   ops.updateOpening(p, f.id, door, { width: doorW });
-  // Window diagonally across: right end of the back wall (back wall runs left → right).
-  const winW = 1.2;
-  const win = ops.addOpening(p, f.id, back, 'window', W + h - (0.3 + winW / 2));
+  // Window diagonally across, on the back wall: 1 m wide, 50 cm from the right wall (the user's measures).
+  const winW = 1.0;
+  const winX = W - 0.5 - winW / 2;
+  const win = ops.addOpening(p, f.id, back, 'window', h + winX);
   ops.updateOpening(p, f.id, win, { width: winW, height: 1.2, sill: 1.0 });
   if (!door || !win) throw new Error('No cupo la puerta o la ventana');
 
@@ -72,9 +73,9 @@ const json = await page.evaluate(async (ID) => {
   // basket and a full-length mirror; the way from the door kept clear.
   // Double bed with its head on the right wall, towards the back (the window beside it), a nightstand behind it.
   // Its headboard has a 15 cm shelf on top to put things on (the user's).
-  const bedY = 1.2;
+  const bedY = 1.16;
   put('cama-doble-repisa', W - 2.05 / 2, bedY, 90);
-  for (const sy of [-1, 1]) put('mesa-noche', W - 0.2, bedY + sy * 0.95, 90); // one each side (the user's)
+  for (const sy of [-1, 1]) put('mesa-noche', W - 0.2, bedY + sy * 0.96, 90, { width: 0.4 }); // one each side (the user's)
   // Entertainment centre and gaming desk in one unit on the left wall, facing the bed (the user's call, to save
   // space): the 55" TV hangs over the desk, monitor and PC tower on it, the gaming chair in front. It stops short of
   // the door's swing.
@@ -86,13 +87,14 @@ const json = await page.evaluate(async (ID) => {
   put('silla-oficina', 1.12, unitY, 90, { color: '#3a3d42' }); // office chair (the user's)
   // Wardrobe (1.80 × 0.60, the user's) in the front-right corner, its doors opening clear of the bed.
   // Wardrobe beside the door (the user's call, so the bed gets a nightstand on each side): the open door rests on it.
-  // Its two sliding doors are a big white board to write on (asked 2026-10-31); slide them in Propiedades.
-  put('closet-tablero', 1.0 + 0.9, D - 0.3, 180, { width: 1.8, depth: 0.6 });
-  // Printer (asked 2026-10-31) on a small cabinet in the front-right corner, paper kept inside, a gaming poster over it.
-  const printerX = 3.15;
-  put('comoda', printerX, D - 0.225, 180, { width: 0.6, depth: 0.45, height: 0.75 });
-  put('impresora', printerX, D - 0.25, 180);
-  put('poster-gamer', printerX, D - 0.01, 180);
+  // Sliding doors (they need no room in front), the wardrobe stands 6 cm off the wall: a big whiteboard is kept behind
+  // it on a rail and, with the room door closed, pulls out over the door (the user's idea). «Tablero afuera» in
+  // Propiedades pulls it out.
+  put('closet-corredizo', W - 0.9, D - 0.3 - 0.06, 180, { width: 1.8, depth: 0.6 }); // in the corner (the user's)
+  // The board (1.3 m) slides out of its place behind the wardrobe into the free wall between the door and it.
+  put('tablero-corredizo', W - 1.8, D - 0.025, 180, { width: 2.6, depth: 0.05, height: 2.1 });
+  // Printer on the unit's low shelf under the desk, at the back-wall end (not on the desk: it takes too much room there).
+  put('impresora', 0.27, unitY - 0.55, 270, { elevation: 0.135 });
   // Laundry basket on the back wall by the foot of the bed.
   put('canasta-ropa', 1.85, 0.25);
   // Full-length mirror on the back wall between the entertainment centre and the basket, clear floor in front of it.
@@ -103,23 +105,25 @@ const json = await page.evaluate(async (ID) => {
   //   - warm LED behind the headboard, a pendant over the nightstand, two warm downlights;
   //   - the setup's neons are «Tira LED neón» pieces: pick any colour in Propiedades and they light in it.
   const WARM = '#ffc56b';
-  const cove = 2.45;
-  put('tira-led-calida', W / 2, 0.03, 0, { width: W - 0.2, elevation: cove, color: WARM });
-  put('tira-led-calida', W / 2, D - 0.03, 180, { width: W - 0.2, elevation: cove, color: WARM });
-  put('tira-led-calida', 0.03, D / 2, 270, { width: D - 0.2, elevation: cove, color: WARM });
-  put('tira-led-calida', W - 0.03, D / 2, 90, { width: D - 0.2, elevation: cove, color: WARM });
+  // Plaster cornices with a hidden warm LED washing the walls and ceiling; on the left wall above the unit.
+  const cove = 2.35;
+  const ch = 0.065; // half the cornice's depth
+  put('cornisa-led', W / 2, ch, 0, { width: W, elevation: cove, color: WARM });
+  put('cornisa-led', W / 2, D - ch, 180, { width: W, elevation: cove, color: WARM });
+  put('cornisa-led', W - ch, D / 2, 90, { width: D - 2 * ch - 0.01, elevation: cove, color: WARM });
+  put('cornisa-led', ch, D / 2, 270, { width: D - 2 * ch - 0.01, elevation: 2.46, color: WARM });
   for (const sy of [-1, 1]) put('lampara-colgante', W - 0.22, bedY + sy * 0.95);
-  for (const lx of [1.3, 2.9]) put('luz-empotrada', lx, D / 2);
-  // Setup neons, warm yellow to start with like the rest: behind the TV, under the desk top and over the poster.
+  // Downlights where light is needed: over the desk and chair, in front of the wardrobe, on the shelves; none over the
+  // bed (no glare lying down: the pendants and the headboard glow light it).
+  for (const [lx, ly] of [[1.3, 0.75], [1.3, 1.9], [2.5, 2.1], [2.0, 0.55]]) put('luz-empotrada', lx, ly, 0, { elevation: 2.58 });
+  // Setup neons, warm yellow to start with like the rest: behind the TV and under the desk top.
   put('tira-led', 0.05, unitY, 270, { width: 1.5, elevation: 1.67, color: WARM });
   put('tira-led', 0.75, unitY, 270, { width: 1.35, elevation: 0.7, color: WARM });
-  put('tira-led', printerX, D - 0.015, 180, { width: 0.8, elevation: 2.0, color: WARM });
 
   // Decoration: a rug under the foot of the bed, a curtain on the window, a picture over the headboard, a plant.
   put('alfombra', 2.1, bedY, 0, { width: 2.0, depth: 1.5, color: '#cdb89a' });
-  put('cortina', 3.1, 0.06, 0, { width: 1.5 });
+  put('cortina', winX, 0.15, 0, { width: winW, height: 2.3 }); // as wide as the window (the user's), under the cornice
   put('cuadro-abstracto', W - 0.02, bedY, 90, { elevation: 1.5 });
-  put('monstera', 3.73, D - 0.27, 0, { width: 0.5, depth: 0.5, height: 1.2 });
   // Shelves (asked 2026-10-31): two on the back wall between the mirror and the window, over the basket.
   put('repisa-decorativa', 1.95, 0.11, 0, { width: 0.8, height: 0.7, elevation: 1.2, color: '#7a5a3f' });
 

@@ -96,6 +96,14 @@ export function rotateFurniture(p: Project, floorId: string, id: string, delta: 
   if (f) f.rotation = squareUp(f.rotation + delta);
 }
 
+/** Switches a light fitting on or off (an «off» flag only while it is off). */
+export function setLightOn(p: Project, floorId: string, id: string, on: boolean): void {
+  const f = p.floors.find((fl) => fl.id === floorId)?.furniture.find((x) => x.id === id);
+  if (!f) return;
+  if (on) delete f.off;
+  else f.off = true;
+}
+
 export function setGateOpen(p: Project, floorId: string, id: string, open: boolean): void {
   const f = p.floors.find((fl) => fl.id === floorId)?.furniture.find((x) => x.id === id);
   if (f) f.open = open;

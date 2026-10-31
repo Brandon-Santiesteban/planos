@@ -39,6 +39,7 @@ const furniture = z.object({
   id: z.string(), type: z.string().min(1), x: z.number().finite(), y: z.number().finite(), rotation: z.number().finite(), tilt: z.number().finite().optional(),
   width: positive, depth: positive, height: positive, elevation: z.number().finite().min(0), color: color.optional(),
   open: z.boolean().optional(),
+  off: z.boolean().optional(),
 });
 const background = z.object({
   dataUrl: z.string().startsWith('data:'), origin: vec, metresPerPixel: positive,

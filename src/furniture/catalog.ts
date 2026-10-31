@@ -19,7 +19,7 @@ export type FurnitureModel =
   | 'jardinera' | 'arbol' | 'poste' | 'centroEntretenimiento' | 'cortina' | 'tiraLed' | 'cuadro' | 'repisa'
   | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical' | 'porton' | 'vestier'
   | 'luzEmpotrada' | 'colgante' | 'aplique' | 'aire' | 'canasta' | 'centroEscritorio' | 'impresora'
-  | 'matita' | 'monstera' | 'plantaColgante' | 'pampas' | 'adornos' | 'repisaDeco' | 'closetTablero';
+  | 'matita' | 'monstera' | 'plantaColgante' | 'pampas' | 'adornos' | 'repisaDeco' | 'closetTablero' | 'tableroCorredizo' | 'cornisaLed';
 
 /** Open walk-in dressing modules (model 'vestier'): what each one holds. */
 export type Dressing = 'colgar' | 'repisas' | 'zapatos' | 'cajones';
@@ -54,6 +54,8 @@ export interface CatalogItem {
   dressing?: Dressing;
   /** chests of drawers: a framed mirror standing on top, the chest itself this tall (the rest is the mirror) */
   mirrorAbove?: number;
+  /** wardrobes with sliding doors: their fronts are a white writable board */
+  boardDoors?: boolean;
   /** beds: the headboard carries a shelf this deep on top (included in the depth) */
   headShelf?: number;
   /** light fittings: it lights the room in 3D, from this height of the piece (0 bottom … 1 top), warm white */
@@ -83,11 +85,12 @@ export const CATALOG: CatalogItem[] = [
   item('cama-doble', 'Cama doble', 'Dormitorio', 'cama', [1.4, 1.9, 1.0], LINO, { double: true }),
   item('cama-queen', 'Cama queen', 'Dormitorio', 'cama', [1.6, 2.0, 1.05], LINO, { double: true }),
   item('cama-king', 'Cama king', 'Dormitorio', 'cama', [2.0, 2.0, 1.05], LINO, { double: true }),
-  item('cama-doble-repisa', 'Cama doble con espaldar y repisa', 'Dormitorio', 'cama', [1.4, 2.05, 1.15], LINO, { double: true, headShelf: 0.15 }),
+  item('cama-doble-repisa', 'Cama doble con espaldar y repisa', 'Dormitorio', 'cama', [1.4, 2.05, 1.15], LINO, { double: true, headShelf: 0.15, light: 0.05, ambient: true }),
   item('cama-sencilla', 'Cama sencilla', 'Dormitorio', 'cama', [1.0, 1.9, 0.95], LINO),
   item('mesa-noche', 'Mesa de noche', 'Dormitorio', 'mesaNoche', [0.45, 0.4, 0.55], ROBLE),
   item('closet', 'Clóset', 'Dormitorio', 'closet', [1.2, 0.6, 2.2], BLANCO),
-  item('closet-tablero', 'Clóset con puertas corredizas de tablero blanco', 'Dormitorio', 'closetTablero', [1.8, 0.6, 2.2], NOGAL),
+  item('closet-tablero', 'Clóset con puertas corredizas de tablero blanco', 'Dormitorio', 'closetTablero', [1.8, 0.6, 2.2], NOGAL, { boardDoors: true }),
+  item('closet-corredizo', 'Clóset de puertas corredizas', 'Dormitorio', 'closetTablero', [1.8, 0.6, 2.2], NOGAL),
   item('vestier-colgar', 'Vestier: módulo para colgar', 'Dormitorio', 'vestier', [1.0, 0.55, 2.4], NOGAL_CLARO, { dressing: 'colgar' }),
   item('vestier-repisas', 'Vestier: repisas', 'Dormitorio', 'vestier', [0.7, 0.55, 2.4], NOGAL_CLARO, { dressing: 'repisas' }),
   item('vestier-zapatos', 'Vestier: zapatero y bolsos', 'Dormitorio', 'vestier', [0.7, 0.55, 2.4], NOGAL_CLARO, { dressing: 'zapatos' }),
@@ -114,6 +117,7 @@ export const CATALOG: CatalogItem[] = [
   item('lampara-colgante', 'Lámpara colgante', 'Iluminación', 'colgante', [0.35, 0.35, 0.9], '#2f2b28', { elevation: 1.7, light: 0.05 }),
   item('aplique-pared', 'Aplique de pared', 'Iluminación', 'aplique', [0.16, 0.14, 0.28], '#d9c8a8', { elevation: 1.7, light: 0.5 }),
   item('tira-led-calida', 'Tira LED cálida (luz indirecta)', 'Iluminación', 'tiraLed', [1.0, 0.02, 0.02], '#ffd29a', { elevation: 2.4, light: 0.5 }),
+  item('cornisa-led', 'Cornisa con LED oculto (luz indirecta)', 'Iluminación', 'cornisaLed', [1.0, 0.13, 0.11], '#ffd29a', { elevation: 2.35, light: 0.6 }),
   // Comedor
   item('mesa-comedor-4', 'Mesa de comedor 4 puestos', 'Comedor', 'mesa', [1.2, 0.8, 0.75], ROBLE, { seats: 4 }),
   item('mesa-comedor-6', 'Mesa de comedor 6 puestos', 'Comedor', 'mesa', [1.8, 0.9, 0.75], ROBLE, { seats: 6 }),
@@ -146,6 +150,7 @@ export const CATALOG: CatalogItem[] = [
   // A thin glowing strip; its colour is the light's colour.
   item('tira-led', 'Tira LED neón (color a elegir)', 'Oficina y setup', 'tiraLed', [1.0, 0.02, 0.02], '#8a5cff', { elevation: 1.0, light: 0.5, ambient: true }),
   item('impresora', 'Impresora', 'Oficina y setup', 'impresora', [0.42, 0.36, 0.22], '#e9e9e6', { elevation: 0.75, onTop: true }),
+  item('tablero-corredizo', 'Tablero blanco corredizo (en riel)', 'Oficina y setup', 'tableroCorredizo', [2.0, 0.05, 2.2], '#fbfbf9'),
   item('centro-escritorio', 'Centro de entretenimiento con escritorio', 'Oficina y setup', 'centroEscritorio', [2.18, 0.8, 2.4], NOGAL, { light: 0.9, ambient: true }),
   item('poster-gamer', 'Póster gamer', 'Oficina y setup', 'cuadro', [0.6, 0.02, 0.85], '#15161a', { elevation: 1.07, art: 'gamer' }),
   // Decoración (wall pieces hang with their centre at about 1,5 m)

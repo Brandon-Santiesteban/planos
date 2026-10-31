@@ -1,7 +1,7 @@
 import { createEmptyProject } from './defaults';
 import {
   addFurniture, deleteFurniture, duplicateFurniture, furnitureCorners, furnitureFromCatalog, moveFurniture,
-  dropElevation, isStacked, piecesOnTop, pointInFurniture, rotateFurniture, snapFlushToWall, snapToWalls, stackElevation, tiltedSize, updateFurniture, setFurnitureColor, fitToWall, squareUp,
+  dropElevation, isStacked, piecesOnTop, pointInFurniture, rotateFurniture, snapFlushToWall, snapToWalls, stackElevation, tiltedSize, updateFurniture, setFurnitureColor, fitToWall, squareUp, setLightOn,
 } from './furnitureOps';
 import { addOpening, addWall } from './ops';
 import type { Furniture, Wall } from './types';
@@ -226,4 +226,13 @@ describe('fitToWall', () => {
     f.furniture.push(closet(2, 1.5));
     expect(fitToWall(p, f.id, 'c')).toBe(false);
   });
+});
+
+test('a light fitting can be switched off and on again', () => {
+  const { p, f, floor } = setup();
+  const id = addFurniture(p, f, furnitureFromCatalog('luz-empotrada', { x: 1, y: 1 }));
+  setLightOn(p, f, id, false);
+  expect(floor().furniture[0].off).toBe(true);
+  setLightOn(p, f, id, true);
+  expect(floor().furniture[0].off).toBeUndefined();
 });

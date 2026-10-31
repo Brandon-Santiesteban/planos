@@ -2,6 +2,7 @@
 const PATHS = {
   select: 'M5 3l13 8.5-5.6 1.4L9.6 19z',
   wall: 'M3 9h18v6H3z M9 9v6 M15 9v6',
+  bulb: 'M9 18h6 M10 21h4 M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z',
   door: 'M6 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17 M3 21h18 M14 12.5v.01',
   window: 'M4 4h16v16H4z M12 4v16 M4 12h16',
   room: 'M4 4h16v16H4z M4 14h6v6',

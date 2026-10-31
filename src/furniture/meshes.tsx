@@ -100,8 +100,8 @@ const legs = (w: number, d: number, h: number, t: number, c: string, inset = 0.0
   ));
 
 /**
- * Bed; with `item.headShelf` its headboard carries a shelf that deep on top (to put things on), the bed in front of it
- * and a warm glow washing the wall above the shelf.
+ * Bed; with `item.headShelf` its headboard carries a shelf that deep on top (to put things on), the bed in front of it,
+ * a warm glow washing the wall above the shelf and warm LED under the frame lighting the floor (switchable).
  */
 const bed: Builder = (p) => {
   const s = p.item?.headShelf;
@@ -113,8 +113,17 @@ const bed: Builder = (p) => {
       <B p={[0, h / 2, -d / 2 + 0.01]} s={[w + 0.1, h, 0.02]} c={wood} r={0.6} />
       {[-1, 1].map((sx) => <B key={sx} p={[sx * (w / 2 + 0.04), h / 2, -d / 2 + (s + 0.06) / 2]} s={[0.02, h, s + 0.06]} c={wood} r={0.6} />)}
       <RB p={[0, h + 0.015, -d / 2 + (s + 0.06) / 2]} s={[w + 0.12, 0.03, s + 0.06]} rad={0.006} c={wood} r={0.5} />
-      <Neon p={[0, h + 0.034, -d / 2 + 0.025]} s={[w, 0.005, 0.01]} c={'#ffd9a6'} k={1.2} />
-      <Glow p={[0, h + 0.3, -d / 2 + 0.003]} s={[w + 0.5, 0.6]} c={'#ffcf8a'} o={0.45} />
+      {!p.off && (
+        <>
+          <Neon p={[0, h + 0.034, -d / 2 + 0.025]} s={[w, 0.005, 0.01]} c={'#ffd9a6'} k={1.2} />
+          <Glow p={[0, h + 0.3, -d / 2 + 0.003]} s={[w + 0.5, 0.6]} c={'#ffcf8a'} o={0.45} />
+          {/* Warm LED hidden under the frame, washing the floor round the bed */}
+          {[-1, 1].map((sx) => <Neon key={sx} p={[sx * (w / 2 - 0.07), 0.1, s / 2]} s={[0.01, 0.006, d - s - 0.2]} c={'#ffd9a6'} k={1.4} />)}
+          <Neon p={[0, 0.1, d / 2 - 0.07]} s={[w - 0.14, 0.006, 0.01]} c={'#ffd9a6'} k={1.4} />
+          {[-1, 1].map((sx) => <Glow key={`g${sx}`} p={[sx * (w / 2), 0.016, s / 2]} s={[0.7, d - s]} c={'#ffc277'} o={0.9} rot={[-Math.PI / 2, 0, 0]} />)}
+          <Glow p={[0, 0.016, d / 2]} s={[w, 0.7]} c={'#ffc277'} o={0.9} rot={[-Math.PI / 2, 0, 0]} />
+        </>
+      )}
       <group position={[0, 0, s / 2]}>{bedCore({ ...p, d: d - s })}</group>
     </>
   );
@@ -225,12 +234,29 @@ const airConditioner: Builder = ({ w, d, h, c }) => (
 );
 
 /** Recessed ceiling light: a thin trim ring round a glowing disc, flush under the ceiling. */
+/** Recessed downlight: a slim trim ring flush with the ceiling, a deep anti-glare reflector and the warm lens in it. */
 const recessed: Builder = ({ w, h, c, off }) => (
   <>
-    <C p={[0, h / 2, 0]} r={w / 2} h={h} c={c} m={0.3} rough={0.4} />
-    <C p={[0, -0.001, 0]} r={w * 0.36} h={0.004} c="#fff4dc" e={off ? undefined : "#ffe2a8"} />
+    <C p={[0, h - 0.003, 0]} r={w / 2 + 0.012} h={0.006} c={c} m={0.2} rough={0.35} />
+    <C p={[0, h / 2, 0]} r={w * 0.4} top={w * 0.46} h={h} c={'#d8d4cc'} m={0.6} rough={0.25} />
+    <C p={[0, -0.001, 0]} r={w * 0.3} h={0.004} c="#fff4dc" e={off ? undefined : '#ffe2a8'} />
+    {!off && <Glow p={[0, -0.004, 0]} s={[w * 2.4, w * 2.4]} c={'#ffd9a6'} o={0.55} rot={[Math.PI / 2, 0, 0]} />}
   </>
 );
+
+/** Plaster cornice along the top of a wall hiding a warm LED that washes the wall and the ceiling (indirect light). */
+const cornice: Builder = ({ w, d, c, off }) => {
+  const zb = -d / 2;
+  return (
+    <>
+      <B p={[0, 0.012, zb + 0.06]} s={[w, 0.024, 0.12]} c={'#f2eee6'} r={0.9} />
+      <B p={[0, 0.06, zb + 0.115]} s={[w, 0.1, 0.012]} c={'#f2eee6'} r={0.9} />
+      <B p={[0, 0.0, zb + 0.06]} s={[w, 0.004, 0.124]} c={'#e6e1d8'} r={0.9} />
+      <Neon p={[0, 0.03, zb + 0.05]} s={[w - 0.04, 0.008, 0.012]} c={off ? '#cfcac2' : c} k={off ? 0 : 1.6} />
+      {!off && <Glow p={[0, 0.3, zb + 0.004]} s={[w, 0.55]} c={c} o={0.7} />}
+    </>
+  );
+};
 
 /** Pendant lamp: a cable from the ceiling (the top of the piece) to a metal shade that glows inside. */
 const pendant: Builder = ({ w, h, c, off }) => {
@@ -314,8 +340,8 @@ const monitor: Builder = ({ w, d, h, c }) => {
     <>
       <B p={[0, 0.008, 0]} s={[Math.min(0.25, w * 0.4), 0.016, Math.min(0.18, d)]} c={DARK} />
       <B p={[0, (h - screenH / 2) / 2, -d * 0.2]} s={[0.04, h - screenH / 2, 0.03]} c={DARK} />
-      <B p={[0, h - screenH / 2, -d * 0.1]} s={[w, screenH, 0.03]} c={c} r={0.35} />
-      <B p={[0, h - screenH / 2, -d * 0.1 + 0.016]} s={[w - 0.02, screenH - 0.02, 0.002]} c={'#1f3346'} r={0.15} e={'#203a55'} />
+      <B p={[0, h - screenH / 2, -d * 0.1]} s={[w, screenH, 0.03]} c={c} r={0.7} />
+      <B p={[0, h - screenH / 2, -d * 0.1 + 0.016]} s={[w - 0.02, screenH - 0.02, 0.002]} c={'#1f3346'} r={0.85} e={'#203a55'} />
     </>
   );
 };
@@ -348,8 +374,8 @@ const panel = (frame: string, face: { c?: string; r: number; m: number }): Build
 
 const tv: Builder = ({ w, d, h, c }) => (
   <>
-    <B p={[0, h / 2, 0]} s={[w, h, Math.min(d, 0.05)]} c={c} r={0.3} />
-    <B p={[0, h / 2, Math.min(d, 0.05) / 2 + 0.002]} s={[w - 0.02, h - 0.02, 0.002]} c={'#141b24'} r={0.1} e={'#18283a'} />
+    <B p={[0, h / 2, 0]} s={[w, h, Math.min(d, 0.05)]} c={c} r={0.7} />
+    <B p={[0, h / 2, Math.min(d, 0.05) / 2 + 0.002]} s={[w - 0.02, h - 0.02, 0.002]} c={'#0b0f14'} r={0.85} e={'#0f1a26'} />
   </>
 );
 
@@ -1205,6 +1231,9 @@ const deskEntertainment: Builder = ({ w, d, h, c, seed = 1 }) => {
       <B p={[0, desk - 0.075, d / 2 - 0.018]} s={[0.56, 0.05, 0.006]} c={shade(c, 1.06)} r={0.5} />
       <B p={[0, desk - 0.1, d / 2 - 0.014]} s={[0.3, 0.006, 0.006]} c={black} />
       <B p={[0, desk / 2, -d / 2 + 0.02]} s={[nw, desk - 0.08, 0.02]} c={back} />
+      {/* Low shelf under the desk at its right end, for a printer, with a divider towards the knee space */}
+      <RB p={[nw / 2 - 0.26, 0.12, -d / 2 + 0.25]} s={[0.52, t, 0.48]} rad={0.004} c={c} r={0.55} />
+      <B p={[nw / 2 - 0.52 - t / 2, (0.12 + desk - 0.11) / 2, -d / 2 + 0.25]} s={[t, desk - 0.23, 0.48]} c={c} r={0.55} />
       {/* Slatted wooden wall behind the TV */}
       <B p={[0, (desk + h - bridge) / 2, -d / 2 + 0.008]} s={[nw, h - bridge - desk, 0.016]} c={black} />
       {Array.from({ length: slats }, (_, i) => (
@@ -1228,24 +1257,26 @@ const deskEntertainment: Builder = ({ w, d, h, c, seed = 1 }) => {
  * markers and an eraser, a to-do list written on it). `open`: the front door slid over the other, showing the hanging
  * rail and shelves inside.
  */
-const whiteboardCloset: Builder = ({ w, d, h, c, open }) => {
+const whiteboardCloset: Builder = ({ w, d, h, c, open, item }) => {
+  const plain = !item?.boardDoors;
   const t = 0.022;
   const dh = h - 0.12;
   const dw = w / 2 + 0.02;
   const front = d / 2 - 0.015;
   const rear = d / 2 - 0.05;
   const xA = open ? w / 4 - 0.01 : -w / 4 + 0.01;
-  const board = '#fbfbf9';
+  const board = plain ? shade(c, 1.08) : '#fbfbf9';
   const door = (x: number, z: number, key: string, note: boolean) => (
     <group key={key} position={[x, 0.07 + dh / 2, z]}>
-      <B p={[0, 0, 0]} s={[dw, dh, 0.022]} c={STEEL} m={0.6} r={0.3} />
-      <B p={[0, 0, 0.0115]} s={[dw - 0.03, dh - 0.03, 0.002]} c={board} r={0.12} />
-      <B p={[0, -dh / 2 + 0.95, 0.03]} s={[dw * 0.6, 0.015, 0.05]} c={STEEL} m={0.6} r={0.3} />
+      <B p={[0, 0, 0]} s={[dw, dh, 0.022]} c={plain ? c : STEEL} m={plain ? 0 : 0.6} r={0.3} />
+      <B p={[0, 0, 0.0115]} s={[dw - 0.03, dh - 0.03, 0.002]} c={board} r={plain ? 0.6 : 0.12} />
+      {plain && <B p={[(key === 'a' ? 1 : -1) * (dw / 2 - 0.05), 0, 0.016]} s={[0.02, 0.4, 0.012]} c={DARK} r={0.4} />}
+      {!plain && <><B p={[0, -dh / 2 + 0.95, 0.03]} s={[dw * 0.6, 0.015, 0.05]} c={STEEL} m={0.6} r={0.3} />
       {[['#1d4ed8', -0.12], ['#dc2626', -0.06], ['#111111', 0.0]].map(([col, mx]) => (
         <C key={col as string} p={[(mx as number) - 0.05, -dh / 2 + 0.965, 0.035]} r={0.008} h={0.12} c={col as string} rot={[0, 0, Math.PI / 2]} />
       ))}
-      <B p={[0.12, -dh / 2 + 0.975, 0.035]} s={[0.12, 0.03, 0.045]} c={'#3a3d42'} r={0.8} />
-      {note && (
+      <B p={[0.12, -dh / 2 + 0.975, 0.035]} s={[0.12, 0.03, 0.045]} c={'#3a3d42'} r={0.8} /></>}
+      {note && !plain && (
         <group position={[0, 0.35, 0.0125]}>
           <B p={[-0.1, 0.22, 0]} s={[0.36, 0.012, 0.001]} c={'#1d4ed8'} r={0.9} />
           {[0, 1, 2, 3].map((i) => (
@@ -1278,6 +1309,33 @@ const whiteboardCloset: Builder = ({ w, d, h, c, open }) => {
       <B p={[0, 0.06, d / 2 - 0.03]} s={[w, 0.012, 0.06]} c={STEEL} m={0.6} r={0.3} />
       {door(w / 4 - 0.01, rear, 'b', false)}
       {door(xA, front, 'a', true)}
+    </>
+  );
+};
+
+/**
+ * Pull-out whiteboard on a wall rail: a large white board that lives in the half of the rail at −x (e.g. hidden behind
+ * a wardrobe standing off the wall) and slides out to the +x half (`open`), e.g. over a closed door. Marker ledge with
+ * markers and an eraser, a pull handle on its leading edge.
+ */
+const pullOutBoard: Builder = ({ w, d, h, open }) => {
+  const bw = w / 2;
+  const bh = Math.min(1.2, h - 0.08);
+  const x = open ? w / 4 : -w / 4;
+  const z = d / 2 - 0.015;
+  return (
+    <>
+      <B p={[0, h - 0.02, 0]} s={[w, 0.03, d]} c={STEEL} m={0.6} r={0.3} />
+      <group position={[x, h - 0.06 - bh / 2, z]}>
+        <B p={[0, 0, 0]} s={[bw, bh, 0.02]} c={STEEL} m={0.6} r={0.3} />
+        <B p={[0, 0, 0.0105]} s={[bw - 0.03, bh - 0.03, 0.002]} c={'#fbfbf9'} r={0.12} />
+        <B p={[0, -bh / 2 + 0.01, 0.03]} s={[bw * 0.7, 0.015, 0.05]} c={STEEL} m={0.6} r={0.3} />
+        {[['#1d4ed8', -0.16], ['#dc2626', -0.1], ['#111111', -0.04]].map(([col, mx]) => (
+          <C key={col as string} p={[mx as number, -bh / 2 + 0.025, 0.035]} r={0.008} h={0.12} c={col as string} rot={[0, 0, Math.PI / 2]} />
+        ))}
+        <B p={[0.12, -bh / 2 + 0.035, 0.035]} s={[0.12, 0.03, 0.045]} c={'#3a3d42'} r={0.8} />
+        <B p={[bw / 2 - 0.02, 0, 0.03]} s={[0.02, 0.25, 0.03]} c={DARK} r={0.4} />
+      </group>
     </>
   );
 };
@@ -2094,9 +2152,9 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   lavamanos: basin, ducha: shower, banera: tub, espejo: mirror,
   porton: slidingGate, lavadero: washtub, lavadora: washer, matera: plant, arbol: tree, poste: streetLamp, banca: bench, carro: car, moto, piscina: pool,
   asoleadora: lounger, sombrilla: umbrella, pergola, bar, parrilla: grill, jardinera: planter,
-  centroEntretenimiento: entertainment, centroEscritorio: deskEntertainment, closetTablero: whiteboardCloset, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
+  centroEntretenimiento: entertainment, centroEscritorio: deskEntertainment, closetTablero: whiteboardCloset, tableroCorredizo: pullOutBoard, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
   repisa: collectiblesShelf, jacuzzi, toallero: towelRail, brasero: firePit, puf: pouf, jardinVertical: verticalGarden,
-  vestier: dressing, luzEmpotrada: recessed, colgante: pendant, aplique: sconce, aire: airConditioner,
+  vestier: dressing, luzEmpotrada: recessed, colgante: pendant, aplique: sconce, aire: airConditioner, cornisaLed: cornice,
   canasta: basket, impresora: printer,
   matita: pottedSmall, monstera, plantaColgante: hangingPlant, pampas, adornos: tabletopDecor, repisaDeco: decorShelf,
 };
@@ -2111,7 +2169,8 @@ export function FurnitureModel3D({ f }: { f: Furniture }) {
   const item = catalogItem(f.type);
   const c = f.color ?? item?.color ?? '#b08a63';
   const build = item ? BUILDERS[item.model] : null;
-  const off = useSceneOptions((s) => s.lights === 'neon') && item?.light !== undefined && !item.ambient;
+  const neon = useSceneOptions((s) => s.lights === 'neon');
+  const off = item?.light !== undefined && (f.off === true || (neon && !item.ambient));
   return build ? build({ w: f.width, d: f.depth, h: f.height, c, item, seed: hashSeed(f.id), open: f.open, off }) : <B p={[0, f.height / 2, 0]} s={[f.width, f.height, f.depth]} c={c} />;
 }
 
@@ -2146,7 +2205,7 @@ export default function FurnitureMeshes({ floor, elevation, selectedId }: { floo
     (floor.furniture ?? [])
       .filter((f) => {
         const item = catalogItem(f.type);
-        return item?.light !== undefined && (!neonOnly || item.ambient);
+        return item?.light !== undefined && !f.off && (!neonOnly || item.ambient);
       })
       .slice(0, MAX_FITTING_LIGHTS)
       .map((f) => f.id),
