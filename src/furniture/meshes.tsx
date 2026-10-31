@@ -191,6 +191,17 @@ const chest: Builder = ({ w, d, h, c, item }) => {
   );
 };
 
+/** Wall-mounted air conditioner (minisplit): a rounded white body, the air outlet with its louvre along the bottom
+ * front and a small display. */
+const airConditioner: Builder = ({ w, d, h, c }) => (
+  <>
+    <RB p={[0, h / 2 + 0.02, 0]} s={[w, h - 0.04, d]} c={c} rad={0.04} r={0.4} />
+    <B p={[0, 0.045, d * 0.1]} s={[w - 0.08, 0.05, d * 0.8]} c={shade(c, 0.55)} r={0.6} />
+    <B p={[0, 0.03, d / 2 - 0.02]} s={[w - 0.1, 0.012, 0.05]} rot={[-0.5, 0, 0]} c={shade(c, 0.95)} r={0.4} />
+    <B p={[w / 2 - 0.12, h * 0.55, d / 2 + 0.002]} s={[0.05, 0.02, 0.004]} c="#2a8cff" e="#2a8cff" />
+  </>
+);
+
 /** Recessed ceiling light: a thin trim ring round a glowing disc, flush under the ceiling. */
 const recessed: Builder = ({ w, h, c }) => (
   <>
@@ -1575,7 +1586,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   asoleadora: lounger, sombrilla: umbrella, pergola, bar, parrilla: grill, jardinera: planter,
   centroEntretenimiento: entertainment, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
   repisa: collectiblesShelf, jacuzzi, toallero: towelRail, brasero: firePit, puf: pouf, jardinVertical: verticalGarden,
-  vestier: dressing, luzEmpotrada: recessed, colgante: pendant, aplique: sconce,
+  vestier: dressing, luzEmpotrada: recessed, colgante: pendant, aplique: sconce, aire: airConditioner,
 };
 
 /** How bright light fittings shine by time of day (their light is lost in daylight, plain at night). */

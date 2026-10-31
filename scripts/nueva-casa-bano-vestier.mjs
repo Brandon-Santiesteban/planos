@@ -211,6 +211,9 @@ const json = await page.evaluate(async (ID) => {
   const centreD = 0.45;
   put('centro-entretenimiento', A - T / 2 - centreD / 2, tvY, 90, { width: 2.48, depth: centreD });
   put('televisor-70', A - T / 2 - 0.05, tvY, 90, { elevation: 0.62 });
+  // Air conditioner high on the same wall, over the entertainment centre, blowing towards the bed.
+  f.furniture = f.furniture.filter((m) => !(inBedroom(m) && m.type === 'aire-acondicionado'));
+  put('aire-acondicionado', A - T / 2 - 0.115, tvY, 90, { elevation: 2.15 });
 
   // Bedroom lighting: recessed lights, pendants over the nightstands, warm LED cove over the headboard.
   for (const [lx, ly] of [[1.0, 1.8], [2.4, 1.8], [1.0, 4.0], [2.4, 4.0], [2.4, 5.3]]) put('luz-empotrada', lx, ly);

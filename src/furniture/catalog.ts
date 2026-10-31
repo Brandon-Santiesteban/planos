@@ -18,7 +18,7 @@ export type FurnitureModel =
   | 'banca' | 'carro' | 'moto' | 'piscina' | 'asoleadora' | 'sombrilla' | 'pergola' | 'bar' | 'parrilla'
   | 'jardinera' | 'arbol' | 'poste' | 'centroEntretenimiento' | 'cortina' | 'tiraLed' | 'cuadro' | 'repisa'
   | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical' | 'porton' | 'vestier'
-  | 'luzEmpotrada' | 'colgante' | 'aplique';
+  | 'luzEmpotrada' | 'colgante' | 'aplique' | 'aire';
 
 /** Open walk-in dressing modules (model 'vestier'): what each one holds. */
 export type Dressing = 'colgar' | 'repisas' | 'zapatos' | 'cajones';
@@ -145,6 +145,7 @@ export const CATALOG: CatalogItem[] = [
   item('cuadro-byn', 'Cuadro blanco y negro', 'Decoración', 'cuadro', [0.5, 0.04, 0.7], '#1e1e1e', { elevation: 1.15, art: 'byn' }),
   item('espejo-cuerpo', 'Espejo de cuerpo entero', 'Decoración', 'espejo', [0.6, 0.05, 1.7], '#dfe7ee', { elevation: 0.25 }),
   item('cortina', 'Cortina', 'Decoración', 'cortina', [1.2, 0.08, 2.4], '#d8cdbb'),
+  item('aire-acondicionado', 'Aire acondicionado (minisplit)', 'Dormitorio', 'aire', [0.9, 0.23, 0.3], '#f4f4f2', { elevation: 2.1 }),
   item('repisa-coleccionables', 'Repisa con coleccionables', 'Decoración', 'repisa', [1.0, 0.25, 0.6], '#2e3036', { elevation: 1.45 }),
   // Lavandería
   item('lavadero', 'Lavadero', 'Lavandería', 'lavadero', [0.7, 0.6, 0.85], '#c9c6c0'),
