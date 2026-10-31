@@ -1,7 +1,7 @@
 import { createEmptyProject } from './defaults';
 import {
   addFurniture, deleteFurniture, duplicateFurniture, furnitureCorners, furnitureFromCatalog, moveFurniture,
-  dropElevation, isStacked, piecesOnTop, pointInFurniture, rotateFurniture, snapFlushToWall, snapToWalls, stackElevation, tiltedSize, updateFurniture, setFurnitureColor, fitToWall,
+  dropElevation, isStacked, piecesOnTop, pointInFurniture, rotateFurniture, snapFlushToWall, snapToWalls, stackElevation, tiltedSize, updateFurniture, setFurnitureColor, fitToWall, squareUp,
 } from './furnitureOps';
 import { addOpening, addWall } from './ops';
 import type { Furniture, Wall } from './types';
@@ -105,8 +105,19 @@ test('far from walls there is no snap', () => {
 
 test('snapFlushToWall pushes a parallel piece against a wall without turning it', () => {
   const s = snapFlushToWall([wallN], piece({ x: 2, y: 0.68, rotation: 180 }), 0.15)!;
-  expect(s).toEqual({ x: 2, y: expect.closeTo(0.6) });
+  expect(s).toEqual({ x: 2, y: expect.closeTo(0.6), rotation: 180 });
   expect(snapFlushToWall([wallN], piece({ x: 2, y: 0.68, rotation: 30 }), 0.15)).toBeNull();
+});
+
+test('a piece a few degrees off the wall is put square with it', () => {
+  expect(snapFlushToWall([wallN], piece({ x: 2, y: 0.68, rotation: 182.5 }), 0.15)?.rotation).toBe(180);
+  expect(snapFlushToWall([wallN], piece({ x: 2, y: 0.68, rotation: 357.5 }), 0.15)?.rotation).toBe(0);
+});
+
+test('squareUp: a few degrees off a right angle becomes it; a real angle stays', () => {
+  expect(squareUp(88.5)).toBe(90);
+  expect(squareUp(358)).toBe(0);
+  expect(squareUp(45)).toBe(45);
 });
 
 test('dropElevation: on top of what is below, else back to the floor if it was stacked, else unchanged', () => {

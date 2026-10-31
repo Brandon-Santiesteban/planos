@@ -51,7 +51,7 @@ export function dragFurnitureTo(drag: FurnitureDrag, centre: Vec2, snap: boolean
   const floor = project.floors.find((f) => f.id === drag.floorId);
   const piece = floor?.furniture.find((f) => f.id === drag.id);
   if (!floor || !piece) return;
-  let to = snap ? snapToGrid(centre, FURNITURE_STEP) : centre;
+  let to: Vec2 & { rotation?: number } = snap ? snapToGrid(centre, FURNITURE_STEP) : centre;
   if (snap) to = snapFlushToWall(floor.walls, { ...piece, ...to }, WALL_SNAP) ?? to;
   const ignore = drag.riders.map((r) => r.id);
   const elevation = stack
@@ -61,7 +61,7 @@ export function dragFurnitureTo(drag: FurnitureDrag, centre: Vec2, snap: boolean
   const dy = to.y - drag.start.y;
   const dz = elevation - drag.elevation;
   apply((d) => {
-    updateFurniture(d, drag.floorId, drag.id, { x: to.x, y: to.y, elevation });
+    updateFurniture(d, drag.floorId, drag.id, { x: to.x, y: to.y, elevation, ...(to.rotation !== undefined ? { rotation: to.rotation } : {}) });
     for (const r of drag.riders) {
       updateFurniture(d, drag.floorId, r.id, { x: r.start.x + dx, y: r.start.y + dy, elevation: r.elevation + dz });
     }

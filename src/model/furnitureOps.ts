@@ -13,6 +13,13 @@ export const normalizeRotation = (deg: number) => {
   return r === 360 ? 0 : r;
 };
 
+/** A turn within `tolDeg` of 0°, 90°, 180° or 270° is put exactly square: a few degrees off is never meant. */
+export const squareUp = (deg: number, tolDeg = 3) => {
+  const r = normalizeRotation(deg);
+  const right = Math.round(r / 90) * 90;
+  return Math.abs(r - right) <= tolDeg ? normalizeRotation(right) : r;
+};
+
 function getFloor(p: Project, floorId: string): Floor {
   const f = p.floors.find((fl) => fl.id === floorId);
   if (!f) throw new Error(`Planta no encontrada: ${floorId}`);
@@ -86,7 +93,7 @@ export function moveFurniture(p: Project, floorId: string, id: string, to: Vec2)
 
 export function rotateFurniture(p: Project, floorId: string, id: string, delta: number): void {
   const f = find(p, floorId, id);
-  if (f) f.rotation = normalizeRotation(f.rotation + delta);
+  if (f) f.rotation = squareUp(f.rotation + delta);
 }
 
 export function setGateOpen(p: Project, floorId: string, id: string, open: boolean): void {
@@ -221,7 +228,7 @@ export function snapToWalls(
     if (fr.length === 0 || fr.along < 0 || fr.along > fr.length) continue;
     const sign = fr.side >= 0 ? 1 : -1;
     const out = { x: fr.n.x * sign, y: fr.n.y * sign }; // from the wall towards the piece
-    const rotation = normalizeRotation(facing(out) + userRotation);
+    const rotation = squareUp(facing(out) + userRotation);
     const half = halfExtent(width, depth, rotation, out);
     const gap = Math.abs(fr.side) - w.thickness / 2 - half;
     if (Math.abs(gap) > maxGap || Math.abs(fr.side) < w.thickness / 2) continue;
@@ -237,24 +244,29 @@ export function snapToWalls(
   return best && { x: best.x, y: best.y, rotation: best.rotation };
 }
 
-/** While dragging: pushes a piece that is parallel to a nearby wall flush against it, keeping its rotation. */
-export function snapFlushToWall(walls: Wall[], f: Furniture, maxGap: number): Vec2 | null {
-  let best: { x: number; y: number; gap: number } | null = null;
+/**
+ * While dragging: pushes a piece that is parallel to a nearby wall flush against it. A piece a few degrees off
+ * parallel is turned to sit square with the wall (and square with the plan when the wall nearly is).
+ */
+export function snapFlushToWall(walls: Wall[], f: Furniture, maxGap: number): { x: number; y: number; rotation: number } | null {
+  let best: { x: number; y: number; rotation: number; gap: number } | null = null;
   for (const w of walls) {
     const fr = wallFrame(w, f);
     if (fr.length === 0 || fr.along < 0 || fr.along > fr.length) continue;
     const wallDeg = (Math.atan2(fr.d.y, fr.d.x) * 180) / Math.PI;
     const rel = normalizeRotation(f.rotation - wallDeg) % 90;
-    if (Math.min(rel, 90 - rel) > 0.5) continue; // not parallel
+    const off = rel <= 45 ? rel : rel - 90; // degrees away from parallel, signed
+    if (Math.abs(off) > 3) continue; // not parallel
+    const rotation = squareUp(f.rotation - off);
     const sign = fr.side >= 0 ? 1 : -1;
     const out = { x: fr.n.x * sign, y: fr.n.y * sign };
-    const half = halfExtent(f.width, tiltedSize(f).depth, f.rotation, out);
+    const half = halfExtent(f.width, tiltedSize(f).depth, rotation, out);
     const gap = Math.abs(fr.side) - w.thickness / 2 - half;
     if (Math.abs(gap) > maxGap || Math.abs(fr.side) < w.thickness / 2) continue;
     if (best && Math.abs(gap) >= Math.abs(best.gap)) continue;
-    best = { x: f.x - out.x * gap, y: f.y - out.y * gap, gap };
+    best = { x: f.x - out.x * gap, y: f.y - out.y * gap, rotation, gap };
   }
-  return best && { x: best.x, y: best.y };
+  return best && { x: best.x, y: best.y, rotation: best.rotation };
 }
 
 /** Paints several pieces at once; `null` puts back each piece's own catalogue colour. Returns how many changed. */
@@ -326,7 +338,7 @@ export function fitToWall(p: Project, floorId: string, id: string, opts: { toCei
   const depth = tiltedSize(f).depth;
   f.width = Math.round(width * 1000) / 1000;
   if (opts.toCeiling) f.height = (w.height ?? floor.height) - f.elevation; // built in: floor to ceiling
-  f.rotation = facing(out);
+  f.rotation = squareUp(facing(out));
   f.x = w.a.x + fr.d.x * mid + out.x * (face + depth / 2);
   f.y = w.a.y + fr.d.y * mid + out.y * (face + depth / 2);
   return true;
