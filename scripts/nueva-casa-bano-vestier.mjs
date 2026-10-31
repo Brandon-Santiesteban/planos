@@ -6,8 +6,8 @@
 //   - to the right of the TV partition (x 3.51), a compact en-suite bathroom at the back (2.54 × 2.54 m), entered from
 //     the walk-in: WC on the left wall hidden by the open door, double basin with mirror on the right wall, shower
 //     under a high window;
-//   - the walk-in in front of it, closed by a sliding mirror door at its top left (mirror to the bedroom), modules
-//     in a C (left wall, right wall, front wall);
+//   - the walk-in in front of it, an open doorway at its top left (no door; a full-length mirror beside it on the
+//     bedroom side), modules in a C (left wall, right wall, front wall); the bathroom entered from it, no door;
 //   - lighting: recessed ceiling lights, pendants over the nightstands, a warm LED cove over the headboard, lights in
 //     the bathroom and the dressing room, sconces beside the bathroom mirror.
 // Writes public/ejemplos/nueva-casa.casa.json; the open page shows it by itself.
@@ -116,25 +116,18 @@ const json = await page.evaluate(async (ID) => {
   const tvWall = f.walls.find((w) => w.kind === 'drywall' && Math.abs(w.a.x - A) < 0.02 && Math.abs(w.b.x - A) < 0.02);
   if (!tvWall) throw new Error('No encontré el tabique del TV');
   f.openings = f.openings.filter((o) => o.wallId !== tvWall.id);
-  // The TV partition runs from the back wall to the bathroom wall; the walk-in's side wall goes on to the front wall
-  // and closes it, with a sliding mirror door at its top left (the user's mark): the mirror faces the bedroom, so no
-  // space inside goes to a mirror.
+  // The TV partition runs from the back wall to the bathroom wall; the walk-in's entrance comes next, an open
+  // doorway of 0.8 m with no door (the user's choice), then its side wall to the front wall.
   tvWall.a = { x: A, y: G };
   tvWall.b = { x: A, y: Y };
   const entrance = 0.8;
-  const walkWall = ops.addWall(p, f.id, { x: A, y: Y }, { x: A, y: 6.075 }, T, 'drywall');
-  const walkDoor = ops.addOpening(p, f.id, walkWall, 'door', T / 2 + entrance / 2);
-  if (!walkDoor) throw new Error('La puerta del vestier no cupo');
-  ops.updateOpening(p, f.id, walkDoor, { width: entrance });
-  ops.setDoorMirror(p, f.id, walkDoor, true); // its +normal side is the bedroom (−x)
-  // The bathroom door: from the walk-in, hinged on the left and opening in, so its leaf hides the WC from the doorway.
-  const bathWall = ops.addWall(p, f.id, { x: A, y: Y }, { x: R, y: Y }, T, 'drywall');
+  ops.addWall(p, f.id, { x: A, y: Y + T / 2 + entrance }, { x: A, y: 6.075 }, T, 'drywall');
+  // The bathroom's entrance from the walk-in: an open doorway of 0.7 m with no door (the user's choice), past the WC.
   const bath = { x0: A + T / 2, x1: R, y0: G + 0.075, y1: Y - T / 2 };
   const doorW = 0.7;
-  const bathDoor = ops.addOpening(p, f.id, bathWall, 'door', bath.x0 + 0.75 + doorW / 2 - A);
-  if (!bathDoor) throw new Error('La puerta del baño no cupo');
-  ops.updateOpening(p, f.id, bathDoor, { width: doorW });
-  ops.toggleDoorFlip(p, f.id, bathDoor);
+  const gap0 = bath.x0 + 0.75;
+  ops.addWall(p, f.id, { x: A, y: Y }, { x: gap0, y: Y }, T, 'drywall');
+  ops.addWall(p, f.id, { x: gap0 + doorW, y: Y }, { x: R, y: Y }, T, 'drywall');
   // Rooms: the bedroom, the bathroom behind (ceramic floor) and the walk-in in front (wood).
   const walk = { x0: A + T / 2, x1: R, y0: Y + T / 2, y1: 6.075 };
   room.points = [{ x: 0.075, y: G + 0.075 }, { x: A - T / 2, y: G + 0.075 }, { x: A - T / 2, y: 6.075 }, { x: 0.075, y: 6.075 }];
@@ -168,7 +161,10 @@ const json = await page.evaluate(async (ID) => {
   // a row along the right wall, and shelves on the front wall beside the user's mirror.
   const D = 0.55;
   const inner = R - D; // where the right-hand row starts
-  // No gaps: the left module runs from the door frame to the front row, the rows meet in the corners.
+  // The full-length mirror on the bedroom side of the walk-in's wall, just past its entrance.
+  f.furniture = f.furniture.filter((m) => !(m.type === 'espejo-cuerpo' && Math.abs(m.x - (A - T / 2 - 0.025)) < 0.2));
+  put('espejo-cuerpo', A - T / 2 - 0.025, Y + T / 2 + entrance + 0.6, 90);
+  // No gaps: the left module runs from the doorway to the front row, the rows meet in the corners.
   const leftTop = Y + T / 2 + entrance + 0.02;
   const leftLen = walk.y1 - D - leftTop;
   put('vestier-colgar', walk.x0 + D / 2, leftTop + leftLen / 2, 270, { width: leftLen });
