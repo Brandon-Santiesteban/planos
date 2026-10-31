@@ -544,8 +544,8 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 /* «Luces» in the 3D bar: which light fittings are on */
 .luces { position: relative; }
 .panel-luces {
-  position: absolute; bottom: calc(100% + 10px); right: 0; width: 300px; max-height: 360px; overflow-y: auto;
-  background: var(--sup); border-radius: 10px; padding: 12px; box-shadow: var(--sombra), 0 0 0 1px var(--contorno); z-index: 5;
+  position: fixed; overflow-y: auto;
+  background: var(--sup); border-radius: 10px; padding: 12px; box-shadow: var(--sombra), 0 0 0 1px var(--contorno); z-index: 50;
 }
 .panel-luces-cabeza { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
 .panel-luces-cabeza span { display: flex; gap: 10px; }

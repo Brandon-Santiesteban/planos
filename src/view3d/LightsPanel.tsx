@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
 import { catalogItem } from '../furniture/catalog';
 import { setLightOn, setRoomLightOn } from '../model/furnitureOps';
 import { useEditor } from '../store/editorStore';
@@ -10,6 +11,27 @@ import Icon from '../ui/Icon';
  */
 export default function LightsPanel() {
   const [open, setOpen] = useState(false);
+  const button = useRef<HTMLButtonElement>(null);
+  // The panel floats over the whole page (a narrow 3D pane in «Dividir» would clip it), above its button and kept
+  // inside the window.
+  const [place, setPlace] = useState<CSSProperties>({});
+  useLayoutEffect(() => {
+    if (!open) return;
+    const fit = () => {
+      const r = button.current?.getBoundingClientRect();
+      if (!r) return;
+      const w = Math.min(300, window.innerWidth - 16);
+      setPlace({
+        width: w,
+        left: Math.max(8, Math.min(r.right - w, window.innerWidth - w - 8)),
+        bottom: window.innerHeight - r.top + 10,
+        maxHeight: Math.max(160, Math.min(360, r.top - 18)),
+      });
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, [open]);
   const floor = useEditor((s) => s.project.floors.find((f) => f.id === s.activeFloorId));
   const selectedId = useEditor((s) => (s.selection?.kind === 'furniture' ? s.selection.id : null));
   const lights = (floor?.furniture ?? []).filter((f) => catalogItem(f.type)?.light !== undefined);
@@ -43,11 +65,11 @@ export default function LightsPanel() {
   };
   return (
     <div className="luces">
-      <button type="button" className="btn btn-chico" aria-expanded={open} onClick={() => setOpen(!open)}>
+      <button ref={button} type="button" className="btn btn-chico" aria-expanded={open} onClick={() => setOpen(!open)}>
         <Icon name="bulb" size={16} />Luces
       </button>
-      {open && (
-        <div className="panel-luces" role="dialog" aria-label="Luces">
+      {open && createPortal(
+        <div className="panel-luces" role="dialog" aria-label="Luces" style={place}>
           <div className="panel-luces-cabeza">
             <strong>Luces de esta planta</strong>
             <span>
@@ -78,7 +100,8 @@ export default function LightsPanel() {
               </li>
             ))}
           </ul>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );
