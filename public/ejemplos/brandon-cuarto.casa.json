@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "id": "604f0f53-ddc1-4be6-9aa5-278f8910c779",
+  "name": "Brandon Cuarto",
+  "north": 0,
+  "floors": [
+    {
+      "id": "292cff57-2680-4a05-9bdb-0a150418ba9e",
+      "name": "Planta baja",
+      "height": 2.6,
+      "walls": [],
+      "furniture": [],
+      "openings": [],
+      "rooms": [],
+      "background": null
+    }
+  ]
+}
