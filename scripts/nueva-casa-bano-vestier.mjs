@@ -1,12 +1,11 @@
 // Nueva casa — master bedroom, bathroom and walk-in (asked 2026-10-31), on top of the user's own saved version
-// (biblioteca/). Third layout, the user's choice:
-//   - en-suite bathroom between the TV partition (x 3.51) and the wall at x 4.735, closed at y 4.5 by a drywall wall
-//     with its door: rain shower at the back, double basin with mirror on the side wall, WC by the entrance;
-//   - walk-in dressing room in the right-hand strip, modules in a C (back end, right wall, front end with the chest of
-//     drawers and its mirror), opening to the bedroom by its own door;
+// (biblioteca/). Fourth layout, the user's sketch: to the right of the TV partition (x 3.51),
+//   - a compact en-suite bathroom at the back (2.54 × 2.54 m), door from the bedroom in the TV partition: WC by the
+//     door, double basin with mirror facing it, shower in the corner;
+//   - the walk-in in front of it, modules in a C (against the bathroom wall, the right wall and the front wall with the
+//     chest of drawers and its mirror), open to the bedroom past the end of the TV partition;
 //   - lighting: recessed ceiling lights, pendants over the nightstands, a warm LED cove over the headboard, lights in
 //     the bathroom and the dressing room, sconces beside the bathroom mirror.
-// Both doors open into the bedroom (inwards they would hit the WC and the chest of drawers).
 // Writes public/ejemplos/nueva-casa.casa.json; the open page shows it by itself.
 //   node scripts/nueva-casa-bano-vestier.mjs [puerto]     (needs the dev server, default :5173)
 import { writeFileSync } from 'node:fs';
@@ -37,28 +36,28 @@ const json = await page.evaluate(async (ID) => {
   const room = f.rooms.find((x) => x.name === 'Habitación 15');
   if (!room) throw new Error('No está la Habitación 15');
   const T = 0.05; // the user's drywall partitions are 5 cm
-  const A = 3.51; // TV partition (kept)
-  const X = 4.735; // wall between the bathroom and the walk-in
-  const Y = 4.5; // front wall of the bathroom
+  const A = 3.51; // TV partition (kept, from the back wall to y 4.5)
+  const Y = 2.64; // wall between the bathroom (behind) and the walk-in (in front)
+  const R = 6.075; // inner face of the right outer wall
 
-  // Walls: the bathroom/walk-in wall again (with the walk-in door) and the bathroom's front wall (with its door).
-  const isAt = (w, x) => w.kind === 'drywall' && Math.abs(w.a.x - x) < 0.06 && Math.abs(w.b.x - x) < 0.06;
-  const isFront = (w) => w.kind === 'drywall' && Math.abs(w.a.y - Y) < 0.06 && Math.abs(w.b.y - Y) < 0.06;
-  for (const w of f.walls.filter((w) => isAt(w, X) || isFront(w))) ops.deleteWall(p, f.id, w.id);
-  const side = ops.addWall(p, f.id, { x: X, y: 0.075 }, { x: X, y: 6.075 }, T, 'drywall');
-  const walkInDoor = ops.addOpening(p, f.id, side, 'door', 4.95 - 0.075);
-  const front = ops.addWall(p, f.id, { x: A, y: Y }, { x: X, y: Y }, T, 'drywall');
-  const bathDoor = ops.addOpening(p, f.id, front, 'door', 0.5);
-  if (!walkInDoor || !bathDoor) throw new Error('Una puerta no cupo');
-  for (const id of [walkInDoor, bathDoor]) ops.updateOpening(p, f.id, id, { width: 0.7 });
+  // Walls: only the TV partition and the bathroom wall across; earlier layouts' partitions go.
+  const drywall = f.walls.filter((w) => w.kind === 'drywall' && Math.min(w.a.x, w.b.x) > A + 0.1 && Math.max(w.a.x, w.b.x) < 6.15 && Math.max(w.a.y, w.b.y) < 6.15);
+  const across = f.walls.filter((w) => w.kind === 'drywall' && Math.abs(w.a.y - w.b.y) < 0.01 && w.a.y > 0.1 && w.a.y < 6 && Math.min(w.a.x, w.b.x) >= A - 0.01);
+  for (const w of [...drywall, ...across]) ops.deleteWall(p, f.id, w.id);
+  ops.addWall(p, f.id, { x: A, y: Y }, { x: R, y: Y }, T, 'drywall');
+  // The bathroom door: in the TV partition, from the bedroom, clear of the TV furniture; it opens into the bathroom.
+  const tvWall = f.walls.find((w) => w.kind === 'drywall' && Math.abs(w.a.x - A) < 0.02 && Math.abs(w.b.x - A) < 0.02);
+  if (!tvWall) throw new Error('No encontré el tabique del TV');
+  f.openings = f.openings.filter((o) => o.wallId !== tvWall.id);
+  const bathDoor = ops.addOpening(p, f.id, tvWall.id, 'door', 0.85 - Math.min(tvWall.a.y, tvWall.b.y));
+  if (!bathDoor) throw new Error('La puerta del baño no cupo');
+  ops.updateOpening(p, f.id, bathDoor, { width: 0.7 });
+  ops.toggleDoorFlip(p, f.id, bathDoor);
 
-  // Rooms: the bedroom (an L round the bathroom), the bathroom (ceramic floor) and the walk-in (wood).
-  const bath = { x0: A + T / 2, x1: X - T / 2, y0: 0.075, y1: Y - T / 2 };
-  const walk = { x0: X + T / 2, x1: 6.075, y0: 0.075, y1: 6.075 };
-  room.points = [
-    { x: 0.075, y: 0.075 }, { x: A - T / 2, y: 0.075 }, { x: A - T / 2, y: Y + T / 2 }, { x: X - T / 2, y: Y + T / 2 },
-    { x: X - T / 2, y: 6.075 }, { x: 0.075, y: 6.075 },
-  ];
+  // Rooms: the bedroom, the bathroom behind (ceramic floor) and the walk-in in front (wood), open to the bedroom.
+  const bath = { x0: A + T / 2, x1: R, y0: 0.075, y1: Y - T / 2 };
+  const walk = { x0: A + T / 2, x1: R, y0: Y + T / 2, y1: 6.075 };
+  room.points = [{ x: 0.075, y: 0.075 }, { x: A - T / 2, y: 0.075 }, { x: A - T / 2, y: 6.075 }, { x: 0.075, y: 6.075 }];
   const rect = (b) => [{ x: b.x0, y: b.y0 }, { x: b.x1, y: b.y0 }, { x: b.x1, y: b.y1 }, { x: b.x0, y: b.y1 }];
   f.rooms = f.rooms.filter((x) => x.name !== 'Baño principal' && x.name !== 'Vestier');
   f.rooms.push({ id: newId(), name: 'Baño principal', kind: 'room', floorMaterial: 'ceramica', points: rect(bath) });
@@ -71,33 +70,35 @@ const json = await page.evaluate(async (ID) => {
   f.furniture = f.furniture.filter((m) => !(inRoom(m) && redo.has(m.type)));
   const put = (type, x, y, rotation = 0, extra = {}) => fo.addFurniture(p, f.id, { ...fo.furnitureFromCatalog(type, { x, y }, rotation), ...extra });
 
-  // Bathroom (1.17 × 4.4 m): shower at the back, basin and mirror on the wall to the walk-in, WC by the entrance.
-  const bx = (bath.x0 + bath.x1) / 2;
-  put('ducha', bx, bath.y0 + 0.6, 0, { width: bath.x1 - bath.x0 - 0.02, depth: 1.2 });
-  put('toallero', bath.x0 + 0.06, 1.7, 270);
-  put('lavamanos-doble', bath.x1 - 0.25, 2.4, 90);
-  put('espejo', bath.x1 - 0.015, 2.4, 90, { width: 1.2, height: 0.9, elevation: 1.1 });
-  put('aplique-pared', bath.x1 - 0.07, 1.67, 90, { elevation: 1.45 });
-  put('aplique-pared', bath.x1 - 0.07, 3.13, 90, { elevation: 1.45 });
-  put('sanitario', bath.x1 - 0.35, 3.55, 90);
-  for (const ly of [0.675, 2.4, 3.8]) put('luz-empotrada', bx, ly);
+  // Compact bathroom (2.54 × 2.54 m): WC by the door against the back wall, double basin with mirror on the right
+  // wall facing the door, shower in the front right corner.
+  put('sanitario', 4.55, bath.y0 + 0.35, 0);
+  put('lavamanos-doble', R - 0.25, 0.8, 90);
+  put('espejo', R - 0.015, 0.8, 90, { width: 1.2, height: 0.9, elevation: 1.1 });
+  put('tira-led-calida', R - 0.03, 0.8, 90, { width: 1.1, elevation: 2.05 });
+  put('ducha', R - 0.7, bath.y1 - 0.55, 0, { width: 1.4, depth: 1.1 });
+  put('toallero', 4.1, bath.y1 - 0.06, 180);
+  for (const [lx, ly] of [[4.5, 1.2], [R - 0.7, bath.y1 - 0.55]]) put('luz-empotrada', lx, ly);
 
-  // Walk-in in a C: shelves at the back end, modules along the right wall, the chest of drawers closing the front end.
+  // Walk-in in a C open to the bedroom: hanging modules against the bathroom wall, a row along the right wall, and
+  // the chest of drawers with its mirror plus shelves against the front wall.
   const D = 0.55;
-  const passage = (walk.x0 + walk.x1 - D) / 2;
-  put('vestier-repisas', passage, walk.y0 + D / 2, 0, { width: walk.x1 - walk.x0 - D });
+  const inner = R - D; // where the right-hand row starts
+  put('vestier-colgar', walk.x0 + 0.5, walk.y0 + D / 2, 0, { width: 0.995 });
+  put('vestier-colgar', walk.x0 + 1.495, walk.y0 + D / 2, 0, { width: 0.995 });
   let y = walk.y0;
-  for (const [type, w] of [['vestier-colgar', 1], ['vestier-colgar', 1], ['vestier-cajones', 1], ['vestier-colgar', 1], ['vestier-zapatos', 0.7]]) {
-    put(type, walk.x1 - D / 2, y + w / 2, 90);
+  for (const [type, w] of [['vestier-colgar', 1], ['vestier-cajones', 1], ['vestier-repisas', 0.7], ['vestier-zapatos', 0.7]]) {
+    put(type, R - D / 2, y + w / 2, 90);
     y += w;
   }
   for (const m of f.furniture.filter((m) => inRoom(m) && m.type === 'comoda-espejo')) {
-    Object.assign(m, { rotation: 180, x: (walk.x0 + walk.x1) / 2, y: walk.y1 - m.depth / 2 });
+    Object.assign(m, { rotation: 180, x: walk.x0 + m.width / 2, y: walk.y1 - m.depth / 2 });
   }
-  for (const ly of [1.3, 3.0, 4.7]) put('luz-empotrada', passage, ly);
+  put('vestier-repisas', (walk.x0 + 1.2 + inner) / 2, walk.y1 - D / 2, 180, { width: inner - walk.x0 - 1.2 });
+  for (const ly of [3.9, 4.9]) put('luz-empotrada', (walk.x0 + inner) / 2, ly);
 
   // Bedroom lighting: recessed lights, pendants over the nightstands, warm LED cove over the headboard.
-  for (const [lx, ly] of [[1.0, 1.2], [2.6, 1.2], [1.0, 4.0], [2.6, 4.0], [2.6, 5.3], [4.1, 5.3]]) put('luz-empotrada', lx, ly);
+  for (const [lx, ly] of [[1.0, 1.2], [2.6, 1.2], [1.0, 4.0], [2.6, 4.0], [2.6, 5.3]]) put('luz-empotrada', lx, ly);
   for (const n of f.furniture.filter((m) => inRoom(m) && m.type === 'mesa-noche')) put('lampara-colgante', n.x + 0.05, n.y);
   put('tira-led-calida', 0.09, 2.6, 270, { width: 2.4, elevation: 2.45 });
 
