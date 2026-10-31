@@ -244,16 +244,19 @@ const recessed: Builder = ({ w, h, c, off }) => (
   </>
 );
 
-/** Plaster cornice along the top of a wall hiding a warm LED that washes the wall and the ceiling (indirect light). */
-const cornice: Builder = ({ w, d, c, off }) => {
+/**
+ * Ceiling cove: a slim white band against the ceiling, open at the bottom, hiding a warm LED that grazes down the wall
+ * (indirect light). Its top is the top of the piece: place it so it meets the ceiling.
+ */
+const cornice: Builder = ({ w, d, h, c, off }) => {
   const zb = -d / 2;
+  const white = '#f4f1ea';
   return (
     <>
-      <B p={[0, 0.012, zb + 0.06]} s={[w, 0.024, 0.12]} c={'#f2eee6'} r={0.9} />
-      <B p={[0, 0.06, zb + 0.115]} s={[w, 0.1, 0.012]} c={'#f2eee6'} r={0.9} />
-      <B p={[0, 0.0, zb + 0.06]} s={[w, 0.004, 0.124]} c={'#e6e1d8'} r={0.9} />
-      <Neon p={[0, 0.03, zb + 0.05]} s={[w - 0.04, 0.008, 0.012]} c={off ? '#cfcac2' : c} k={off ? 0 : 1.6} />
-      {!off && <Glow p={[0, 0.3, zb + 0.004]} s={[w, 0.55]} c={c} o={0.7} />}
+      <B p={[0, h - 0.006, zb + d / 2]} s={[w, 0.012, d]} c={white} r={0.9} />
+      <B p={[0, h / 2, zb + d - 0.006]} s={[w, h, 0.012]} c={white} r={0.9} />
+      <Neon p={[0, h - 0.02, zb + 0.03]} s={[w - 0.04, 0.008, 0.012]} c={off ? '#d9d6d0' : c} k={off ? 0 : 1.6} />
+      {!off && <Glow p={[0, h - 0.4, zb + 0.004]} s={[w, 0.8]} c={c} o={0.75} />}
     </>
   );
 };
@@ -1325,7 +1328,8 @@ const pullOutBoard: Builder = ({ w, d, h, open }) => {
   const z = d / 2 - 0.015;
   return (
     <>
-      <B p={[0, h - 0.02, 0]} s={[w, 0.03, d]} c={STEEL} m={0.6} r={0.3} />
+      {/* The rail only where the board is kept (hidden behind the wardrobe); the board runs out past its end */}
+      <B p={[-w / 4, h - 0.02, 0]} s={[w / 2, 0.03, d]} c={STEEL} m={0.6} r={0.3} />
       <group position={[x, h - 0.06 - bh / 2, z]}>
         <B p={[0, 0, 0]} s={[bw, bh, 0.02]} c={STEEL} m={0.6} r={0.3} />
         <B p={[0, 0, 0.0105]} s={[bw - 0.03, bh - 0.03, 0.002]} c={'#fbfbf9'} r={0.12} />

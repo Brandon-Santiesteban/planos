@@ -105,13 +105,13 @@ const json = await page.evaluate(async (ID) => {
   //   - warm LED behind the headboard, a pendant over the nightstand, two warm downlights;
   //   - the setup's neons are «Tira LED neón» pieces: pick any colour in Propiedades and they light in it.
   const WARM = '#ffc56b';
-  // Plaster cornices with a hidden warm LED washing the walls and ceiling; on the left wall above the unit.
-  const cove = 2.35;
-  const ch = 0.065; // half the cornice's depth
+  // Ceiling coves all round: a slim white band against the ceiling hiding a warm LED that grazes down the walls.
+  const cove = 2.52; // 8 cm tall: its top meets the 2.60 m ceiling
+  const ch = 0.05; // half the cove's depth
   put('cornisa-led', W / 2, ch, 0, { width: W, elevation: cove, color: WARM });
   put('cornisa-led', W / 2, D - ch, 180, { width: W, elevation: cove, color: WARM });
   put('cornisa-led', W - ch, D / 2, 90, { width: D - 2 * ch - 0.01, elevation: cove, color: WARM });
-  put('cornisa-led', ch, D / 2, 270, { width: D - 2 * ch - 0.01, elevation: 2.46, color: WARM });
+  put('cornisa-led', ch, D / 2, 270, { width: D - 2 * ch - 0.01, elevation: cove, color: WARM });
   for (const sy of [-1, 1]) put('lampara-colgante', W - 0.22, bedY + sy * 0.95);
   // Downlights where light is needed: over the desk and chair, in front of the wardrobe, on the shelves; none over the
   // bed (no glare lying down: the pendants and the headboard glow light it).

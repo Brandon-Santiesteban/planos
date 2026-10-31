@@ -117,7 +117,7 @@ export const CATALOG: CatalogItem[] = [
   item('lampara-colgante', 'Lámpara colgante', 'Iluminación', 'colgante', [0.35, 0.35, 0.9], '#2f2b28', { elevation: 1.7, light: 0.05 }),
   item('aplique-pared', 'Aplique de pared', 'Iluminación', 'aplique', [0.16, 0.14, 0.28], '#d9c8a8', { elevation: 1.7, light: 0.5 }),
   item('tira-led-calida', 'Tira LED cálida (luz indirecta)', 'Iluminación', 'tiraLed', [1.0, 0.02, 0.02], '#ffd29a', { elevation: 2.4, light: 0.5 }),
-  item('cornisa-led', 'Cornisa con LED oculto (luz indirecta)', 'Iluminación', 'cornisaLed', [1.0, 0.13, 0.11], '#ffd29a', { elevation: 2.35, light: 0.6 }),
+  item('cornisa-led', 'Cornisa con LED oculto (luz indirecta)', 'Iluminación', 'cornisaLed', [1.0, 0.1, 0.08], '#ffd29a', { elevation: 2.52, light: 0.7 }),
   // Comedor
   item('mesa-comedor-4', 'Mesa de comedor 4 puestos', 'Comedor', 'mesa', [1.2, 0.8, 0.75], ROBLE, { seats: 4 }),
   item('mesa-comedor-6', 'Mesa de comedor 6 puestos', 'Comedor', 'mesa', [1.8, 0.9, 0.75], ROBLE, { seats: 6 }),
