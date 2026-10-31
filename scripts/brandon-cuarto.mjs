@@ -73,11 +73,11 @@ const json = await page.evaluate(async (ID) => {
   // space): the 55" TV hangs over the desk, monitor and PC tower on it, the gaming chair in front. It stops short of
   // the door's swing.
   const unitY = 1.075;
-  put('centro-escritorio', 0.3, unitY, 270, { width: 2.15, depth: 0.6, height: 2.3 });
+  put('centro-escritorio', 0.4, unitY, 270, { width: 2.15, depth: 0.8, height: 2.3 }); // desk 80 cm deep (the user's)
   put('televisor', 0.08, unitY, 270, { elevation: 1.22 });
-  put('monitor', 0.22, unitY, 270);
-  put('torre-pc', 0.3, unitY + 0.55, 270);
-  put('silla-gamer', 1.05, unitY, 90);
+  put('monitor', 0.3, unitY, 270);
+  put('torre-pc', 0.4, unitY + 0.55, 270);
+  put('silla-gamer', 1.2, unitY, 90);
   // Wardrobe (1.80 × 0.60, the user's) in the front-right corner, its doors opening clear of the bed.
   put('closet', W - 0.9, D - 0.3, 180, { width: 1.8, depth: 0.6 });
   // The front wall between the door and the wardrobe stays free; a gaming poster on it.
