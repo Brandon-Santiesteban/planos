@@ -121,13 +121,19 @@ const json = await page.evaluate(async (ID) => {
   tvWall.a = { x: A, y: G };
   tvWall.b = { x: A, y: Y };
   const entrance = 0.8;
-  ops.addWall(p, f.id, { x: A, y: Y + T / 2 + entrance }, { x: A, y: 6.075 }, T, 'drywall');
+  const walkWall = ops.addWall(p, f.id, { x: A, y: Y }, { x: A, y: 6.075 }, T, 'drywall');
+  const walkIn = ops.addOpening(p, f.id, walkWall, 'door', T / 2 + entrance / 2);
+  if (!walkIn) throw new Error('La entrada del vestier no cupo');
+  ops.updateOpening(p, f.id, walkIn, { width: entrance });
+  ops.setDoorVano(p, f.id, walkIn, true);
   // The bathroom's entrance from the walk-in: an open doorway of 0.7 m with no door (the user's choice), past the WC.
   const bath = { x0: A + T / 2, x1: R, y0: G + 0.075, y1: Y - T / 2 };
   const doorW = 0.7;
-  const gap0 = bath.x0 + 0.75;
-  ops.addWall(p, f.id, { x: A, y: Y }, { x: gap0, y: Y }, T, 'drywall');
-  ops.addWall(p, f.id, { x: gap0 + doorW, y: Y }, { x: R, y: Y }, T, 'drywall');
+  const bathWall = ops.addWall(p, f.id, { x: A, y: Y }, { x: R, y: Y }, T, 'drywall');
+  const bathIn = ops.addOpening(p, f.id, bathWall, 'door', bath.x0 + 0.75 + doorW / 2 - A);
+  if (!bathIn) throw new Error('La entrada del baño no cupo');
+  ops.updateOpening(p, f.id, bathIn, { width: doorW });
+  ops.setDoorVano(p, f.id, bathIn, true);
   // Rooms: the bedroom, the bathroom behind (ceramic floor) and the walk-in in front (wood).
   const walk = { x0: A + T / 2, x1: R, y0: Y + T / 2, y1: 6.075 };
   room.points = [{ x: 0.075, y: G + 0.075 }, { x: A - T / 2, y: G + 0.075 }, { x: A - T / 2, y: 6.075 }, { x: 0.075, y: 6.075 }];

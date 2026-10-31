@@ -5,7 +5,7 @@ import { wallLength } from '../geometry/walls';
 import { RoomMaterials, WallFinishes } from '../materials/MaterialPanels';
 import {
   deleteItems, deleteOpening, deleteRoom, deleteWall, rectRoomSize, renameRoom, resizeRectRoom, setRoofHeight, setRoomKind, setStairShape, setStairUp, setWallLength,
-  toggleDoorFlip, setDoorGlass, setDoorMirror, updateOpening, updateWall, setWallKind,
+  toggleDoorFlip, setDoorGlass, setDoorMirror, setDoorVano, updateOpening, updateWall, setWallKind,
 } from '../model/ops';
 import type { Floor, Project, Room, RoomKind, StairShape, StairUp } from '../model/types';
 import { formatArea } from '../model/units';
@@ -102,24 +102,30 @@ function OpeningProps({ floor, id }: { floor: Floor; id: string }) {
   const set = (patch: Parameters<typeof updateOpening>[3]) => edit((d, f) => void updateOpening(d, f, id, patch));
   return (
     <>
-      <h2>{o.kind === 'door' ? 'Puerta' : 'Ventana'}</h2>
+      <h2>{o.kind === 'door' ? (o.vano ? 'Vano (sin puerta)' : 'Puerta') : 'Ventana'}</h2>
       <LengthField label="Ancho" value={o.width} onCommit={(v) => set({ width: v! })} />
       <LengthField label="Alto" value={o.height} onCommit={(v) => set({ height: v! })} />
       {o.kind === 'window' && <LengthField label="Antepecho" value={o.sill} help="Altura desde el suelo hasta la ventana." onCommit={(v) => set({ sill: v! })} />}
       <LengthField label="Posición desde el inicio" value={o.offset} onCommit={(v) => set({ offset: v! })} />
       <p className="hint parrafo">Si una medida no cabe en el muro, se deja la que tenía.</p>
       {o.kind === 'door' && (
+        <label className="toggle-linea">
+          <input type="checkbox" checked={o.vano === true} onChange={(e) => edit((d, f) => setDoorVano(d, f, id, e.target.checked))} />
+          Sin puerta (vano abierto)
+        </label>
+      )}
+      {o.kind === 'door' && !o.vano && (
         <div className="acciones">
           <button className="btn btn-sec" onClick={() => edit((d, f) => toggleDoorFlip(d, f, id))}><Icon name="flip" size={16} />Invertir apertura</button>
         </div>
       )}
-      {o.kind === 'door' && (
+      {o.kind === 'door' && !o.vano && (
         <label className="toggle-linea">
           <input type="checkbox" checked={o.glass === true} onChange={(e) => edit((d, f) => setDoorGlass(d, f, id, e.target.checked))} />
           Puerta de vidrio
         </label>
       )}
-      {o.kind === 'door' && (
+      {o.kind === 'door' && !o.vano && (
         <label className="toggle-linea">
           <input type="checkbox" checked={o.mirror === true} onChange={(e) => edit((d, f) => setDoorMirror(d, f, id, e.target.checked))} />
           Puerta corrediza de espejo

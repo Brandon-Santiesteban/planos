@@ -51,7 +51,7 @@ function floorText(floor: Floor): string[] {
       const d = normalize(sub(w.b, w.a));
       const at = lerp(w.a, w.b, o.offset / wallLength(w));
       const side = (s: number) => roomAt(floor, add(at, scale(perp(d), s * (w.thickness / 2 + 0.1))))?.name ?? 'afuera';
-      const what = o.kind === 'door' ? (o.glass ? 'Puerta de vidrio' : o.mirror ? 'Puerta corrediza de espejo' : 'Puerta') : 'Ventana';
+      const what = o.kind === 'door' ? (o.vano ? 'Vano sin puerta' : o.glass ? 'Puerta de vidrio' : o.mirror ? 'Puerta corrediza de espejo' : 'Puerta') : 'Ventana';
       const sizes = o.kind === 'door' ? `${n(o.width)} × ${n(o.height)}` : `${n(o.width)} × ${n(o.height)}, antepecho ${n(o.sill)}`;
       out.push(`- ${what} ${sizes} entre «${side(1)}» y «${side(-1)}» (centro en x ${n(at.x)}, y ${n(at.y)})`);
     }

@@ -434,6 +434,17 @@ export function setDoorGlass(p: Project, floorId: string, openingId: string, gla
   if (glass) delete o.mirror;
 }
 
+/** An open doorway with no door (or back to a plain door). */
+export function setDoorVano(p: Project, floorId: string, openingId: string, vano: boolean): void {
+  const o = getFloor(p, floorId).openings.find((x) => x.id === openingId);
+  if (!o || o.kind !== 'door') return;
+  if (vano) {
+    o.vano = true;
+    delete o.glass;
+    delete o.mirror;
+  } else delete o.vano;
+}
+
 /** A sliding mirror door (or back to a plain door). A door is glass or mirror, not both. */
 export function setDoorMirror(p: Project, floorId: string, openingId: string, mirror: boolean): void {
   const o = getFloor(p, floorId).openings.find((x) => x.id === openingId);

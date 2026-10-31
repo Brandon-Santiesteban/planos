@@ -71,7 +71,7 @@ function WallMesh({ wall, floor, selected }: { wall: Wall; floor: Floor; selecte
       })}
       {openings
         // Windows, and doors marked as glass (a sliding glass door), get a pane.
-        .filter((o) => o.kind === 'window' || o.glass)
+        .filter((o) => o.kind === 'window' || (o.glass && !o.vano))
         .map((o) => {
           const c = add(wall.a, scale(d, o.offset));
           return (
@@ -81,11 +81,23 @@ function WallMesh({ wall, floor, selected }: { wall: Wall; floor: Floor; selecte
             </mesh>
           );
         })}
+      {/* Thresholds: the floor across the wall under every door, so the ground never shows through. */}
       {openings
-        .filter((o) => o.kind === 'door' && o.mirror)
+        .filter((o) => o.kind === 'door')
+        .map((o) => {
+          const c = add(wall.a, scale(d, o.offset));
+          return (
+            <mesh key={`u${o.id}`} position={[c.x, 0.005, c.y]} rotation={[0, rot, 0]} receiveShadow>
+              <boxGeometry args={[o.width, 0.008, wall.thickness + 0.004]} />
+              <meshStandardMaterial color="#cdc5b8" roughness={0.7} />
+            </mesh>
+          );
+        })}
+      {openings
+        .filter((o) => o.kind === 'door' && o.mirror && !o.vano)
         .map((o) => <MirrorDoor key={o.id} wall={wall} d={d} offset={o.offset} width={o.width} height={o.height} flip={o.flip} />)}
       {openings
-        .filter((o) => o.kind === 'door' && !o.glass && !o.mirror)
+        .filter((o) => o.kind === 'door' && !o.glass && !o.mirror && !o.vano)
         .map((o) => <DoorLeaf key={o.id} wall={wall} d={d} offset={o.offset} width={o.width} height={o.height} flip={o.flip} />)}
     </group>
   );

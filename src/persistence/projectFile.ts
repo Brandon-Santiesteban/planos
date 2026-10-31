@@ -21,6 +21,7 @@ const opening = z.object({
   flip: z.boolean().optional(),
   glass: z.boolean().optional(),
   mirror: z.boolean().optional(),
+  vano: z.boolean().optional(),
 });
 const room = z.object({
   id: z.string(), name: z.string(), kind: z.enum(['room', 'balcony', 'roof', 'stairs', 'exterior']), points: z.array(vec).min(3),

@@ -41,6 +41,8 @@ export interface Opening {
   /** doors: a sliding door whose panel is a full mirror on the +normal side (−normal when flipped), e.g. closing a
    *  walk-in with the mirror facing the bedroom */
   mirror?: boolean;
+  /** doors: an open doorway with no door at all (a «vano»): the wall is cut and the threshold paved, nothing else */
+  vano?: boolean;
 }
 
 /**

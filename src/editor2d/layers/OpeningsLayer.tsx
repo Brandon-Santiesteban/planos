@@ -38,6 +38,17 @@ function OpeningSymbol({ wall, o, selected }: { wall: Wall; o: Opening; selected
       </g>
     );
   }
+  if (o.vano) {
+    // Open doorway: the wall is simply cut, with its jambs marked.
+    const j = [add(start, scale(n, half)), sub(start, scale(n, half)), add(end, scale(n, half)), sub(end, scale(n, half))];
+    return (
+      <g className={cls} data-id={o.id}>
+        <polygon className="opening-gap" points={pts(gap)} />
+        <line className="door-leaf" x1={j[0].x} y1={j[0].y} x2={j[1].x} y2={j[1].y} />
+        <line className="door-leaf" x1={j[2].x} y1={j[2].y} x2={j[3].x} y2={j[3].y} />
+      </g>
+    );
+  }
   if (o.mirror) {
     // Sliding mirror door: one panel across the opening on its mirror side, drawn thick.
     const q = (wall.thickness / 4) * (o.flip ? -1 : 1);
