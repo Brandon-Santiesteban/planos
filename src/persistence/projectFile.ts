@@ -20,6 +20,7 @@ const opening = z.object({
   offset: z.number().finite(), width: positive, height: positive, sill: z.number().finite().min(0),
   flip: z.boolean().optional(),
   glass: z.boolean().optional(),
+  mirror: z.boolean().optional(),
 });
 const room = z.object({
   id: z.string(), name: z.string(), kind: z.enum(['room', 'balcony', 'roof', 'stairs', 'exterior']), points: z.array(vec).min(3),

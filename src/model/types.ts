@@ -38,6 +38,9 @@ export interface Opening {
   flip?: boolean;
   /** doors: a glass door (e.g. a sliding glass door to a balcony) — drawn with a glass pane */
   glass?: boolean;
+  /** doors: a sliding door whose panel is a full mirror on the +normal side (−normal when flipped), e.g. closing a
+   *  walk-in with the mirror facing the bedroom */
+  mirror?: boolean;
 }
 
 /**

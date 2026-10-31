@@ -38,6 +38,18 @@ function OpeningSymbol({ wall, o, selected }: { wall: Wall; o: Opening; selected
       </g>
     );
   }
+  if (o.mirror) {
+    // Sliding mirror door: one panel across the opening on its mirror side, drawn thick.
+    const q = (wall.thickness / 4) * (o.flip ? -1 : 1);
+    const a = add(start, scale(n, q));
+    const b = add(end, scale(n, q));
+    return (
+      <g className={cls} data-id={o.id}>
+        <polygon className="opening-gap" points={pts(gap)} />
+        <line className="door-leaf door-espejo" x1={a.x} y1={a.y} x2={b.x} y2={b.y} />
+      </g>
+    );
+  }
   // Door: leaf hinged at the start, opening towards +normal (−normal when flipped), with a 90° swing arc.
   const side = o.flip ? scale(n, -1) : n;
   const tip = add(add(start, scale(side, half)), scale(side, o.width));

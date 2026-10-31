@@ -429,7 +429,19 @@ export function setStairShape(p: Project, floorId: string, roomId: string, shape
 /** Doors: swing to the other side of the wall. */
 export function setDoorGlass(p: Project, floorId: string, openingId: string, glass: boolean): void {
   const o = getFloor(p, floorId).openings.find((x) => x.id === openingId);
-  if (o && o.kind === 'door') o.glass = glass;
+  if (!o || o.kind !== 'door') return;
+  o.glass = glass;
+  if (glass) delete o.mirror;
+}
+
+/** A sliding mirror door (or back to a plain door). A door is glass or mirror, not both. */
+export function setDoorMirror(p: Project, floorId: string, openingId: string, mirror: boolean): void {
+  const o = getFloor(p, floorId).openings.find((x) => x.id === openingId);
+  if (!o || o.kind !== 'door') return;
+  if (mirror) {
+    o.mirror = true;
+    delete o.glass;
+  } else delete o.mirror;
 }
 
 export function toggleDoorFlip(p: Project, floorId: string, openingId: string): void {

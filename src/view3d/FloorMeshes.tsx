@@ -8,6 +8,7 @@ import { floorSurfaceMaterial, plainMaterial, railingMaterial, useMaterialLibrar
 import { railingColors, railingParts } from '../materials/railing';
 import { applyMetricUVs, wallEndExtension } from '../materials/wallFaces';
 import type { Floor, RailingType, Room, Vec2, Wall } from '../model/types';
+import { MirrorFace } from '../furniture/meshes';
 import { usePalette } from './palette';
 import StairsMesh from './StairsMesh';
 import { railingEdges } from './railingEdges';
@@ -81,13 +82,33 @@ function WallMesh({ wall, floor, selected }: { wall: Wall; floor: Floor; selecte
           );
         })}
       {openings
-        .filter((o) => o.kind === 'door' && !o.glass)
+        .filter((o) => o.kind === 'door' && o.mirror)
+        .map((o) => <MirrorDoor key={o.id} wall={wall} d={d} offset={o.offset} width={o.width} height={o.height} flip={o.flip} />)}
+      {openings
+        .filter((o) => o.kind === 'door' && !o.glass && !o.mirror)
         .map((o) => <DoorLeaf key={o.id} wall={wall} d={d} offset={o.offset} width={o.width} height={o.height} flip={o.flip} />)}
     </group>
   );
 }
 
 const DOOR_WOOD = '#8a6446';
+
+/** A sliding mirror door, shown closed: a light frame filling the opening with a full mirror on its mirror side. */
+function MirrorDoor({ wall, d, offset, width, height, flip }: { wall: Wall; d: Vec2; offset: number; width: number; height: number; flip?: boolean }) {
+  const side = flip ? -1 : 1;
+  const c = add(wall.a, scale(d, offset));
+  const h = height - 0.01;
+  return (
+    <group position={[c.x, 0, c.y]} rotation={[0, yaw(d), 0]}>
+      <mesh position={[0, h / 2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[width - 0.01, h, 0.035]} />
+        <meshStandardMaterial color="#e9e4dc" roughness={0.5} />
+      </mesh>
+      {/* Local +z is the wall's +normal (yaw turns x onto d). */}
+      <MirrorFace p={[0, h / 2, side * 0.02]} s={[width - 0.08, h - 0.08, 0.006]} c="#dfe7ee" />
+    </group>
+  );
+}
 /** How far a solid door stands open, so it reads as a door without closing the way through. */
 const DOOR_OPEN = (70 * Math.PI) / 180;
 

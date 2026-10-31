@@ -6,8 +6,8 @@
 //   - to the right of the TV partition (x 3.51), a compact en-suite bathroom at the back (2.54 × 2.54 m), entered from
 //     the walk-in: WC on the left wall hidden by the open door, double basin with mirror on the right wall, shower
 //     under a high window;
-//   - the walk-in in front of it, entered from the bedroom at its top left, modules in a C (left wall, right wall,
-//     front wall beside the user's mirror);
+//   - the walk-in in front of it, closed by a sliding mirror door at its top left (mirror to the bedroom), modules
+//     in a C (left wall, right wall, front wall);
 //   - lighting: recessed ceiling lights, pendants over the nightstands, a warm LED cove over the headboard, lights in
 //     the bathroom and the dressing room, sconces beside the bathroom mirror.
 // Writes public/ejemplos/nueva-casa.casa.json; the open page shows it by itself.
@@ -75,8 +75,6 @@ const json = await page.evaluate(async (ID) => {
       r.points = r.points.map((q) => at(q, cy <= 6.2 ? Math.min(q.y, 6.2) : Math.max(q.y, 6.21)));
     }
     for (const m of f.furniture) Object.assign(m, at(m));
-    // The user's full-length mirror stays on the walk-in's front wall, where it was from its left end.
-    for (const m of f.furniture.filter((m) => m.type === 'espejo-cuerpo' && m.y > Y && m.y < 6.15)) m.x = A + T / 2 + 0.575;
   }
 
   // Private garden across the whole back of the house: the back wall (glass sliding door, the bathroom's high window)
@@ -118,12 +116,17 @@ const json = await page.evaluate(async (ID) => {
   const tvWall = f.walls.find((w) => w.kind === 'drywall' && Math.abs(w.a.x - A) < 0.02 && Math.abs(w.b.x - A) < 0.02);
   if (!tvWall) throw new Error('No encontré el tabique del TV');
   f.openings = f.openings.filter((o) => o.wallId !== tvWall.id);
-  // The TV partition runs from the back wall to the bathroom wall; the walk-in's entrance is next (0.8 m, the user's
-  // mark), then its side wall to the front wall closes it from the bedroom.
+  // The TV partition runs from the back wall to the bathroom wall; the walk-in's side wall goes on to the front wall
+  // and closes it, with a sliding mirror door at its top left (the user's mark): the mirror faces the bedroom, so no
+  // space inside goes to a mirror.
   tvWall.a = { x: A, y: G };
   tvWall.b = { x: A, y: Y };
   const entrance = 0.8;
-  ops.addWall(p, f.id, { x: A, y: Y + T / 2 + entrance }, { x: A, y: 6.075 }, T, 'drywall');
+  const walkWall = ops.addWall(p, f.id, { x: A, y: Y }, { x: A, y: 6.075 }, T, 'drywall');
+  const walkDoor = ops.addOpening(p, f.id, walkWall, 'door', T / 2 + entrance / 2);
+  if (!walkDoor) throw new Error('La puerta del vestier no cupo');
+  ops.updateOpening(p, f.id, walkDoor, { width: entrance });
+  ops.setDoorMirror(p, f.id, walkDoor, true); // its +normal side is the bedroom (−x)
   // The bathroom door: from the walk-in, hinged on the left and opening in, so its leaf hides the WC from the doorway.
   const bathWall = ops.addWall(p, f.id, { x: A, y: Y }, { x: R, y: Y }, T, 'drywall');
   const bath = { x0: A + T / 2, x1: R, y0: G + 0.075, y1: Y - T / 2 };
@@ -172,8 +175,11 @@ const json = await page.evaluate(async (ID) => {
     put(type, R - D / 2, y + w / 2, 90);
     y += w;
   }
-  const shelvesX0 = walk.x0 + 0.9;
-  put('vestier-repisas', (shelvesX0 + inner) / 2, walk.y1 - D / 2, 180, { width: inner - shelvesX0 });
+  // The front wall: drawers and shelves corner to corner (the full-length mirror is now the door).
+  f.furniture = f.furniture.filter((m) => !(m.type === 'espejo-cuerpo' && m.x > A && m.x < XR && m.y > Y && m.y < 6.15));
+  const drawersW = 0.75;
+  put('vestier-cajones', walk.x0 + drawersW / 2, walk.y1 - D / 2, 180, { width: drawersW });
+  put('vestier-repisas', (walk.x0 + drawersW + inner) / 2, walk.y1 - D / 2, 180, { width: inner - walk.x0 - drawersW });
   for (const ly of [walk.y0 + 0.9, walk.y0 + 1.7]) put('luz-empotrada', (walk.x0 + D + inner) / 2, ly);
 
   // Garden decoration (the user's reference photo): planters and a small tree on the lawn, a vertical garden on the

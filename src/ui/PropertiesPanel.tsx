@@ -5,7 +5,7 @@ import { wallLength } from '../geometry/walls';
 import { RoomMaterials, WallFinishes } from '../materials/MaterialPanels';
 import {
   deleteItems, deleteOpening, deleteRoom, deleteWall, rectRoomSize, renameRoom, resizeRectRoom, setRoofHeight, setRoomKind, setStairShape, setStairUp, setWallLength,
-  toggleDoorFlip, setDoorGlass, updateOpening, updateWall, setWallKind,
+  toggleDoorFlip, setDoorGlass, setDoorMirror, updateOpening, updateWall, setWallKind,
 } from '../model/ops';
 import type { Floor, Project, Room, RoomKind, StairShape, StairUp } from '../model/types';
 import { formatArea } from '../model/units';
@@ -119,6 +119,13 @@ function OpeningProps({ floor, id }: { floor: Floor; id: string }) {
           Puerta de vidrio
         </label>
       )}
+      {o.kind === 'door' && (
+        <label className="toggle-linea">
+          <input type="checkbox" checked={o.mirror === true} onChange={(e) => edit((d, f) => setDoorMirror(d, f, id, e.target.checked))} />
+          Puerta corrediza de espejo
+        </label>
+      )}
+      {o.mirror && <p className="hint parrafo">El espejo mira hacia el lado de la apertura: «Invertir apertura» lo pasa al otro lado.</p>}
       <DeleteButton onClick={() => remove(o.kind === 'door' ? 'Puerta eliminada' : 'Ventana eliminada', (d, f) => deleteOpening(d, f, id))} />
     </>
   );

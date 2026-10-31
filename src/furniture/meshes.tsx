@@ -926,7 +926,7 @@ export function hashSeed(s: string): number {
 
 let mirrorEnv: { gl: THREE.WebGLRenderer; tex: THREE.Texture } | null = null;
 
-function MirrorFace({ p, s, c }: { p: V3; s: V3; c: string }) {
+export function MirrorFace({ p, s, c }: { p: V3; s: V3; c: string }) {
   const gl = useThree((st) => st.gl);
   const env = useMemo(() => {
     if (mirrorEnv?.gl !== gl) {
