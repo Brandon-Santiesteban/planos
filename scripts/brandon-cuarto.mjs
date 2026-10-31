@@ -71,9 +71,10 @@ const json = await page.evaluate(async (ID) => {
   // Furniture (asked 2026-10-31): double bed, wardrobe, entertainment centre and gaming desk in one piece, a laundry
   // basket and a full-length mirror; the way from the door kept clear.
   // Double bed with its head on the right wall, towards the back (the window beside it), a nightstand behind it.
-  const bedY = 1.15;
-  put('cama-doble', W - 0.95, bedY, 90);
-  for (const sy of [-1, 1]) put('mesa-noche', W - 0.2, bedY + sy * 0.925, 90); // one each side (the user's)
+  // Its headboard has a 15 cm shelf on top to put things on (the user's).
+  const bedY = 1.2;
+  put('cama-doble-repisa', W - 2.05 / 2, bedY, 90);
+  for (const sy of [-1, 1]) put('mesa-noche', W - 0.2, bedY + sy * 0.95, 90); // one each side (the user's)
   // Entertainment centre and gaming desk in one unit on the left wall, facing the bed (the user's call, to save
   // space): the 55" TV hangs over the desk, monitor and PC tower on it, the gaming chair in front. It stops short of
   // the door's swing.
@@ -107,8 +108,7 @@ const json = await page.evaluate(async (ID) => {
   put('tira-led-calida', W / 2, D - 0.03, 180, { width: W - 0.2, elevation: cove, color: WARM });
   put('tira-led-calida', 0.03, D / 2, 270, { width: D - 0.2, elevation: cove, color: WARM });
   put('tira-led-calida', W - 0.03, D / 2, 90, { width: D - 0.2, elevation: cove, color: WARM });
-  put('tira-led-calida', W - 0.02, bedY, 90, { width: 1.5, elevation: 1.05, color: WARM });
-  for (const sy of [-1, 1]) put('lampara-colgante', W - 0.22, bedY + sy * 0.925);
+  for (const sy of [-1, 1]) put('lampara-colgante', W - 0.22, bedY + sy * 0.95);
   for (const lx of [1.3, 2.9]) put('luz-empotrada', lx, D / 2);
   // Setup neons, warm yellow to start with like the rest: behind the TV, under the desk top and over the poster.
   put('tira-led', 0.05, unitY, 270, { width: 1.5, elevation: 1.67, color: WARM });
@@ -118,19 +118,19 @@ const json = await page.evaluate(async (ID) => {
   // Decoration: a rug under the foot of the bed, a curtain on the window, a picture over the headboard, a plant.
   put('alfombra', 2.1, bedY, 0, { width: 2.0, depth: 1.5, color: '#cdb89a' });
   put('cortina', 3.1, 0.06, 0, { width: 1.5 });
-  put('cuadro-abstracto', W - 0.02, bedY, 90, { elevation: 1.3 });
+  put('cuadro-abstracto', W - 0.02, bedY, 90, { elevation: 1.5 });
   put('monstera', 3.73, D - 0.27, 0, { width: 0.5, depth: 0.5, height: 1.2 });
-  // A low chest of drawers at the foot of the bed to keep things on and in (asked 2026-10-31).
-  put('comoda', 2.1 - 0.22, bedY, 90, { width: 1.3, depth: 0.4, height: 0.45 });
   // Shelves (asked 2026-10-31): two on the back wall between the mirror and the window, over the basket.
   put('repisa-decorativa', 1.95, 0.11, 0, { width: 0.8, height: 0.7, elevation: 1.2, color: '#7a5a3f' });
 
   // Little things that bring it to life (asked 2026-10-31): plants and decor on the surfaces, a hanging plant by the
   // window, a pampas vase in the corner by the unit.
   put('matita', 0.3, unitY - 0.5, 0, { elevation: 0.75 }); // on the desk
-  put('matita', W - 0.2, bedY + 0.925, 0, { elevation: 0.55, color: '#c87a55' }); // nightstand by the wardrobe
-  put('adornos-mesa', W - 0.2, bedY - 0.925, 90, { elevation: 0.55 }); // nightstand under the window
-  put('adornos-mesa', 2.1 - 0.22, bedY + 0.3, 90, { elevation: 0.45, color: '#e9e4da' }); // on the chest
+  put('matita', W - 0.2, bedY + 0.95, 0, { elevation: 0.55, color: '#c87a55' }); // nightstand by the wardrobe
+  put('adornos-mesa', W - 0.2, bedY - 0.95, 90, { elevation: 0.55 }); // nightstand under the window
+  // On the headboard shelf: books with a candle, a small plant.
+  put('adornos-mesa', W - 0.085, bedY - 0.35, 90, { elevation: 1.18, color: '#e9e4da' });
+  put('matita', W - 0.085, bedY + 0.45, 0, { elevation: 1.18, width: 0.12, depth: 0.12, height: 0.22 });
   put('planta-colgante', 2.62, 0.3, 0, { elevation: 2.6 - 0.9 });
   put('jarron-pampas', 0.65, 0.15, 0, { width: 0.22, depth: 0.22, height: 0.8 });
 

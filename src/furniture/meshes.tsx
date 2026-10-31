@@ -99,7 +99,28 @@ const legs = (w: number, d: number, h: number, t: number, c: string, inset = 0.0
     <B key={`leg${i}`} p={[sx * (w / 2 - inset - t / 2), h / 2, sz * (d / 2 - inset - t / 2)]} s={[t, h, t]} c={c} />
   ));
 
-const bed: Builder = ({ w, d, h, c, item }) => {
+/**
+ * Bed; with `item.headShelf` its headboard carries a shelf that deep on top (to put things on), the bed in front of it
+ * and a warm glow washing the wall above the shelf.
+ */
+const bed: Builder = (p) => {
+  const s = p.item?.headShelf;
+  if (!s) return bedCore(p);
+  const { w, d, h } = p;
+  const wood = shade('#b08a63', 0.85);
+  return (
+    <>
+      <B p={[0, h / 2, -d / 2 + 0.01]} s={[w + 0.1, h, 0.02]} c={wood} r={0.6} />
+      {[-1, 1].map((sx) => <B key={sx} p={[sx * (w / 2 + 0.04), h / 2, -d / 2 + (s + 0.06) / 2]} s={[0.02, h, s + 0.06]} c={wood} r={0.6} />)}
+      <RB p={[0, h + 0.015, -d / 2 + (s + 0.06) / 2]} s={[w + 0.12, 0.03, s + 0.06]} rad={0.006} c={wood} r={0.5} />
+      <Neon p={[0, h + 0.034, -d / 2 + 0.025]} s={[w, 0.005, 0.01]} c={'#ffd9a6'} k={1.2} />
+      <Glow p={[0, h + 0.3, -d / 2 + 0.003]} s={[w + 0.5, 0.6]} c={'#ffcf8a'} o={0.45} />
+      <group position={[0, 0, s / 2]}>{bedCore({ ...p, d: d - s })}</group>
+    </>
+  );
+};
+
+const bedCore: Builder = ({ w, d, h, c, item }) => {
   const frame = shade('#b08a63', 0.85);
   const leg = 0.12;
   const base = leg + 0.2;

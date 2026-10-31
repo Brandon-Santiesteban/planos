@@ -54,6 +54,8 @@ export interface CatalogItem {
   dressing?: Dressing;
   /** chests of drawers: a framed mirror standing on top, the chest itself this tall (the rest is the mirror) */
   mirrorAbove?: number;
+  /** beds: the headboard carries a shelf this deep on top (included in the depth) */
+  headShelf?: number;
   /** light fittings: it lights the room in 3D, from this height of the piece (0 bottom … 1 top), warm white */
   light?: number;
   /** ambient light (neon strips, a lit unit): it stays on when the room lights are switched off in 3D */
@@ -81,6 +83,7 @@ export const CATALOG: CatalogItem[] = [
   item('cama-doble', 'Cama doble', 'Dormitorio', 'cama', [1.4, 1.9, 1.0], LINO, { double: true }),
   item('cama-queen', 'Cama queen', 'Dormitorio', 'cama', [1.6, 2.0, 1.05], LINO, { double: true }),
   item('cama-king', 'Cama king', 'Dormitorio', 'cama', [2.0, 2.0, 1.05], LINO, { double: true }),
+  item('cama-doble-repisa', 'Cama doble con espaldar y repisa', 'Dormitorio', 'cama', [1.4, 2.05, 1.15], LINO, { double: true, headShelf: 0.15 }),
   item('cama-sencilla', 'Cama sencilla', 'Dormitorio', 'cama', [1.0, 1.9, 0.95], LINO),
   item('mesa-noche', 'Mesa de noche', 'Dormitorio', 'mesaNoche', [0.45, 0.4, 0.55], ROBLE),
   item('closet', 'Clóset', 'Dormitorio', 'closet', [1.2, 0.6, 2.2], BLANCO),
