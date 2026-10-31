@@ -14,11 +14,11 @@ test('Ctrl+C and Ctrl+V copy and paste the selected piece of furniture', async (
   await expect(pieces).toHaveCount(1);
 
   await page.keyboard.press('Control+v'); // nothing copied yet
-  await expect(page.getByText('Primero copia un mueble con Ctrl+C')).toBeVisible();
+  await expect(page.getByText('Primero copia algo del plano con Ctrl+C')).toBeVisible();
 
   await pieces.first().click();
   await page.keyboard.press('Control+c');
-  await expect(page.getByText('Mueble copiado: Ctrl+V para pegarlo')).toBeVisible();
+  await expect(page.getByText('Copiado: 1 mueble. Ctrl+V para pegar')).toBeVisible();
   await page.keyboard.press('Control+v');
   await page.keyboard.press('Control+v');
   await expect(pieces).toHaveCount(3);

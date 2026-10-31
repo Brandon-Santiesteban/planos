@@ -6,7 +6,8 @@ import { createSelectTool } from '../editor2d/tools/selectTool';
 import type { ToolContext } from '../editor2d/tools';
 import type { View } from '../editor2d/viewport';
 import { useEditor } from '../store/editorStore';
-import { copySelectedFurniture, duplicateSelectedFurniture, pasteFurniture } from './actions';
+import { copySelection, describe, pasteClipboard } from '../store/clipboard';
+import { duplicateSelectedFurniture } from './actions';
 
 const view: View = { centre: { x: 0, y: 0 }, pxPerMetre: 100 };
 const ctx = (over: Partial<ToolContext> = {}): ToolContext => ({ state: useEditor.getState(), view, altKey: false, shiftKey: false, ...over });
@@ -101,23 +102,45 @@ test('Ctrl+D duplicates the selected piece and selects the copy', () => {
 
 test('Ctrl+C then Ctrl+V pastes copies 30 cm apart each time, and on another floor in the same spot', () => {
   s().select({ kind: 'furniture', id: deskId });
-  const text = copySelectedFurniture()!;
+  const text = copySelection()!;
   s().select(null);
-  expect(pasteFurniture(text)).toBe(true);
-  expect(pasteFurniture(text)).toBe(true);
+  expect(pasteClipboard(text)).toBe(true);
+  expect(pasteClipboard(text)).toBe(true);
   expect(pieces().map((p) => [p.x, p.y])).toEqual([[1, 1.5], [1.3, 1.8], [1.6, 2.1]]);
   expect(s().selection).toEqual({ kind: 'furniture', id: pieces()[2].id });
   let f2 = '';
   s().apply((d) => void (f2 = addFloor(d)));
   s().setActiveFloor(f2);
-  pasteFurniture(text);
+  pasteClipboard(text);
   expect(s().project.floors[1].furniture.map((p) => [p.x, p.y])).toEqual([[1, 1.5]]);
 });
 
 test('Ctrl+C with no piece selected copies nothing', () => {
   s().select(null);
-  expect(copySelectedFurniture()).toBeNull();
-  expect(pasteFurniture('texto cualquiera')).toBe(false);
+  expect(copySelection()).toBeNull();
+  expect(pasteClipboard('texto cualquiera')).toBe(false);
+});
+
+test('a copied wall takes its door along; walls, rooms and furniture paste together from a box selection', () => {
+  const f = s().project.floors[0];
+  const wall = f.walls[0];
+  s().select({ kind: 'wall', id: wall.id });
+  const text = copySelection()!;
+  pasteClipboard(text);
+  const after = s().project.floors[0];
+  expect(after.walls).toHaveLength(2);
+  const copy = after.walls[1];
+  expect(copy.a).toEqual({ x: wall.a.x + 0.3, y: wall.a.y + 0.3 });
+  expect(after.openings.filter((o) => o.wallId === copy.id)).toHaveLength(1);
+  expect(s().selection).toEqual({ kind: 'wall', id: copy.id });
+
+  s().selectGroup([{ kind: 'wall', id: wall.id }, { kind: 'room', id: f.rooms[0].id }, { kind: 'furniture', id: deskId }]);
+  const all = copySelection()!;
+  expect(describe(JSON.parse(all.slice(all.indexOf(':') + 1)))).toBe('1 muro, 1 habitación y 1 mueble');
+  pasteClipboard(all);
+  const end = s().project.floors[0];
+  expect([end.walls.length, end.rooms.length, end.furniture.length, end.openings.length]).toEqual([3, 2, 2, 3]);
+  expect(s().group).toHaveLength(3);
 });
 
 test('a furniture selection survives undo only while the piece exists', () => {

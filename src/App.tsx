@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import GridControls from './editor2d/GridControls';
-import { duplicateSelectedFurniture, startFurnitureClipboard } from './furniture/actions';
+import { duplicateSelectedFurniture } from './furniture/actions';
+import { startClipboard } from './store/clipboard';
 import Plan2D from './editor2d/Plan2D';
 import { library, uploadBrowserProjects, writeLinkedFile } from './persistence/appLibrary';
 import { startAppUpdates } from './persistence/appUpdates';
@@ -87,7 +88,7 @@ export default function App() {
       if (t && !e.altKey) s.setTool(t.tool);
     };
     window.addEventListener('keydown', onKey);
-    const stopClipboard = startFurnitureClipboard();
+    const stopClipboard = startClipboard();
     return () => {
       window.removeEventListener('keydown', onKey);
       stopClipboard();
