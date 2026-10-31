@@ -105,14 +105,16 @@ const json = await page.evaluate(async (ID) => {
 
   // Compact bathroom (2.54 × 2.54 m), entered from the walk-in. The door is hinged on the left and opens in, so the
   // open leaf hides the WC on the left wall from the doorway (the user asked for that privacy); the double basin with
-  // its mirror is on the right wall, the shower in the back right corner under the high window.
+  // its mirror is on the right wall, the shower along the back wall under the high window.
   put('sanitario', bath.x0 + 0.35, bath.y1 - 0.6, 270);
   put('lavamanos-doble', R - 0.25, bath.y1 - 0.62, 90);
   put('espejo', R - 0.015, bath.y1 - 0.62, 90, { width: 1.2, height: 0.9, elevation: 1.1 });
   put('tira-led-calida', R - 0.03, bath.y1 - 0.62, 90, { width: 1.1, elevation: 2.05 });
-  put('ducha', R - 0.6, bath.y0 + 0.65, 0, { width: 1.2, depth: 1.3 });
+  // The shower runs along the back wall from x 4.0 to the right wall (2.08 × 1.30 m, the user's mark).
+  const showerX0 = 4.0;
+  put('ducha', (showerX0 + R) / 2, bath.y0 + 0.65, 0, { width: R - showerX0, depth: 1.3 });
   put('toallero', bath.x0 + 0.06, bath.y0 + 0.9, 270);
-  for (const [lx, ly] of [[4.3, bath.y0 + 1.2], [R - 0.6, bath.y0 + 0.65], [R - 0.7, bath.y1 - 0.62]]) put('luz-empotrada', lx, ly);
+  for (const [lx, ly] of [[(showerX0 + R) / 2, bath.y0 + 0.65], [4.4, bath.y1 - 0.6], [R - 0.7, bath.y1 - 0.62]]) put('luz-empotrada', lx, ly);
 
   // Walk-in in a C open to the bedroom: a hanging module beside the bathroom door, a row along the right wall, and
   // the chest of drawers with its mirror plus shelves against the front wall.

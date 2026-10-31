@@ -14,6 +14,7 @@ import WallsLayer from './layers/WallsLayer';
 import Compass from './Compass';
 import PreviewLayer from './PreviewLayer';
 import { getTool, type ToolContext } from './tools';
+import { savedView, saveView } from '../store/savedViews';
 import { type Bounds, fitView, type Size, type View, screenToWorld, worldToScreen, zoomAt } from './viewport';
 import type { Project } from '../model/types';
 
@@ -58,10 +59,19 @@ export default function Plan2D() {
   const loadCount = useEditor((s) => s.loadCount);
   const measured = size !== DEFAULT_SIZE;
 
-  // Frame the house whenever a project is opened (and once the real size of the view is known).
+  // When a project is opened (and once the real size of the view is known): back to where it was being looked at,
+  // or the whole house framed the first time.
   useEffect(() => {
-    setView(fitView(houseBounds(useEditor.getState().project), sizeRef.current));
+    const p = useEditor.getState().project;
+    setView(savedView(p.id).plan ?? fitView(houseBounds(p), sizeRef.current));
   }, [loadCount, measured]);
+  // Remember the zoom and centre (a moment after the last change).
+  useEffect(() => {
+    if (!measured) return;
+    const id = useEditor.getState().project.id;
+    const t = setTimeout(() => saveView(id, { plan: view }), 300);
+    return () => clearTimeout(t);
+  }, [view, measured]);
 
   const ctx = (): ToolContext => ({ state: useEditor.getState(), view: viewRef.current, ...mods.current });
 

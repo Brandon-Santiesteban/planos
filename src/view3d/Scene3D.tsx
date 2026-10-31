@@ -6,6 +6,7 @@ import Compass from '../editor2d/Compass';
 import { floorElevation } from '../model/ops';
 import type { Project } from '../model/types';
 import { useEditor } from '../store/editorStore';
+import { savedView, saveView } from '../store/savedViews';
 import FloorMeshes from './FloorMeshes';
 import FurnitureMeshes from '../furniture/meshes';
 import { usePalette } from './palette';
@@ -31,14 +32,50 @@ function bounds(p: Project) {
 type Frame = { cx: number; cy: number; size: number };
 
 /** Moves the camera to frame the house whenever another project is opened. */
+type Orbit = {
+  target: Vector3;
+  update(): void;
+  addEventListener(type: 'change', fn: () => void): void;
+  removeEventListener(type: 'change', fn: () => void): void;
+};
+
+/**
+ * Places the camera when a project is opened: where it was last left for that project (also after a reload), or
+ * looking at the whole house the first time. Every camera move is remembered.
+ */
 function CameraRig({ frame }: { frame: Frame }) {
   const camera = useThree((s) => s.camera);
-  const controls = useThree((s) => s.controls) as unknown as { target: { set(x: number, y: number, z: number): void }; update(): void } | null;
+  const controls = useThree((s) => s.controls) as unknown as Orbit | null;
   useEffect(() => {
-    camera.position.set(frame.cx + frame.size * 1.3, frame.size * 1.2, frame.cy + frame.size * 1.6);
-    controls?.target.set(frame.cx, 0, frame.cy);
+    const saved = savedView(useEditor.getState().project.id).camera;
+    if (saved) {
+      camera.position.set(...saved.position);
+      controls?.target.set(...saved.target);
+    } else {
+      camera.position.set(frame.cx + frame.size * 1.3, frame.size * 1.2, frame.cy + frame.size * 1.6);
+      controls?.target.set(frame.cx, 0, frame.cy);
+    }
     controls?.update();
   }, [frame, camera, controls]);
+  useEffect(() => {
+    if (!controls) return;
+    // At most every 300 ms while it moves (the camera glides on for a while after the mouse lets go).
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const remember = () => {
+      if (timer) return;
+      timer = setTimeout(() => {
+        timer = undefined;
+        saveView(useEditor.getState().project.id, {
+          camera: { position: camera.position.toArray() as [number, number, number], target: controls.target.toArray() as [number, number, number] },
+        });
+      }, 300);
+    };
+    controls.addEventListener('change', remember);
+    return () => {
+      clearTimeout(timer);
+      controls.removeEventListener('change', remember);
+    };
+  }, [camera, controls]);
   return null;
 }
 
