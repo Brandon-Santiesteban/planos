@@ -1,5 +1,5 @@
 // Nueva casa — master bedroom, second pass (asked 2026-10-31), on top of the user's own saved version (biblioteca/):
-//   - walk-in dressing room between the two drywall partitions (modules along the bathroom wall);
+//   - walk-in dressing room between the two drywall partitions (modules along the TV partition, the user's choice);
 //   - en-suite bathroom on the right-hand strip: one straight drywall wall with its door where the gap was, rain
 //     shower at the back, double basin with mirror facing the door, WC by the entrance against the front wall;
 //   - lighting: recessed ceiling lights, pendants over the nightstands, a warm LED cove over the headboard, lights in
@@ -60,10 +60,11 @@ const json = await page.evaluate(async (ID) => {
   f.furniture = f.furniture.filter((m) => !(inRoom(m) && redo.has(m.type)));
   const put = (type, x, y, rotation = 0, extra = {}) => fo.addFurniture(p, f.id, { ...fo.furnitureFromCatalog(type, { x, y }, rotation), ...extra });
 
-  // Dressing room: modules against the bathroom wall, fronts to the passage (0.62 m) by the TV wall.
+  // Dressing room: modules against the TV partition (its face at x 3.535), fronts to the passage by the bathroom wall.
+  const tvFace = 3.51 + 0.025;
   let y = 0.075;
   for (const [type, w] of [['vestier-colgar', 1], ['vestier-colgar', 1], ['vestier-cajones', 1], ['vestier-zapatos', 0.7]]) {
-    put(type, face - 0.275, y + w / 2, 90);
+    put(type, tvFace + 0.275, y + w / 2, 270);
     y += w;
   }
   // The chest of drawers against the bathroom wall, square.
@@ -85,7 +86,7 @@ const json = await page.evaluate(async (ID) => {
   for (const n of f.furniture.filter((m) => inRoom(m) && m.type === 'mesa-noche')) put('lampara-colgante', n.x + 0.05, n.y);
   put('tira-led-calida', 0.09, 2.6, 270, { width: 2.4, elevation: 2.45 });
   // Dressing room.
-  for (const ly of [0.8, 2.0, 3.2]) put('luz-empotrada', 3.85, ly);
+  for (const ly of [0.8, 2.0, 3.2]) put('luz-empotrada', (tvFace + 0.55 + face) / 2, ly);
 
   // The open page follows the file: count the saved copy as the file's version, so the new one loads by itself.
   const origin = JSON.parse(await (await fetch(`/api/kv/origen:${ID}`)).text());
