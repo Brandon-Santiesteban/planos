@@ -3,7 +3,8 @@
 //   - a private garden 2 m deep across the whole back of the house: the back wall (glass sliding door, the bathroom's
 //     high window) moves 1 m in; closed by the house, the lot lines and a 2 m fence on the side strip;
 //   - to the right of the TV partition (x 3.51), a compact en-suite bathroom at the back (2.54 × 2.54 m), entered from
-//     the walk-in: double basin with mirror facing the door, shower under a high window, WC by the door;
+//     the walk-in: WC on the left wall hidden by the open door, double basin with mirror on the right wall, shower
+//     under a high window;
 //   - the walk-in in front of it, modules in a C (against the bathroom wall, the right wall and the front wall with the
 //     chest of drawers and its mirror), open to the bedroom past the end of the TV partition;
 //   - lighting: recessed ceiling lights, pendants over the nightstands, a warm LED cove over the headboard, lights in
@@ -102,15 +103,16 @@ const json = await page.evaluate(async (ID) => {
   f.furniture = f.furniture.filter((m) => !(inRoom(m) && redo.has(m.type)));
   const put = (type, x, y, rotation = 0, extra = {}) => fo.addFurniture(p, f.id, { ...fo.furnitureFromCatalog(type, { x, y }, rotation), ...extra });
 
-  // Compact bathroom (2.54 × 2.54 m), entered from the walk-in: double basin with mirror on the back wall across from
-  // the door, shower in the back right corner under the high window, WC on the right wall by the door.
-  put('lavamanos-doble', 4.2, bath.y0 + 0.25, 0);
-  put('espejo', 4.2, bath.y0 + 0.015, 0, { width: 1.2, height: 0.9, elevation: 1.1 });
-  put('tira-led-calida', 4.2, bath.y0 + 0.03, 0, { width: 1.1, elevation: 2.05 });
+  // Compact bathroom (2.54 × 2.54 m), entered from the walk-in. The door is hinged on the left and opens in, so the
+  // open leaf hides the WC on the left wall from the doorway (the user asked for that privacy); the double basin with
+  // its mirror is on the right wall, the shower in the back right corner under the high window.
+  put('sanitario', bath.x0 + 0.35, bath.y1 - 0.6, 270);
+  put('lavamanos-doble', R - 0.25, bath.y1 - 0.62, 90);
+  put('espejo', R - 0.015, bath.y1 - 0.62, 90, { width: 1.2, height: 0.9, elevation: 1.1 });
+  put('tira-led-calida', R - 0.03, bath.y1 - 0.62, 90, { width: 1.1, elevation: 2.05 });
   put('ducha', R - 0.6, bath.y0 + 0.65, 0, { width: 1.2, depth: 1.3 });
-  put('sanitario', R - 0.35, bath.y1 - 0.6, 90);
-  put('toallero', bath.x0 + 0.06, bath.y0 + 1.5, 270);
-  for (const [lx, ly] of [[4.3, bath.y0 + 1.4], [R - 0.6, bath.y0 + 0.65]]) put('luz-empotrada', lx, ly);
+  put('toallero', bath.x0 + 0.06, bath.y0 + 0.9, 270);
+  for (const [lx, ly] of [[4.3, bath.y0 + 1.2], [R - 0.6, bath.y0 + 0.65], [R - 0.7, bath.y1 - 0.62]]) put('luz-empotrada', lx, ly);
 
   // Walk-in in a C open to the bedroom: a hanging module beside the bathroom door, a row along the right wall, and
   // the chest of drawers with its mirror plus shelves against the front wall.
