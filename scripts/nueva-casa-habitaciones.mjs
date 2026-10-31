@@ -1,8 +1,9 @@
 // Nueva casa — Habitaciones 1 y 2 (asked 2026-10-31): each with a private bathroom, a double bed and air
 // conditioning, on top of the user's own saved version (biblioteca/). Both rooms are 3.05 × 5 m beside the side
 // corridor (Pasillo lateral, x 0–2.15):
-//   - private bathroom across the far end (the one nearer the master suite): shower in the outer corner under a high
-//     window, WC in the middle, basin with mirror by the corridor wall; door from the bedroom;
+//   - private bathroom across the end on the wall between the two rooms, back to back with the other one so they
+//     share the plumbing: shower in the outer corner under a high window, WC in the middle, basin with mirror by the
+//     corridor wall; door from the bedroom;
 //   - bedroom: double bed with its head on the bathroom wall, two nightstands, air conditioner high on the outer wall;
 //   - door from the corridor; window: Habitación 1 on the outer side, Habitación 2 to the patio;
 //   - the corridor opens to the patio at its end, so the rooms can be reached.
@@ -57,10 +58,12 @@ const json = await page.evaluate(async (ID) => {
   for (const name of ['Habitación 1', 'Habitación 2']) {
     const room = f.rooms.find((x) => x.name === name);
     if (!room) throw new Error(`No está la ${name}`);
-    const ys = room.points.map((q) => q.y);
-    const y0 = Math.min(...ys);
-    const y1 = Math.max(...ys);
     const bathName = `Baño ${name.toLowerCase()}`;
+    // The whole room between its masonry walls (whatever an earlier run split it into).
+    const cy = room.points.reduce((t, q) => t + q.y, 0) / room.points.length;
+    const across = f.walls.filter((w) => !w.kind && near(w.a.y, w.b.y, 0.02) && Math.min(w.a.x, w.b.x) <= 3.75 && Math.max(w.a.x, w.b.x) >= 3.75).map((w) => w.a.y);
+    const y0 = Math.max(...across.filter((y) => y < cy)) + 0.075;
+    const y1 = Math.min(...across.filter((y) => y > cy)) - 0.075;
     const inside = (q) => q.x > C && q.x < XR && q.y > y0 - 0.05 && q.y < y1 + 0.05;
     // Start again inside the room every run: pieces, the bathroom wall, and the doors and windows added here.
     f.furniture = f.furniture.filter((m) => !inside(m));
@@ -75,44 +78,52 @@ const json = await page.evaluate(async (ID) => {
     f.openings = f.openings.filter((o) => !onWall(o, corridorWall) && !onWall(o, outer));
     f.rooms = f.rooms.filter((x) => x.name !== bathName);
 
-    // Private bathroom across the end nearer the master suite (1.55 m deep).
-    const B = y0 + 1.55; // inner face of the bathroom wall on the bathroom side
-    const wallY = B + 0.05;
+    // Private bathroom (1.55 m deep) across the end on the wall between the two rooms, so both bathrooms are back to
+    // back and share the plumbing (the user's call): WCs and showers on that shared wall.
+    const atEnd = name === 'Habitación 1'; // Habitación 1's bathroom at its far end, Habitación 2's at its near end
+    const L = y1 - y0;
+    const yy = (d) => (atEnd ? y1 - d : y0 + d); // distance from the bathroom's end wall → plan y
+    const away = atEnd ? 180 : 0; // pieces with their back to that end wall
+    const wallY = yy(1.6);
     const bathWall = ops.addWall(p, f.id, { x: C, y: wallY }, { x: XR, y: wallY }, 0.1, 'drywall');
     const bathDoor = opening(f.walls.find((w) => w.id === bathWall), 'door', { x: 3.3, y: wallY }, { width: 0.7 });
-    ops.toggleDoorFlip(p, f.id, bathDoor); // it opens into the bathroom
+    if (!atEnd) ops.toggleDoorFlip(p, f.id, bathDoor); // it opens into the bathroom
+    const span = (a, b) => [Math.min(yy(a), yy(b)), Math.max(yy(a), yy(b))];
+    const [b0, b1] = span(0, 1.55);
     f.rooms.push({
       id: newId(), name: bathName, kind: 'room', floorMaterial: 'ceramica',
-      points: [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: B }, { x: x0, y: B }],
+      points: [{ x: x0, y: b0 }, { x: x1, y: b0 }, { x: x1, y: b1 }, { x: x0, y: b1 }],
     });
-    room.points = [{ x: x0, y: wallY + 0.05 }, { x: x1, y: wallY + 0.05 }, { x: x1, y: y1 }, { x: x0, y: y1 }];
-    put('ducha', x1 - 0.55, y0 + 0.5, 0, { width: 1.1, depth: 1.0 });
-    put('sanitario', 3.55, y0 + 0.35, 0);
-    put('lavamanos', x0 + 0.225, y0 + 0.75, 270);
-    put('espejo', x0 + 0.015, y0 + 0.75, 270, { width: 0.6, height: 0.8, elevation: 1.15 });
-    put('toallero', x1 - 0.06, y0 + 1.25, 90);
-    put('luz-empotrada', 3.3, y0 + 0.8);
-    if (outer) opening(outer, 'window', { x: XR, y: y0 + 0.5 }, { width: 0.6, height: 0.45, sill: 1.85 });
+    const [r0, r1] = span(1.65, L);
+    room.points = [{ x: x0, y: r0 }, { x: x1, y: r0 }, { x: x1, y: r1 }, { x: x0, y: r1 }];
+    put('ducha', x1 - 0.55, yy(0.5), away, { width: 1.1, depth: 1.0 });
+    put('sanitario', 3.55, yy(0.35), away);
+    put('lavamanos', x0 + 0.225, yy(0.75), 270);
+    put('espejo', x0 + 0.015, yy(0.75), 270, { width: 0.6, height: 0.8, elevation: 1.15 });
+    put('toallero', x1 - 0.06, yy(1.25), 90);
+    put('luz-empotrada', 3.3, yy(0.8));
+    if (outer) opening(outer, 'window', { x: XR, y: yy(0.5) }, { width: 0.6, height: 0.45, sill: 1.85 });
 
     // Bedroom: double bed against the bathroom wall, nightstands, air conditioner on the outer wall.
-    const bedY = wallY + 0.05 + 0.95;
+    const bedY = yy(1.65 + 0.95);
     const bedX = 3.8;
-    put('cama-doble', bedX, bedY, 0);
+    put('cama-doble', bedX, bedY, away);
     for (const sx of [-1, 1]) {
-      put('mesa-noche', bedX + sx * (0.7 + 0.25), wallY + 0.05 + 0.2, 0);
-      put('lampara-colgante', bedX + sx * (0.7 + 0.25), wallY + 0.05 + 0.25, 0);
+      put('mesa-noche', bedX + sx * (0.7 + 0.25), yy(1.65 + 0.2), away);
+      put('lampara-colgante', bedX + sx * (0.7 + 0.25), yy(1.65 + 0.25), 0);
     }
-    put('aire-acondicionado', x1 - 0.115, bedY + 0.3, 90, { elevation: 2.15 });
-    for (const ly of [bedY - 0.2, y1 - 0.9]) put('luz-empotrada', 3.75, ly);
-    // Door from the corridor near the room's open end.
-    ops.toggleDoorFlip(p, f.id, opening(corridorWall, 'door', { x: C, y: y1 - 0.6 }, { width: 0.8 })); // opens into the room
+    put('aire-acondicionado', x1 - 0.115, yy(1.65 + 1.25), 90, { elevation: 2.15 });
+    for (const d of [1.65 + 0.75, L - 0.9]) put('luz-empotrada', 3.75, yy(d));
+    // Door from the corridor near the bedroom's open end, opening into the room.
+    const door = opening(corridorWall, 'door', { x: C, y: yy(L - 0.6) }, { width: 0.8 });
+    if (!atEnd) ops.toggleDoorFlip(p, f.id, door);
     // Window: Habitación 2 looks onto the patio, Habitación 1 to the outer side.
     const patioWall = horizontal(y1 + 0.075, 3.75);
     if (name === 'Habitación 2' && patioWall) {
       f.openings = f.openings.filter((o) => o.wallId !== patioWall.id || o.kind !== 'window');
       opening(patioWall, 'window', { x: 3.9, y: y1 + 0.075 }, { width: 1.5, height: 1.2, sill: 1.0 });
     } else if (outer) {
-      opening(outer, 'window', { x: XR, y: (bedY + y1) / 2 + 0.3 }, { width: 1.2, height: 1.2, sill: 1.0 });
+      opening(outer, 'window', { x: XR, y: yy((1.65 + 1.9 + L) / 2) }, { width: 1.2, height: 1.2, sill: 1.0 });
     }
   }
 
