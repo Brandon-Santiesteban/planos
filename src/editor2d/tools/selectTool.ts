@@ -1,7 +1,6 @@
 import { snapToGrid } from '../../geometry/snap';
 import { dist, sub } from '../../geometry/vec';
 import { projectOntoWall } from '../../geometry/walls';
-import { DEFAULTS } from '../../model/defaults';
 import { deleteFurniture } from '../../model/furnitureOps';
 import {
   deleteItems, deleteOpening, deleteRoom, deleteWall, type Joint, jointsAt, prepareWallDrag, setJoints, tidyRoomOutlines,
@@ -11,10 +10,9 @@ import type { Floor, Vec2 } from '../../model/types';
 import { beginFurnitureDrag, dragFurnitureTo, type FurnitureDrag, rotateSelectedFurniture } from '../../furniture/actions';
 import { type Item, useEditor } from '../../store/editorStore';
 import { notify } from '../../ui/toasts';
-import { useGrid } from '../gridSettings';
 import { hitTest } from '../hitTest';
 import type { ToolContext, ToolHandler } from './index';
-import { activeFloor, snapForTool } from './index';
+import { activeFloor, MOVE_STEP, snapForTool } from './index';
 
 const HIT_PX = 8;
 const DRAG_START_PX = 3;
@@ -107,12 +105,11 @@ export function createSelectTool(): ToolHandler {
       } else if (d.kind === 'endpoint') {
         const wall = floor.walls.find((w) => w.id === d.wallId);
         if (!wall) return;
-        const to = snapForTool(p, ctx, [], wall[d.end]).point;
+        const to = snapForTool(p, ctx, [], wall[d.end], MOVE_STEP).point;
         store.apply((draft) => void setJoints(draft, floorId, d.joints, to), { record: false });
       } else if (d.kind === 'wall') {
         let total = sub(p, downAt);
-        const grid = useGrid.getState();
-        if (ctx.state.snapping && !ctx.altKey && grid.visible) total = snapToGrid(total, grid.step);
+        if (ctx.state.snapping && !ctx.altKey) total = snapToGrid(total, MOVE_STEP);
         const step = sub(total, d.applied);
         if (step.x === 0 && step.y === 0) return;
         let moved = false;
@@ -124,7 +121,7 @@ export function createSelectTool(): ToolHandler {
         const wall = floor.walls.find((w) => w.id === d.wallId);
         if (!wall) return;
         let offset = projectOntoWall(wall, p).offset;
-        if (ctx.state.snapping && !ctx.altKey) offset = Math.round(offset / DEFAULTS.gridStep) * DEFAULTS.gridStep;
+        if (ctx.state.snapping && !ctx.altKey) offset = Math.round(offset / MOVE_STEP) * MOVE_STEP;
         store.apply((draft) => void updateOpening(draft, floorId, d.openingId, { offset }), { record: false });
       }
     },

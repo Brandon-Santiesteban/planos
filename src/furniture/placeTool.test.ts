@@ -28,10 +28,10 @@ test('the ghost follows the pointer and a click places the piece', () => {
   usePlacement.setState({ itemId: 'escritorio' });
   const t = createPlaceFurnitureTool();
   t.onPointerMove!({ x: 2.013, y: 2.026 }, ctx());
-  expect(usePlacement.getState().ghost).toEqual({ x: 2, y: 2.05, rotation: 0 });
+  expect(usePlacement.getState().ghost).toEqual({ x: 2.01, y: 2.03, rotation: 0 });
   t.onPointerDown!({ x: 2.013, y: 2.026 }, ctx());
   expect(pieces()).toHaveLength(1);
-  expect(pieces()[0]).toMatchObject({ type: 'escritorio', x: 2, y: 2.05, rotation: 0, elevation: 0 });
+  expect(pieces()[0]).toMatchObject({ type: 'escritorio', x: 2.01, y: 2.03, rotation: 0, elevation: 0 });
   s().undo();
   expect(pieces()).toHaveLength(0);
 });

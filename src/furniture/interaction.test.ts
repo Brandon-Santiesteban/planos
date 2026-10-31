@@ -39,15 +39,15 @@ test('a monitor on the desk is picked before the desk', () => {
   expect(hitTest(s().project.floors[0], { x: 1, y: 1.4 }, 0.05)).toEqual({ kind: 'furniture', id: mon });
 });
 
-test('dragging a piece snaps to 5 cm and undoes in one step', () => {
+test('dragging a piece moves it freely in 1 cm steps and undoes in one step', () => {
   const t = createSelectTool();
   t.onPointerDown!({ x: 1, y: 1.5 }, ctx());
   expect(s().selection).toEqual({ kind: 'furniture', id: deskId });
   t.onPointerMove!({ x: 1.5, y: 1.5 }, ctx());
   t.onPointerMove!({ x: 2.012, y: 2.031 }, ctx());
   t.onPointerUp!({ x: 2.012, y: 2.031 }, ctx());
-  expect(pieces()[0].x).toBeCloseTo(2);
-  expect(pieces()[0].y).toBeCloseTo(2.05);
+  expect(pieces()[0].x).toBeCloseTo(2.01);
+  expect(pieces()[0].y).toBeCloseTo(2.03);
   s().undo();
   expect(pieces()[0]).toMatchObject({ x: 1, y: 1.5 });
 });

@@ -8,8 +8,8 @@ import type { Vec2 } from '../model/types';
 import { useEditor } from '../store/editorStore';
 import { notify } from '../ui/toasts';
 
-/** Positions snap to this step unless Alt is held. */
-export const FURNITURE_STEP = 0.05;
+/** Positions snap to this step unless Alt is held: 1 cm, so a piece moves freely and its measures stay round. */
+export const FURNITURE_STEP = 0.01;
 /** A piece closer than this to a wall sits flush against it. */
 export const WALL_SNAP = 0.15;
 

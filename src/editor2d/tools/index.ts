@@ -45,12 +45,22 @@ export function activeFloor(state: EditorState) {
   return state.project.floors.find((f) => f.id === state.activeFloorId) ?? state.project.floors[0];
 }
 
-/** Snaps to wall endpoints of the active floor (and `extra` points), else to the grid; Alt or the toggle disables it. */
+/**
+ * Moving what is already drawn (walls, corners, doors) goes in 1 cm steps: it feels free while measures stay round.
+ * Only drawing new walls follows the grid shown.
+ */
+export const MOVE_STEP = 0.01;
+
+/**
+ * Snaps to wall endpoints of the active floor (and `extra` points), else to the grid (or to `step` when given);
+ * Alt or the toggle disables it.
+ */
 export function snapForTool(
   p: Vec2,
   ctx: ToolContext,
   extra: Vec2[] = [],
   exclude?: Vec2,
+  step?: number,
 ): { point: Vec2; kind: 'endpoint' | 'grid' | 'none' } {
   if (!ctx.state.snapping || ctx.altKey) return { point: p, kind: 'none' };
   const endpoints = activeFloor(ctx.state)
@@ -58,9 +68,9 @@ export function snapForTool(
     .concat(extra)
     .filter((e) => !exclude || dist(e, exclude) > DEFAULTS.joinTolerance);
   const grid = useGrid.getState();
-  const r = snapPoint(p, { gridStep: grid.step, endpoints, radius: SNAP_RADIUS_PX / ctx.view.pxPerMetre });
-  // With the grid hidden only wall corners attract the pointer.
-  return r.kind === 'grid' && !grid.visible ? { point: p, kind: 'none' } : r;
+  const r = snapPoint(p, { gridStep: step ?? grid.step, endpoints, radius: SNAP_RADIUS_PX / ctx.view.pxPerMetre });
+  // With the grid hidden only wall corners attract the pointer (fine steps still apply).
+  return r.kind === 'grid' && !grid.visible && step === undefined ? { point: p, kind: 'none' } : r;
 }
 
 const noopTool: ToolHandler = { preview: () => null, reset: () => {} };
