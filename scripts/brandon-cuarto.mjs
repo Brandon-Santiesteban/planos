@@ -106,20 +106,11 @@ const json = await page.evaluate(async (ID) => {
   put('espejo-cuerpo', 1.15, 0.025);
 
   // Lighting (asked 2026-10-31): warm yellow everywhere for a cosy room, mostly indirect.
-  //   - cove of warm LED all round the ceiling (indirect light washing the walls);
-  //   - warm LED behind the headboard, a pendant over the nightstand, two warm downlights;
+  //   - warm LED on the headboard and under the bed, a pendant over each nightstand, four downlights;
   //   - the setup's neons are «Tira LED neón» pieces: pick any colour in Propiedades and they light in it.
   const WARM = '#ffc56b';
-  // Ceiling coves all round: a slim white band against the ceiling hiding a warm LED that grazes down the walls.
-  const cove = 2.52; // 8 cm tall: its top meets the 2.60 m ceiling
-  const ch = 0.05; // half the cove's depth
-  put('cornisa-led', W / 2, ch, 0, { width: W, elevation: cove, color: WARM });
-  put('cornisa-led', W / 2, D - ch, 180, { width: W, elevation: cove, color: WARM });
-  put('cornisa-led', W - ch, D / 2, 90, { width: D - 2 * ch - 0.01, elevation: cove, color: WARM });
-  put('cornisa-led', ch, D / 2, 270, { width: D - 2 * ch - 0.01, elevation: cove, color: WARM });
   for (const sy of [-1, 1]) put('lampara-colgante', W - 0.22, bedY + sy * 0.95);
-  // Downlights where light is needed: over the desk and chair, in front of the wardrobe, on the shelves; none over the
-  // bed (no glare lying down: the pendants and the headboard glow light it).
+  // No ceiling coves (the user didn't like them).
   // Four downlights in a rectangle centred on the main light in the middle of the room (symmetric, the user's).
   for (const lx of [1.2, 2.8]) for (const ly of [0.75, 2.25]) put('luz-empotrada', lx, ly, 0, { elevation: 2.58 });
   // Setup neons, warm yellow to start with like the rest: behind the TV and under the desk top.
