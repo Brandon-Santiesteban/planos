@@ -4,24 +4,26 @@ import { useEditor } from '../store/editorStore';
 import Icon from '../ui/Icon';
 import SegmentedSwitch from '../ui/SegmentedSwitch';
 import { notify } from '../ui/toasts';
-import { buildExport, downloadBlob, floorsToExport, type ExportFormat, type ExportScope } from './exportFile';
+import { buildExport, downloadBlob, floorsToExport, PDF_DEFAULTS, type ExportFormat, type ExportScope, type PdfChoices } from './exportFile';
 
 /** Open state plus the last choices (kept while the app is open). */
-const useExport = create<{ open: boolean; scope: ExportScope; format: ExportFormat }>()(() => ({
+const useExport = create<{ open: boolean; scope: ExportScope; format: ExportFormat; pdf: PdfChoices }>()(() => ({
   open: false,
   scope: 'actual',
   format: 'pdf',
+  pdf: PDF_DEFAULTS,
 }));
+const setPdf = (patch: Partial<PdfChoices>) => useExport.setState((s) => ({ pdf: { ...s.pdf, ...patch } }));
 const close = () => useExport.setState({ open: false });
 
 const HELP: Record<ExportFormat, string> = {
-  pdf: 'Una hoja A3 por planta a escala 1:50 (1:100 o 1:200 si no cabe), con cotas, norte, escala gráfica y cajetín.',
+  pdf: 'Planos para el arquitecto: textos y cotas a tamaño de imprenta, cotas exteriores encadenadas, cuadro de áreas, norte, escala gráfica y cajetín. Si la planta no cabe en la hoja a esa escala, se reparte en varias hojas con un plano guía, sin reducirla.',
   texto: 'Un texto con cada espacio y sus medidas, qué puerta conecta con qué, los muebles y los muros. Cópialo y pégalo en el chat con Claude, o descárgalo como .txt.',
   dxf: 'Un archivo en metros para AutoCAD u otro CAD, con capas MUROS, HUECOS, HABITACIONES, MUEBLES, COTAS y TEXTOS. Con todas las plantas, van una al lado de otra.',
 };
 
 function ExportDialog() {
-  const { scope, format } = useExport();
+  const { scope, format, pdf } = useExport();
   const project = useEditor((s) => s.project);
   const activeFloorId = useEditor((s) => s.activeFloorId);
   const [busy, setBusy] = useState(false);
@@ -31,7 +33,7 @@ function ExportDialog() {
     if (busy || empty) return;
     setBusy(true);
     try {
-      const { name, blob } = await buildExport(project, activeFloorId, scope, format);
+      const { name, blob } = await buildExport(project, activeFloorId, scope, format, pdf);
       downloadBlob(name, blob);
       close();
       notify({ kind: 'ok', text: `Descargado «${name}»` });
@@ -89,6 +91,49 @@ function ExportDialog() {
           />
           <span className="ayuda">{HELP[format]}</span>
         </div>
+        {format === 'pdf' && (
+          <>
+            <div className="field">
+              <span className="label">Papel</span>
+              <SegmentedSwitch
+                label="Papel"
+                value={pdf.paper}
+                options={[{ value: 'A1', label: 'A1' }, { value: 'A2', label: 'A2' }, { value: 'A3', label: 'A3' }]}
+                onChange={(v) => setPdf({ paper: v })}
+              />
+            </div>
+            <div className="field">
+              <span className="label">Escala</span>
+              <SegmentedSwitch
+                label="Escala"
+                value={String(pdf.scale)}
+                options={[
+                  { value: 'auto', label: 'Automática' },
+                  { value: '50', label: '1:50' },
+                  { value: '75', label: '1:75' },
+                  { value: '100', label: '1:100' },
+                  { value: '200', label: '1:200' },
+                ]}
+                onChange={(v) => setPdf({ scale: v === 'auto' ? 'auto' : (Number(v) as PdfChoices['scale']) })}
+              />
+              {pdf.scale === 'auto' && <span className="ayuda">1:50 si la planta cabe en una hoja; si no, 1:100.</span>}
+            </div>
+            <div className="exportar-opciones">
+              <label className="toggle-linea">
+                <input type="checkbox" checked={pdf.dimensions} onChange={(e) => setPdf({ dimensions: e.target.checked })} />
+                Incluir cotas
+              </label>
+              <label className="toggle-linea">
+                <input type="checkbox" checked={pdf.wallDimensions} onChange={(e) => setPdf({ wallDimensions: e.target.checked })} />
+                Cota de cada muro
+              </label>
+              <label className="toggle-linea">
+                <input type="checkbox" checked={pdf.furniture} onChange={(e) => setPdf({ furniture: e.target.checked })} />
+                Incluir muebles
+              </label>
+            </div>
+          </>
+        )}
         <div className="ventana-botones">
           <button className="btn btn-sec" onClick={close}>Cancelar</button>
           {format === 'texto' && !empty && (

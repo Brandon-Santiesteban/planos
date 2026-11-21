@@ -55,3 +55,21 @@ test('Esc closes the window', () => {
   fireEvent.keyDown(window, { key: 'Escape' });
   expect(screen.queryByRole('dialog')).toBeNull();
 });
+
+test('PDF: paper, scale, dimensions and furniture choices reach the export (A1, automatic, no furniture by default)', async () => {
+  vi.spyOn(exportFile, 'downloadBlob').mockImplementation(() => {});
+  const build = vi.spyOn(exportFile, 'buildExport').mockResolvedValue({ name: 'x.pdf', blob: new Blob([]) });
+  render(<ExportButton />);
+  fireEvent.click(screen.getByRole('button', { name: /Exportar/ }));
+  fireEvent.click(screen.getByRole('radio', { name: 'PDF a escala' }));
+  expect(screen.getByRole('radio', { name: 'A1' })).toHaveAttribute('aria-checked', 'true');
+  expect(screen.getByRole('radio', { name: 'Automática' })).toHaveAttribute('aria-checked', 'true');
+  expect(screen.getByRole('checkbox', { name: 'Incluir muebles' })).not.toBeChecked();
+  expect(screen.getByRole('checkbox', { name: 'Incluir cotas' })).toBeChecked();
+  fireEvent.click(screen.getByRole('radio', { name: 'A3' }));
+  fireEvent.click(screen.getByRole('radio', { name: '1:75' }));
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Incluir muebles' }));
+  fireEvent.click(screen.getByRole('button', { name: /Descargar/ }));
+  await waitFor(() => expect(build).toHaveBeenCalled());
+  expect(build.mock.calls[0][4]).toEqual({ paper: 'A3', scale: 75, furniture: true, dimensions: true, wallDimensions: false });
+});

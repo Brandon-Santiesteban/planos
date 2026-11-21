@@ -1,6 +1,6 @@
 // A floor plan as a flat list of drawing primitives, in metres and plan coordinates (x right, y down).
 // Shared by the PDF and DXF exporters so both show exactly the same drawing.
-import { polygonArea, polygonCentroid } from '../geometry/polygons';
+import { pointInPolygon, polygonArea, polygonCentroid } from '../geometry/polygons';
 import { add, lerp, normalize, perp, scale, sub } from '../geometry/vec';
 import { isEndConnected, wallFootprint, wallLength } from '../geometry/walls';
 import type { Floor, Furniture, Opening, Room, Vec2, Wall } from '../model/types';
@@ -24,11 +24,56 @@ export interface Drawing { prims: Prim[]; bounds: Bounds | null }
 export interface DrawingOptions {
   /** Display name for a piece of furniture (the catalog's); defaults to its type id made readable. */
   furnitureName?: (f: Furniture) => string;
+  /**
+   * Plot scale denominator (100 for 1:100). When given, texts and dimension furniture (ticks, gaps, offsets)
+   * are sized in paper millimetres (PAPER_MM) and converted to metres at this scale, so they read the same at
+   * any scale. Without it, the old fixed sizes in metres are used.
+   */
+  scale?: number;
+  /** Furniture outlines and names (default true). */
+  furniture?: boolean;
+  /** A dimension along every wall (default true). */
+  wallDimensions?: boolean;
+  /** Chained dimension strings plus an overall dimension outside each side of the building (default false). */
+  exteriorDimensions?: boolean;
+  /**
+   * Room labels that fit (default false): a label too wide for a tall narrow room turns to run along it, and an
+   * outdoor space whose label still does not fit, or that lies under an indoor room, is left unlabelled.
+   */
+  fitLabels?: boolean;
 }
 
 // Sizes on the drawing, in metres (at 1:50 a 0,2 m text is 4 mm on paper).
 const TEXT = { room: 0.2, area: 0.14, dimension: 0.13, furniture: 0.1 };
 const DIM = { gap: 0.05, offset: 0.4, overshoot: 0.08, tick: 0.14, textGap: 0.12 };
+
+/** Sizes on paper, in mm, used when a scale is given: text cap heights and dimension furniture. */
+export const PAPER_MM = {
+  text: { room: 2.5, area: 1.8, dimension: 2, furniture: 1.5 },
+  dim: {
+    gap: 1.5, // between the building (or wall face) and the start of an extension line
+    offset: 6, // wall dimensions: from the wall face to the dimension line
+    overshoot: 1.5, // extension lines run past the dimension line
+    tick: 2.5, // oblique tick length
+    textGap: 1, // between the dimension line and its text
+    first: 10, // exterior chains: from the building to the first string
+    step: 8, // exterior chains: between strings
+  },
+};
+
+interface Sizes { text: typeof TEXT; dim: typeof DIM & { first: number; step: number } }
+
+/** Sizes in metres for the drawing: from paper mm when a scale is given, else the old metre sizes. */
+function sizesFor(scale?: number): Sizes {
+  if (!scale) return { text: TEXT, dim: { ...DIM, first: 0.6, step: 0.45 } };
+  const m = (mm: number) => (mm * scale) / 1000;
+  const t = PAPER_MM.text;
+  const d = PAPER_MM.dim;
+  return {
+    text: { room: m(t.room), area: m(t.area), dimension: m(t.dimension), furniture: m(t.furniture) },
+    dim: { gap: m(d.gap), offset: m(d.offset), overshoot: m(d.overshoot), tick: m(d.tick), textGap: m(d.textGap), first: m(d.first), step: m(d.step) },
+  };
+}
 const TREAD = 0.28;
 
 const deg = (v: Vec2) => (Math.atan2(v.y, v.x) * 180) / Math.PI;
@@ -135,17 +180,34 @@ function stairs(r: Room): Line[] {
   return lines;
 }
 
-function roomPrims(r: Room): Prim[] {
+function roomPrims(r: Room, text: Sizes['text'] = TEXT, fit?: { others: Room[] }): Prim[] {
   const out: Prim[] = [{ type: 'poly', layer: 'HABITACIONES', points: r.points, closed: true, dashed: r.kind === 'roof' || undefined }];
   if (r.kind === 'stairs') out.push(...stairs(r));
   // A roof is only outlined: its label would sit on top of the room underneath.
-  if (r.kind !== 'roof') {
-    const c = polygonCentroid(r.points);
-    out.push(
-      { type: 'text', layer: 'TEXTOS', at: { x: c.x, y: c.y - 0.12 }, text: r.name, height: TEXT.room, angle: 0 },
-      { type: 'text', layer: 'TEXTOS', at: { x: c.x, y: c.y + 0.15 }, text: formatArea(polygonArea(r.points)), height: TEXT.area, angle: 0 },
-    );
+  if (r.kind === 'roof') return out;
+  const c = polygonCentroid(r.points);
+  const area = formatArea(polygonArea(r.points));
+  let angle = 0;
+  if (fit) {
+    const xs = r.points.map((p) => p.x);
+    const ys = r.points.map((p) => p.y);
+    const w = Math.max(...xs) - Math.min(...xs);
+    const h = Math.max(...ys) - Math.min(...ys);
+    const need = Math.max(r.name.length * text.room * 0.78, area.length * text.area * 0.78) * 1.05;
+    const tall = text.room * 1.2 + text.area * 2.2;
+    const fitsFlat = need <= w && tall <= h;
+    const fitsUp = need <= h && tall <= w;
+    if (!fitsFlat && fitsUp) angle = -90;
+    const outdoor = r.kind === 'exterior';
+    const covered = outdoor && fit.others.some((o) => o !== r && o.kind !== 'exterior' && o.kind !== 'roof' && pointInPolygon(c, o.points));
+    if (outdoor && ((!fitsFlat && !fitsUp) || covered || !pointInPolygon(c, r.points))) return out;
   }
+  // name above the centre, area below; turned, "above" is towards −x
+  const off = (k: number): Vec2 => (angle === 0 ? { x: c.x, y: c.y + k } : { x: c.x + k, y: c.y });
+  out.push(
+    { type: 'text', layer: 'TEXTOS', at: off(-text.room * 0.6), text: r.name, height: text.room, angle },
+    { type: 'text', layer: 'TEXTOS', at: off(text.area * 1.07), text: area, height: text.area, angle },
+  );
   return out;
 }
 
@@ -154,7 +216,7 @@ const readable = (type: string) => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-function furniturePrims(f: Furniture, name: string): Prim[] {
+function furniturePrims(f: Furniture, name: string, height = TEXT.furniture): Prim[] {
   const t = (f.rotation * Math.PI) / 180;
   const cos = Math.cos(t);
   const sin = Math.sin(t);
@@ -165,12 +227,14 @@ function furniturePrims(f: Furniture, name: string): Prim[] {
   });
   return [
     { type: 'poly', layer: 'MUEBLES', points: corners, closed: true },
-    { type: 'text', layer: 'MUEBLES', at: { x: f.x, y: f.y }, text: name, height: TEXT.furniture, angle: 0 },
+    { type: 'text', layer: 'MUEBLES', at: { x: f.x, y: f.y }, text: name, height, angle: 0 },
   ];
 }
 
 /** Dimension on the −perp side of the wall (like the editor): line, extension lines, oblique ticks and length. */
-function dimension(w: Wall): Prim[] {
+function dimension(w: Wall, sz: Sizes = sizesFor()): Prim[] {
+  const DIM = sz.dim;
+  const TEXT = sz.text;
   const d = normalize(sub(w.b, w.a));
   const out = scale(perp(d), -1);
   const half = w.thickness / 2;
@@ -195,16 +259,52 @@ function dimension(w: Wall): Prim[] {
 
 export function buildDrawing(floor: Floor, opts: DrawingOptions = {}): Drawing {
   const name = opts.furnitureName ?? ((f: Furniture) => readable(f.type));
+  const sz = sizesFor(opts.scale);
   const prims: Prim[] = [];
-  for (const r of floor.rooms) prims.push(...roomPrims(r));
-  for (const f of floor.furniture) prims.push(...furniturePrims(f, name(f)));
+  for (const r of floor.rooms) prims.push(...roomPrims(r, sz.text, opts.fitLabels ? { others: floor.rooms } : undefined));
+  if (opts.furniture !== false) for (const f of floor.furniture) prims.push(...furniturePrims(f, name(f), sz.text.furniture));
   for (const w of floor.walls) prims.push(...wallPieces(floor.walls, w, floor.openings));
   for (const o of floor.openings) {
     const w = floor.walls.find((x) => x.id === o.wallId);
     if (w) prims.push(...openingSymbol(w, o));
   }
-  for (const w of floor.walls) prims.push(...dimension(w));
+  if (opts.wallDimensions !== false) for (const w of floor.walls) prims.push(...dimension(w, sz));
+  if (opts.exteriorDimensions) prims.push(...exteriorDimensions(floor, { scale: opts.scale }));
+  if (opts.fitLabels) {
+    const kept = dropClashingOutdoorLabels(floor, prims);
+    return { prims: kept, bounds: drawingBounds(kept) };
+  }
   return { prims, bounds: drawingBounds(prims) };
+}
+
+/** Box of a text, as [minX, minY, maxX, maxY]. */
+function textBox(t: Text): [number, number, number, number] {
+  // Helvetica runs ≈ 0.78 cap heights per character; plus a little clearance
+  const w = (t.text.length * t.height * 0.78) / 2 + t.height * 0.3;
+  const h = t.height * 0.8;
+  return Math.abs(t.angle) > 45 ? [t.at.x - h, t.at.y - w, t.at.x + h, t.at.y + w] : [t.at.x - w, t.at.y - h, t.at.x + w, t.at.y + h];
+}
+const overlaps = (a: number[], b: number[]) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+
+/** Outdoor spaces whose label would sit on a dimension lose the label (the area schedule still lists them). */
+function dropClashingOutdoorLabels(floor: Floor, prims: Prim[]): Prim[] {
+  const dims = prims.flatMap((p) => {
+    if (p.layer !== 'COTAS') return [];
+    if (p.type === 'text') return [textBox(p)];
+    if (p.type === 'line') return [[Math.min(p.a.x, p.b.x), Math.min(p.a.y, p.b.y), Math.max(p.a.x, p.b.x), Math.max(p.a.y, p.b.y)]];
+    return [];
+  });
+  if (dims.length === 0) return prims;
+  const outdoor = new Set(floor.rooms.filter((r) => r.kind === 'exterior').map((r) => r.name));
+  const labels = prims.filter((p): p is Text => p.type === 'text' && p.layer === 'TEXTOS');
+  const drop = new Set<Prim>();
+  for (let i = 0; i + 1 < labels.length; i++) {
+    const [name, area] = [labels[i], labels[i + 1]];
+    if (!outdoor.has(name.text) || !area.text.endsWith('m²')) continue;
+    if ([name, area].some((t) => dims.some((d) => overlaps(textBox(t), d)))) { drop.add(name); drop.add(area); }
+    i++;
+  }
+  return prims.filter((p) => !drop.has(p));
 }
 
 /** Rough width of a text (for bounds and fitting). */
@@ -256,4 +356,171 @@ export function northArrow(c: Vec2, size: number, north: number, layer: Layer = 
     },
     { type: 'text', layer, at: add(c, scale(dir, size / 2 + size * 0.22)), text: 'N', height: size * 0.25, angle: 0 },
   ];
+}
+
+// ---- exterior dimensioning -------------------------------------------------------------------
+
+type Side = 'n' | 's' | 'w' | 'e';
+interface Extent { lo: number; hi: number; clo: number; chi: number }
+
+const MIN_WALL = 0.6; // shorter walls are posts, left out of the building outline
+const MERGE = 0.04; // points closer than 4 cm are one point (dimensions read to the centimetre, kept clean)
+
+function uniqueSorted(values: number[]): number[] {
+  const out: number[] = [];
+  for (const v of [...values].sort((a, b) => a - b)) if (!out.length || v - out[out.length - 1] > MERGE) out.push(v);
+  return out;
+}
+
+const sameChain = (a: number[], b: number[]) => a.length === b.length && a.every((v, i) => Math.abs(v - b[i]) <= MERGE);
+
+/**
+ * Chained dimension strings outside each side of the building (the walls' outer outline), nearest first:
+ * 1. openings and corners of the facade walls seen from that side,
+ * 2. corners plus the axes of the walls that meet the facade,
+ * 3. the overall length.
+ * A string that would repeat the next one is left out. All on layer COTAS, sized like `DrawingOptions.scale`.
+ */
+export function exteriorDimensions(floor: Floor, opts: { scale?: number } = {}): Prim[] {
+  // Posts and stubs (gate pillars, columns) would set the outline on their own: only real walls count.
+  const all = floor.walls;
+  const walls = all.filter((w) => wallLength(w) >= MIN_WALL);
+  if (walls.length === 0) return [];
+  const sz = sizesFor(opts.scale);
+  const fps = walls.map((w) => wallFootprint(w, isEndConnected(all, w.id, 'a'), isEndConnected(all, w.id, 'b')));
+  const box = drawingBounds(fps.map((points) => ({ type: 'poly', layer: 'MUROS', points, closed: true }) as Poly))!;
+  const out: Prim[] = [];
+  for (const side of ['n', 's', 'w', 'e'] as Side[]) out.push(...sideDimensions(walls, floor.openings, fps, box, side, sz));
+  return out;
+}
+
+function sideDimensions(walls: Wall[], openings: Opening[], fps: Vec2[][], box: Bounds, side: Side, sz: Sizes): Prim[] {
+  const horizontal = side === 'n' || side === 's';
+  const outward = side === 'n' || side === 'w' ? -1 : 1;
+  const al = (p: Vec2) => (horizontal ? p.x : p.y);
+  const ac = (p: Vec2) => (horizontal ? p.y : p.x);
+  const pt = (along: number, across: number): Vec2 => (horizontal ? { x: along, y: across } : { x: across, y: along });
+  const face = horizontal ? (outward < 0 ? box.minY : box.maxY) : (outward < 0 ? box.minX : box.maxX);
+  const [boxLo, boxHi] = horizontal ? [box.minX, box.maxX] : [box.minY, box.maxY];
+  if (boxHi - boxLo < MERGE) return [];
+
+  const ext: Extent[] = fps.map((fp) => {
+    const a = fp.map(al);
+    const c = fp.map(ac);
+    return { lo: Math.min(...a), hi: Math.max(...a), clo: Math.min(...c), chi: Math.max(...c) };
+  });
+  const parallel = (w: Wall) => Math.abs(ac(w.a) - ac(w.b)) < 1e-3 && Math.abs(al(w.a) - al(w.b)) > 1e-3;
+  const perpendicular = (w: Wall) => Math.abs(al(w.a) - al(w.b)) < 1e-3 && Math.abs(ac(w.a) - ac(w.b)) > 1e-3;
+  const eps = 0.02;
+  // Facade: walk along the side and see which wall is met first coming from outside. A run of the same wall
+  // longer than MIN_RUN is a visible piece of facade; walls deeper than MAX_DEPTH behind the face (seen through a
+  // passage between two buildings) are not part of it.
+  const STEP = 0.05;
+  const MIN_RUN = 0.3;
+  const MAX_DEPTH = 3;
+  const runs: { i: number; lo: number; hi: number }[] = [];
+  for (let x = boxLo + STEP / 2; x < boxHi; x += STEP) {
+    let best = -1;
+    let bestFace = 0;
+    ext.forEach((o, j) => {
+      if (!(o.lo < x && o.hi > x)) return;
+      const f = outward < 0 ? o.clo : -o.chi;
+      if (best < 0 || f < bestFace - 1e-6) { best = j; bestFace = f; }
+    });
+    if (best >= 0 && Math.abs((outward < 0 ? bestFace : -bestFace) - face) > MAX_DEPTH) best = -1;
+    const last = runs[runs.length - 1];
+    if (last && last.i === best && x - last.hi < STEP * 1.5) last.hi = x;
+    else runs.push({ i: best, lo: x, hi: x });
+  }
+  const seen = runs.filter((r) => r.i >= 0 && r.hi - r.lo + STEP >= MIN_RUN);
+  const facade = [...new Set(seen.map((r) => r.i))].map((i) => ({ w: walls[i], e: ext[i], i }));
+  const snap = (v: number, e: Extent) => (Math.abs(v - e.lo) < STEP ? e.lo : Math.abs(v - e.hi) < STEP ? e.hi : v);
+  const corners = [boxLo, boxHi, ...seen.flatMap((r) => [snap(r.lo - STEP / 2, ext[r.i]), snap(r.hi + STEP / 2, ext[r.i])])];
+  const visible = (i: number, v: number) => seen.some((r) => r.i === i && v >= r.lo - STEP && v <= r.hi + STEP);
+  const openingEdges = facade.flatMap(({ w, i }) => {
+    if (!parallel(w)) return [];
+    const d = normalize(sub(w.b, w.a));
+    return openings
+      .filter((o) => o.wallId === w.id)
+      .map((o) => [o.offset - o.width / 2, o.offset + o.width / 2].map((k) => al(add(w.a, scale(d, k)))))
+      .filter(([p, q]) => visible(i, p) && visible(i, q))
+      .flat();
+  });
+  const axes: number[] = [];
+  walls.forEach((w, j) => {
+    if (!perpendicular(w)) return;
+    const e = ext[j];
+    const meets = facade.some(({ w: fw, e: f }) => parallel(fw) && e.lo < f.hi - eps && e.hi > f.lo + eps && e.clo <= f.chi + eps && e.chi >= f.clo - eps);
+    const axis = al(w.a);
+    if (meets && corners.every((c) => Math.abs(c - axis) > w.thickness + MERGE)) axes.push(axis);
+  });
+
+  const overall = uniqueSorted([boxLo, boxHi]);
+  const chains: number[][] = [];
+  for (const c of [uniqueSorted([...corners, ...openingEdges]), uniqueSorted([...corners, ...axes]), overall]) {
+    if (c.length < 2) continue;
+    const last = chains[chains.length - 1];
+    if (last && sameChain(last, c)) continue;
+    chains.push(c);
+  }
+  // the overall string is always last: drop an earlier string that is the same
+  const strings = chains.filter((c, i) => i === chains.length - 1 || !sameChain(c, overall));
+
+  const { dim, text } = sz;
+  const h = text.dimension;
+  const angle = horizontal ? 0 : -90;
+  const tick = { x: (dim.tick / 2) * Math.SQRT1_2, y: -(dim.tick / 2) * Math.SQRT1_2 };
+  const lineAt = (k: number) => face + outward * (dim.first + k * dim.step);
+  const prims: Prim[] = [];
+  // extension lines: one per point, out to the furthest string that uses it
+  const reach = new Map<number, number>();
+  strings.forEach((c, k) => c.forEach((v) => {
+    const key = [...reach.keys()].find((r) => Math.abs(r - v) <= MERGE) ?? v;
+    reach.set(key, Math.max(reach.get(key) ?? 0, k));
+  }));
+  for (const [v, k] of reach) {
+    prims.push({ type: 'line', layer: 'COTAS', a: pt(v, face + outward * dim.gap), b: pt(v, lineAt(k) + outward * dim.overshoot) });
+  }
+  strings.forEach((c, k) => {
+    const y = lineAt(k);
+    prims.push({ type: 'line', layer: 'COTAS', a: pt(c[0], y), b: pt(c[c.length - 1], y) });
+    for (const v of c) {
+      const p = pt(v, y);
+      prims.push({ type: 'line', layer: 'COTAS', a: sub(p, tick), b: add(p, tick) });
+    }
+    // Text on the top / left of the line. A segment too short for its text puts it on the other side, and the
+    // next short one back on top, so neighbours do not overlap.
+    let prevShortBelow = false;
+    for (let i = 0; i + 1 < c.length; i++) {
+      const len = c[i + 1] - c[i];
+      const label = formatMetres(len).replace(' m', '');
+      const fits = label.length * h * 0.78 + 2 * dim.textGap <= len;
+      const below: boolean = !fits && !prevShortBelow;
+      prevShortBelow = below;
+      const sideSign = below ? 1 : -1;
+      prims.push({
+        type: 'text', layer: 'COTAS', at: pt((c[i] + c[i + 1]) / 2, y + sideSign * (dim.textGap + h / 2)),
+        text: label, height: h, angle,
+      });
+    }
+  });
+  return prims;
+}
+
+// ---- area schedule ---------------------------------------------------------------------------
+
+export interface AreaRow { name: string; area: number }
+export interface AreaGroup { title: string; rows: AreaRow[]; subtotal: number }
+/** Rooms of a floor and their areas (m²), grouped. `total` = interior spaces + terraces and balconies. */
+export interface AreaSchedule { groups: AreaGroup[]; total: number }
+
+export function areaSchedule(floor: Floor): AreaSchedule {
+  const group = (title: string, kinds: Room['kind'][]): AreaGroup => {
+    const rows = floor.rooms.filter((r) => kinds.includes(r.kind)).map((r) => ({ name: r.name, area: polygonArea(r.points) }));
+    return { title, rows, subtotal: rows.reduce((s, r) => s + r.area, 0) };
+  };
+  const interior = group('Espacios interiores', ['room', 'stairs']);
+  const terraces = group('Terrazas y balcones', ['balcony']);
+  const outside = group('Zonas exteriores', ['exterior']);
+  return { groups: [interior, terraces, outside].filter((g) => g.rows.length > 0), total: interior.subtotal + terraces.subtotal };
 }
