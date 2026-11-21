@@ -2,6 +2,7 @@ import Icon from '../ui/Icon';
 import SegmentedSwitch from '../ui/SegmentedSwitch';
 import { type GridStep, useGrid } from './gridSettings';
 import { usePlanOptions } from './planOptions';
+import { PlanPhotoButton } from './photo/PlanPhotoDialog';
 
 const STEPS: { value: string; label: string }[] = [
   { value: '0.1', label: '10 cm' },
@@ -9,7 +10,7 @@ const STEPS: { value: string; label: string }[] = [
   { value: '1', label: '1 m' },
 ];
 
-/** Show/hide the plan grid and choose its size (also the snapping size). */
+/** Show/hide the plan grid and choose its size (also the snapping size); m² labels; the plan photo. */
 export default function GridControls() {
   const { visible, step, setVisible, setStep } = useGrid();
   return (
@@ -23,6 +24,7 @@ export default function GridControls() {
         <Icon name="grid" size={16} />Cuadrícula
       </button>
       <AreaToggle />
+      <PlanPhotoButton />
       {visible && (
         <SegmentedSwitch label="Tamaño de la cuadrícula" value={String(step)} options={STEPS} onChange={(v) => setStep(Number(v) as GridStep)} />
       )}

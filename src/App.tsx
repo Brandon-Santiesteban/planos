@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { HelpDialog } from './ui/HelpDialog';
 import GridControls from './editor2d/GridControls';
+import PlanPhotoHost from './editor2d/photo/PlanPhotoDialog';
 import { duplicateSelectedFurniture } from './furniture/actions';
 import { startClipboard } from './store/clipboard';
 import Plan2D from './editor2d/Plan2D';
@@ -131,6 +132,7 @@ export default function App() {
       <ProjectsDialog onOpenFile={open} />
       <DialogHost />
       <HelpDialog />
+      <PlanPhotoHost />
     </div>
   );
 }

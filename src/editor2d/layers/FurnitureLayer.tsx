@@ -28,8 +28,10 @@ function Piece({ f, selected, pxPerMetre, ghost = false }: { f: Furniture; selec
   );
 }
 
-/** Furniture as top-view outlines with symbols; lower pieces first so a monitor shows over its desk. */
-export default function FurnitureLayer({ floor, selection, group, pxPerMetre }: { floor: Floor; selection: Selection; group?: Set<string>; pxPerMetre: number }) {
+/** Furniture as top-view outlines with symbols; lower pieces first so a monitor shows over its desk. `noGhost` leaves out the piece being placed. */
+export default function FurnitureLayer({ floor, selection, group, pxPerMetre, noGhost = false }: {
+  floor: Floor; selection: Selection; group?: Set<string>; pxPerMetre: number; noGhost?: boolean;
+}) {
   const tool = useEditor((s) => s.tool);
   const { itemId, ghost } = usePlacement();
   const item = itemId ? catalogItem(itemId) : undefined;
@@ -38,7 +40,7 @@ export default function FurnitureLayer({ floor, selection, group, pxPerMetre }: 
       {byElevation(floor.furniture ?? []).map((f) => (
         <Piece key={f.id} f={f} selected={(selection?.kind === 'furniture' && selection.id === f.id) || !!group?.has(f.id)} pxPerMetre={pxPerMetre} />
       ))}
-      {tool === 'furniture' && item && ghost && (
+      {!noGhost && tool === 'furniture' && item && ghost && (
         <Piece
           f={{ id: 'fantasma', type: item.id, ...ghost, width: item.width, depth: item.depth, height: item.height, elevation: 0 }}
           selected={false}
