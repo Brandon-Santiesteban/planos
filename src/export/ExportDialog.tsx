@@ -4,24 +4,26 @@ import { useEditor } from '../store/editorStore';
 import Icon from '../ui/Icon';
 import SegmentedSwitch from '../ui/SegmentedSwitch';
 import { notify } from '../ui/toasts';
+import type { DxfUnits } from './dxf';
 import { buildExport, downloadBlob, floorsToExport, type ExportFormat, type ExportScope } from './exportFile';
 
 /** Open state plus the last choices (kept while the app is open). */
-const useExport = create<{ open: boolean; scope: ExportScope; format: ExportFormat }>()(() => ({
+const useExport = create<{ open: boolean; scope: ExportScope; format: ExportFormat; units: DxfUnits }>()(() => ({
   open: false,
   scope: 'actual',
   format: 'pdf',
+  units: 'mm',
 }));
 const close = () => useExport.setState({ open: false });
 
 const HELP: Record<ExportFormat, string> = {
   pdf: 'Una hoja A3 por planta a escala 1:50 (1:100 o 1:200 si no cabe), con cotas, norte, escala gráfica y cajetín.',
   texto: 'Un texto con cada espacio y sus medidas, qué puerta conecta con qué, los muebles y los muros. Cópialo y pégalo en el chat con Claude, o descárgalo como .txt.',
-  dxf: 'Un archivo en metros para AutoCAD u otro CAD, con capas MUROS, HUECOS, HABITACIONES, MUEBLES, COTAS y TEXTOS. Con todas las plantas, van una al lado de otra.',
+  dxf: 'Un DXF de AutoCAD 2007 (abre en BricsCAD, DraftSight, LibreCAD…) a escala real, con capas MUROS, HUECOS, ESPACIOS, ESCALERAS, TERRENO, MUEBLES, COTAS y TEXTOS. Con todas las plantas, van una al lado de otra.',
 };
 
 function ExportDialog() {
-  const { scope, format } = useExport();
+  const { scope, format, units } = useExport();
   const project = useEditor((s) => s.project);
   const activeFloorId = useEditor((s) => s.activeFloorId);
   const [busy, setBusy] = useState(false);
@@ -31,7 +33,7 @@ function ExportDialog() {
     if (busy || empty) return;
     setBusy(true);
     try {
-      const { name, blob } = await buildExport(project, activeFloorId, scope, format);
+      const { name, blob } = await buildExport(project, activeFloorId, scope, format, { dxfUnits: units });
       downloadBlob(name, blob);
       close();
       notify({ kind: 'ok', text: `Descargado «${name}»` });
@@ -89,6 +91,20 @@ function ExportDialog() {
           />
           <span className="ayuda">{HELP[format]}</span>
         </div>
+        {format === 'dxf' && (
+          <div className="field">
+            <span className="label">Unidades</span>
+            <SegmentedSwitch
+              label="Unidades"
+              value={units}
+              options={[{ value: 'mm', label: 'Milímetros' }, { value: 'm', label: 'Metros' }]}
+              onChange={(v) => useExport.setState({ units: v })}
+            />
+            <span className="ayuda">
+              {units === 'mm' ? '1 unidad = 1 mm: un muro de 15 cm mide 150.' : '1 unidad = 1 m: un muro de 15 cm mide 0,15.'} Elige las que use la oficina que lo va a abrir.
+            </span>
+          </div>
+        )}
         <div className="ventana-botones">
           <button className="btn btn-sec" onClick={close}>Cancelar</button>
           {format === 'texto' && !empty && (
