@@ -574,3 +574,33 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 /* «Solo esta planta» / «Techos» in the floors panel (2D and 3D) */
 .vista-plantas { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 4px 0 10px; }
 .vista-plantas .btn-chico.activo { background: color-mix(in srgb, var(--acento) 14%, var(--sup)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--acento) 45%, transparent); color: var(--acento); }
+/* ---------- «Foto del plano» window ---------- */
+.ventana-foto { max-width: 980px; max-height: calc(100vh - 32px); display: flex; flex-direction: column; }
+.foto-cuerpo { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 18px; min-height: 0; flex: 1; margin-top: 8px; }
+.foto-opciones { display: flex; flex-direction: column; gap: 14px; }
+.foto-opciones .carril { flex-wrap: wrap; }
+.foto-casilla { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; padding: 3px 0; }
+.field .foto-casilla { font-size: 14px; font-weight: 400; }
+.field .foto-casilla input { flex: none; width: 16px; height: 16px; padding: 0; margin: 0; box-shadow: none; accent-color: var(--acento); }
+.foto-vista {
+  min-height: 240px; max-height: calc(100vh - 260px); overflow: auto; display: flex; flex-direction: column; gap: 12px;
+  align-items: center; padding: 12px; border-radius: 10px; background: var(--sup2); box-shadow: inset 0 0 0 1px var(--linea);
+}
+.foto-vista img { display: block; max-width: 100%; max-height: calc(100vh - 290px); height: auto; background: #FFFFFF; box-shadow: var(--sombra); transition: opacity .15s; }
+.foto-vista img.actualizando { opacity: .55; }
+@media (max-width: 700px) { .foto-cuerpo { grid-template-columns: 1fr; } .foto-vista { max-height: none; } }
+/* Off-screen source of the pictures, always in the light palette whatever the theme. */
+.foto-plano-fuente {
+  position: fixed; left: -100000px; top: 0; pointer-events: none;
+  --sup: #FFFFFF; --sup2: #E9EEF6; --tinta: #0B1F3F; --tenue: #566684; --linea: #D3DCEA; --acento: #12355E;
+  --t1: #4338A0; --t2: #8A5200; --t3: #0B6A63; --peligro: #B3261E; --plano-fondo: #FFFFFF;
+}
+.foto-plano-svg { display: block; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
+.foto-plano-svg .room-name, .foto-plano-svg .room-area, .foto-plano-svg .dimension {
+  paint-order: stroke; stroke: #FFFFFF; stroke-width: 3px; stroke-linejoin: round; vector-effect: non-scaling-stroke;
+}
+.foto-pie-linea { stroke: var(--linea); stroke-width: 1px; }
+.foto-pie-titulo { fill: var(--tinta); font-size: 16px; font-weight: 600; }
+.foto-escala-negro { fill: var(--tinta); stroke: var(--tinta); stroke-width: 1px; }
+.foto-escala-blanco { fill: #FFFFFF; stroke: var(--tinta); stroke-width: 1px; }
+.foto-escala-texto { fill: var(--tenue); font-size: 12px; font-variant-numeric: tabular-nums; }
