@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
+import { useViewOptions, withoutRoofs } from '../store/viewOptions';
 import type { Vec2 } from '../model/types';
 import { useEditor } from '../store/editorStore';
 import { isEditableTarget } from '../ui/keys';
@@ -176,7 +177,10 @@ export default function Plan2D() {
   const preview = tool.preview();
   const typing = preview?.kind === 'wall' && preview.typed !== '' ? preview : null;
   const typingAt = typing ? worldToScreen(view, size, typing.b) : null;
-  const below = floorIndex > 0 ? project.floors[floorIndex - 1] : null;
+  const { onlyActive, roofs } = useViewOptions();
+  // «Solo esta planta» drops the grey walls of the floor below; «Techos» off drops the roof outlines.
+  const below = floorIndex > 0 && !onlyActive ? project.floors[floorIndex - 1] : null;
+  const shownFloor = roofs ? floor : withoutRoofs(floor);
 
   return (
     <div ref={wrapRef} className={`plan2d-wrap tool-${toolName}`}>
@@ -195,7 +199,7 @@ export default function Plan2D() {
           <GridLayer view={view} size={size} />
           <SiteLayer site={project.site} pxPerMetre={k} />
           {below && <WallsLayer floor={below} ghost />}
-          <RoomsLayer floor={floor} selection={selection} group={group} pxPerMetre={k} />
+          <RoomsLayer floor={shownFloor} selection={selection} group={group} pxPerMetre={k} />
           <FurnitureLayer floor={floor} selection={selection} group={group} pxPerMetre={k} />
           <WallsLayer floor={floor} selection={selection} group={group} />
           <OpeningsLayer floor={floor} selection={selection} group={group} />

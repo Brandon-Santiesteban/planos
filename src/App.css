@@ -570,3 +570,7 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 [data-tema="oscuro"] .ayuda-grupo dt { filter: brightness(1.6); }
 .ayuda-grupo dd { margin: 0; color: var(--tenue); }
 @media (max-width: 640px) { .ayuda-grupos { grid-template-columns: 1fr; } }
+
+/* «Solo esta planta» / «Techos» in the floors panel (2D and 3D) */
+.vista-plantas { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 4px 0 10px; }
+.vista-plantas .btn-chico.activo { background: color-mix(in srgb, var(--acento) 14%, var(--sup)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--acento) 45%, transparent); color: var(--acento); }

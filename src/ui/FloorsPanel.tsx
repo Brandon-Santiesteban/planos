@@ -4,6 +4,7 @@ import { useEditor } from '../store/editorStore';
 import { askConfirm } from './Dialog';
 import { LengthField } from './fields';
 import Icon from './Icon';
+import { useViewOptions } from '../store/viewOptions';
 
 /** Short level badge: B for the ground floor, then 1, 2… */
 const level = (i: number) => (i === 0 ? 'B' : String(i));
@@ -12,6 +13,7 @@ export default function FloorsPanel() {
   const floors = useEditor((s) => s.project.floors);
   const activeFloorId = useEditor((s) => s.activeFloorId);
   const [renaming, setRenaming] = useState<string | null>(null);
+  const { onlyActive, roofs, set: setView } = useViewOptions();
   const active = floors.find((f) => f.id === activeFloorId) ?? floors[0];
   const index = floors.indexOf(active);
 
@@ -74,6 +76,24 @@ export default function FloorsPanel() {
           );
         })}
       </ul>
+      <div className="vista-plantas" role="group" aria-label="Qué se ve en el plano y en 3D">
+        <button
+          className={`btn btn-chico${onlyActive ? ' activo' : ''}`}
+          aria-pressed={onlyActive}
+          onClick={() => setView({ onlyActive: !onlyActive })}
+          title="Ver solo la planta elegida, sin las de abajo ni las de arriba (plano y 3D)"
+        >
+          <Icon name="layers" size={16} />Solo esta planta
+        </button>
+        <button
+          className={`btn btn-chico${roofs ? ' activo' : ''}`}
+          aria-pressed={roofs}
+          onClick={() => setView({ roofs: !roofs })}
+          title={roofs ? 'Quitar los techos para ver las habitaciones por dentro (plano y 3D)' : 'Poner los techos'}
+        >
+          <Icon name="room" size={16} />{roofs ? 'Techos puestos' : 'Sin techos'}
+        </button>
+      </div>
       <LengthField
         key={active.id}
         label={`Altura de ${active.name}`}

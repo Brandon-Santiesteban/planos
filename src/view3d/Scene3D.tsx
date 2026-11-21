@@ -18,6 +18,7 @@ import SegmentedSwitch from '../ui/SegmentedSwitch';
 import WalkControls from '../walk/WalkControls';
 import { WalkButton, WalkHint } from '../walk/WalkOverlay';
 import { useWalk } from '../walk/walkStore';
+import { useViewOptions, withoutRoofs } from '../store/viewOptions';
 import { Ground, horizonColor, OutdoorLights, RoomLights, SkyDome, SkyLights } from './Surroundings';
 import RenderBridge from '../render/RenderBridge';
 import RenderButtons from '../render/RenderButtons';
@@ -118,7 +119,10 @@ export default function Scene3D() {
   // Leaving the 3D view ends the walk.
   useEffect(() => () => useWalk.getState().set({ walking: false }), []);
   const activeIndex = Math.max(0, project.floors.findIndex((f) => f.id === activeFloorId));
-  const visible = project.floors.filter((_, i) => i <= activeIndex || showUpperFloors || walking);
+  const { onlyActive, roofs } = useViewOptions();
+  const shown = project.floors.filter((_, i) => (onlyActive && !walking ? i === activeIndex : i <= activeIndex || showUpperFloors || walking));
+  // «Techos» off (not while walking): roof slabs hidden, so the rooms under them can be seen from above.
+  const visible = roofs || walking ? shown : shown.map(withoutRoofs);
   const { grass, time, lights: lighting, doorsClosed } = useSceneOptions();
   const visibleIds = visible.map((f) => f.id).join();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -168,7 +172,7 @@ export default function Scene3D() {
       </svg>
       <WalkHint />
       <div className="scene-toggle">
-        {!walking && (
+        {!walking && !onlyActive && (
           <label>
             <input type="checkbox" checked={showUpperFloors} onChange={(e) => useEditor.getState().setShowUpperFloors(e.target.checked)} />
             Plantas superiores
