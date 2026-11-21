@@ -25,8 +25,14 @@ test('opens a window with floor and format switches and downloads the chosen fil
   expect(screen.getByRole('dialog', { name: 'Exportar planos' })).toBeInTheDocument();
   expect(screen.getByRole('radio', { name: 'Planta actual' })).toHaveAttribute('aria-checked', 'true');
   expect(screen.getByRole('radio', { name: 'PDF a escala' })).toHaveAttribute('aria-checked', 'true');
+  expect(screen.queryByRole('radio', { name: 'Milímetros' })).toBeNull();
   fireEvent.click(screen.getByRole('radio', { name: 'DXF para arquitecto' }));
+  expect(screen.getByRole('radio', { name: 'Milímetros' })).toHaveAttribute('aria-checked', 'true');
+  fireEvent.click(screen.getByRole('radio', { name: 'Metros' }));
+  const build = vi.spyOn(exportFile, 'buildExport');
   fireEvent.click(screen.getByRole('button', { name: /Descargar/ }));
+  await waitFor(() => expect(build).toHaveBeenCalled());
+  expect(build.mock.calls[0][4]).toEqual({ dxfUnits: 'm' });
   await waitFor(() => expect(download).toHaveBeenCalled());
   expect(download.mock.calls[0][0]).toBe('Mi casa - Planta baja.dxf');
   expect(screen.queryByRole('dialog')).toBeNull();

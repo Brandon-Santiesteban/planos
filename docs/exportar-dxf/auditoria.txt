@@ -1,0 +1,47 @@
+ezdxf 1.4.5: ezdxf.readfile (strict) + recover.readfile + doc.audit()
+
+file: casa-cesar-5-todas-mm.dxf
+DXF version: AC1021  ($ACADVER AC1021), $INSUNITS=4, $DWGCODEPAGE=ANSI_1252
+$EXTMIN=(-3000.0, -40760.0, 0.0) $EXTMAX=(69465.0, 2544.0, 0.0)
+recover: 0 errors, 0 fixes
+audit: 0 errors, 0 fixes
+layers: 0(c7,lw-3), MUROS(c7,lw50), MUROS-RELLENO(c8,lw0), HUECOS(c4,lw25), ESPACIOS(c3,lw13), ESCALERAS(c6,lw18), TERRENO(c30,lw18), MUEBLES(c8,lw13), COTAS(c1,lw13), TEXTOS(c2,lw18), Defpoints(c7,lw-3)
+  COTAS          LINE        325
+  COTAS          TEXT        65
+  ESCALERAS      LINE        29
+  ESCALERAS      LWPOLYLINE  2
+  ESPACIOS       LWPOLYLINE  40
+  HUECOS         ARC         34
+  HUECOS         LINE        178
+  MUEBLES        LWPOLYLINE  236
+  MUEBLES        TEXT        236
+  MUROS          LWPOLYLINE  135
+  MUROS-RELLENO  HATCH       135
+  TERRENO        LWPOLYLINE  23
+  TEXTOS         HATCH       1
+  TEXTOS         LWPOLYLINE  1
+  TEXTOS         TEXT        123
+texts with accents (decoded): Andén | Antejardín E10 | Antejardín E11 | Baliza de jardín (luz baja) | Carro (sedán) | Circulación (gym) | Clóset | Cuadro abstracto cálido | Deck y jardín de la piscina | Estantería | Galería de servicio E10 | Habitación H1 | Habitación H2 | Habitación principal | Habitación principal E10
+
+file: casa-cesar-5-primer-piso-m.dxf
+DXF version: AC1021  ($ACADVER AC1021), $INSUNITS=6, $DWGCODEPAGE=ANSI_1252
+$EXTMIN=(-3.0, -40.8, 0.0) $EXTMAX=(35.8, 0.4, 0.0)
+recover: 0 errors, 0 fixes
+audit: 0 errors, 0 fixes
+layers: 0(c7,lw-3), MUROS(c7,lw50), MUROS-RELLENO(c8,lw0), HUECOS(c4,lw25), ESPACIOS(c3,lw13), ESCALERAS(c6,lw18), TERRENO(c30,lw18), MUEBLES(c8,lw13), COTAS(c1,lw13), TEXTOS(c2,lw18), Defpoints(c7,lw-3)
+  COTAS          LINE        220
+  COTAS          TEXT        44
+  ESCALERAS      LINE        29
+  ESCALERAS      LWPOLYLINE  2
+  ESPACIOS       LWPOLYLINE  26
+  HUECOS         ARC         24
+  HUECOS         LINE        108
+  MUEBLES        LWPOLYLINE  206
+  MUEBLES        TEXT        206
+  MUROS          LWPOLYLINE  89
+  MUROS-RELLENO  HATCH       89
+  TERRENO        LWPOLYLINE  23
+  TEXTOS         HATCH       1
+  TEXTOS         LWPOLYLINE  1
+  TEXTOS         TEXT        103
+texts with accents (decoded): Andén | Antejardín E10 | Antejardín E11 | Baliza de jardín (luz baja) | Carro (sedán) | Clóset | Cuadro abstracto cálido | Deck y jardín de la piscina | Estantería | Galería de servicio E10 | Habitación principal | Jardín central | Jardín lateral (habitaciones) | Jardín vertical | Jarrón con pampas

@@ -1,4 +1,5 @@
 import type { Floor, Project } from '../model/types';
+import type { DxfUnits } from './dxf';
 
 export type ExportScope = 'actual' | 'todas';
 export type ExportFormat = 'pdf' | 'dxf' | 'texto';
@@ -19,7 +20,9 @@ export function exportFileName(projectName: string, label: string, format: Expor
   return `${clean(projectName) || 'Plano'} - ${clean(label) || 'Planta'}.${EXT[format]}`;
 }
 
-export async function buildExport(project: Project, activeFloorId: string, scope: ExportScope, format: ExportFormat): Promise<{ name: string; blob: Blob }> {
+export async function buildExport(project: Project, activeFloorId: string, scope: ExportScope, format: ExportFormat,
+  opts: { dxfUnits?: DxfUnits } = {},
+): Promise<{ name: string; blob: Blob }> {
   const floors = floorsToExport(project, activeFloorId, scope);
   if (floors.length === 0) throw new Error('No hay nada dibujado para exportar en esta planta');
   const label = scope === 'todas' && project.floors.length > 1 ? 'Todas las plantas' : floors[0].name;
@@ -33,7 +36,7 @@ export async function buildExport(project: Project, activeFloorId: string, scope
     return { name, blob: new Blob([exportText(project, floors)], { type: 'text/plain;charset=utf-8' }) };
   }
   const { exportDxf } = await import('./dxf');
-  return { name, blob: new Blob([exportDxf(project, floors)], { type: 'application/dxf' }) };
+  return { name, blob: new Blob([exportDxf(project, floors, { units: opts.dxfUnits })], { type: 'application/dxf' }) };
 }
 
 export function downloadBlob(name: string, blob: Blob) {
