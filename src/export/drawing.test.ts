@@ -1,5 +1,5 @@
 import type { Floor, Opening, Room, Wall } from '../model/types';
-import { buildDrawing, drawingBounds, northArrow, type Poly, type Prim, type Text } from './drawing';
+import { areaSchedule, buildDrawing, drawingBounds, exteriorDimensions, northArrow, PAPER_MM, type Poly, type Prim, type Text } from './drawing';
 
 const w = (id: string, ax: number, ay: number, bx: number, by: number, t = 0.2): Wall =>
   ({ id, a: { x: ax, y: ay }, b: { x: bx, y: by }, thickness: t, height: null });
@@ -201,4 +201,79 @@ test('north arrow points to geographic north', () => {
   expect(tip(east).x).toBeCloseTo(5);
   expect(tip(east).y).toBeCloseTo(0);
   expect((up.find((p) => p.type === 'text') as Text).text).toBe('N');
+});
+
+describe('paper sizes, options and exterior dimensions', () => {
+  // 8 × 6 m box with a 1 m window on the north wall and a partition meeting it at x = 3
+  const box = floor({
+    walls: [w('n', 0, 0, 8, 0), w('e', 8, 0, 8, 6), w('s', 8, 6, 0, 6), w('o', 0, 6, 0, 0), w('p', 3, 0, 3, 6)],
+    openings: [{ id: 'v', wallId: 'n', kind: 'window', offset: 5, width: 1, height: 1.2, sill: 0.9 }],
+    rooms: [
+      { id: 'a', name: 'Sala', kind: 'room', points: rect(0, 0, 3, 6) },
+      { id: 'b', name: 'Patio', kind: 'balcony', points: rect(3, 0, 8, 6) },
+      { id: 'c', name: 'Jardín', kind: 'exterior', points: rect(0, 6, 8, 10) },
+      { id: 'd', name: 'Cubierta', kind: 'roof', points: rect(0, 0, 8, 6) },
+    ],
+    furniture: [{ id: 'm', type: 'mesa', x: 1, y: 1, rotation: 0, width: 1, depth: 1, height: 1, elevation: 0 }],
+  });
+
+  test('with a scale, texts are sized in paper mm', () => {
+    const d = buildDrawing(box, { scale: 100 });
+    const name = of(d.prims, 'TEXTOS', 'text').find((t) => t.text === 'Sala')!;
+    expect(name.height).toBeCloseTo((PAPER_MM.text.room * 100) / 1000); // 2,5 mm → 0,25 m at 1:100
+    const dim = of(d.prims, 'COTAS', 'text')[0];
+    expect(dim.height).toBeCloseTo(0.2);
+    expect(of(buildDrawing(box, { scale: 50 }).prims, 'COTAS', 'text')[0].height).toBeCloseTo(0.1);
+  });
+
+  test('furniture and wall dimensions can be left out', () => {
+    const d = buildDrawing(box, { furniture: false, wallDimensions: false });
+    expect(d.prims.some((p) => p.layer === 'MUEBLES')).toBe(false);
+    expect(d.prims.some((p) => p.layer === 'COTAS')).toBe(false);
+  });
+
+  test('exterior strings: openings + corners, then corners + wall axes, then the overall, outside the building', () => {
+    const prims = exteriorDimensions(box, { scale: 100 });
+    const texts = prims.filter((p): p is Text => p.type === 'text');
+    const north = texts.filter((t) => t.angle === 0 && t.at.y < -0.1).sort((a, b) => a.at.y - b.at.y || a.at.x - b.at.x);
+    const rows = [...new Set(north.map((t) => Math.round(t.at.y * 100)))].sort((a, b) => b - a);
+    // nearest first: window chain, axes chain, overall
+    expect(rows).toHaveLength(3);
+    const row = (k: number) => north.filter((t) => Math.round(t.at.y * 100) === rows[k]).map((t) => t.text);
+    expect(row(0)).toEqual(['4,60', '1,00', '2,60']); // −0,1 … 4,5 | 4,5 … 5,5 | 5,5 … 8,1
+    expect(row(1)).toEqual(['3,10', '5,10']); // to the partition's axis at x = 3
+    expect(row(2)).toEqual(['8,20']);
+    // the vertical sides read bottom to top
+    expect(texts.some((t) => t.angle === -90 && t.text === '6,20')).toBe(true);
+    // every dimension sits outside the walls' outline
+    for (const t of texts) expect(t.at.y < -0.1 || t.at.y > 6.1 || t.at.x < -0.1 || t.at.x > 8.1).toBe(true);
+  });
+
+  test('buildDrawing adds the exterior strings when asked', () => {
+    const d = buildDrawing(box, { scale: 100, wallDimensions: false, exteriorDimensions: true });
+    expect(of(d.prims, 'COTAS', 'text').map((t) => t.text)).toContain('8,20');
+  });
+
+  test('fitLabels turns a label along a tall narrow room and drops outdoor labels that cannot fit', () => {
+    const narrow = floor({
+      rooms: [
+        { id: 'a', name: 'Pasillo largo', kind: 'room', points: rect(0, 0, 1, 8) },
+        { id: 'b', name: 'Separación lateral', kind: 'exterior', points: rect(2, 0, 2.3, 8) },
+      ],
+    });
+    const texts = of(buildDrawing(narrow, { scale: 100, fitLabels: true }).prims, 'TEXTOS', 'text');
+    expect(texts.find((t) => t.text === 'Pasillo largo')!.angle).toBe(-90);
+    expect(texts.some((t) => t.text === 'Separación lateral')).toBe(false);
+    // without it, every label stays flat
+    expect(of(buildDrawing(narrow).prims, 'TEXTOS', 'text').every((t) => t.angle === 0)).toBe(true);
+  });
+
+  test('area schedule: grouped rooms, roofs left out, total = interior + terraces', () => {
+    const s = areaSchedule(box);
+    expect(s.groups.map((g) => g.title)).toEqual(['Espacios interiores', 'Terrazas y balcones', 'Zonas exteriores']);
+    expect(s.groups[0].rows).toEqual([{ name: 'Sala', area: 18 }]);
+    expect(s.groups[1].subtotal).toBeCloseTo(30);
+    expect(s.groups[2].subtotal).toBeCloseTo(32);
+    expect(s.total).toBeCloseTo(48);
+  });
 });

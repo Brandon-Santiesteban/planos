@@ -342,6 +342,8 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 /* ---- Exportar planos (src/export) ---- */
 .ventana-exportar { max-width: 520px; }
 .ventana-exportar .carril button { flex: 1; }
+.ventana-exportar .exportar-opciones { display: flex; flex-wrap: wrap; gap: 0 20px; margin: -4px 0 14px; font-size: 13px; }
+.ventana-exportar .exportar-opciones .toggle-linea { margin: 4px 0; }
 .ventana-exportar .ayuda { text-align: justify; hyphens: auto; text-align-last: left; }
 /* ---------- Phase 2: dropdown, stairs in the plan, walk mode ---------- */
 .desplegable { position: relative; }

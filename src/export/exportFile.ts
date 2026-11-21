@@ -1,5 +1,6 @@
 import type { Floor, Project } from '../model/types';
 import type { DxfUnits } from './dxf';
+import type { PaperSize, ScaleChoice } from './pdf';
 
 export type ExportScope = 'actual' | 'todas';
 export type ExportFormat = 'pdf' | 'dxf' | 'texto';
@@ -20,8 +21,13 @@ export function exportFileName(projectName: string, label: string, format: Expor
   return `${clean(projectName) || 'Plano'} - ${clean(label) || 'Planta'}.${EXT[format]}`;
 }
 
-export async function buildExport(project: Project, activeFloorId: string, scope: ExportScope, format: ExportFormat,
-  opts: { dxfUnits?: DxfUnits } = {},
+/** PDF choices from the export window. */
+export interface PdfChoices { paper: PaperSize; scale: ScaleChoice; furniture: boolean; dimensions: boolean; wallDimensions: boolean }
+
+export const PDF_DEFAULTS: PdfChoices = { paper: 'A1', scale: 'auto', furniture: false, dimensions: true, wallDimensions: false };
+
+export async function buildExport(
+  project: Project, activeFloorId: string, scope: ExportScope, format: ExportFormat, pdf: PdfChoices = PDF_DEFAULTS, opts: { dxfUnits?: DxfUnits } = {},
 ): Promise<{ name: string; blob: Blob }> {
   const floors = floorsToExport(project, activeFloorId, scope);
   if (floors.length === 0) throw new Error('No hay nada dibujado para exportar en esta planta');
@@ -29,7 +35,10 @@ export async function buildExport(project: Project, activeFloorId: string, scope
   const name = exportFileName(project.name, label, format);
   if (format === 'pdf') {
     const { exportPdf } = await import('./pdf'); // jsPDF only loads when someone exports
-    return { name, blob: new Blob([exportPdf(project, floors)], { type: 'application/pdf' }) };
+    const bytes = exportPdf(project, floors, {
+      paper: pdf.paper, scaleChoice: pdf.scale, furniture: pdf.furniture, dimensions: pdf.dimensions, wallDimensions: pdf.wallDimensions,
+    });
+    return { name, blob: new Blob([bytes], { type: 'application/pdf' }) };
   }
   if (format === 'texto') {
     const { exportText } = await import('./texto');
