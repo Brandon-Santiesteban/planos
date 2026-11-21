@@ -50,7 +50,7 @@ export default function StairsMesh({ room, rise, selected }: { room: Room; rise:
     const out: { from: Vector3; to: Vector3; r: number }[] = [];
     const divider = stairDivider(room);
     if (!divider) {
-      const c = f.width - 0.06;
+      const c = room.railAtStart ? 0.06 : f.width - 0.06;
       out.push({ from: at(0, c, RAIL), to: at(f.length, c, rise + RAIL), r: 0.025 });
       out.push({ from: at(0, c, 0), to: at(0, c, RAIL), r: 0.02 });
       out.push({ from: at(f.length, c, rise), to: at(f.length, c, rise + RAIL), r: 0.02 });
@@ -86,7 +86,7 @@ export default function StairsMesh({ room, rise, selected }: { room: Room; rise:
       {room.glass && !stairDivider(room)
         ? steps.map((s, i) => (
             // One glass balustrade pane per step along the open side, the slim handrail on top.
-            <mesh key={`g${i}`} position={at((s.a0 + s.a1) / 2, f.width - 0.04, s.top + RAIL / 2)} rotation={[0, yawAngle, 0]}>
+            <mesh key={`g${i}`} position={at((s.a0 + s.a1) / 2, room.railAtStart ? 0.04 : f.width - 0.04, s.top + RAIL / 2)} rotation={[0, yawAngle, 0]}>
               <boxGeometry args={[s.a1 - s.a0, RAIL, 0.012]} />
               <meshStandardMaterial color={GLASS} transparent opacity={0.3} roughness={0.05} depthWrite={false} />
             </mesh>

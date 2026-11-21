@@ -20,7 +20,7 @@ export type FurnitureModel =
   | 'consola' | 'jacuzzi' | 'toallero' | 'brasero' | 'puf' | 'jardinVertical' | 'porton' | 'vestier'
   | 'luzEmpotrada' | 'colgante' | 'aplique' | 'aire' | 'canasta' | 'centroEscritorio' | 'impresora'
   | 'matita' | 'monstera' | 'plantaColgante' | 'pampas' | 'adornos' | 'repisaDeco' | 'closetTablero' | 'tableroCorredizo' | 'cornisaLed'
-  | 'barraSonido' | 'parlante' | 'subwoofer';
+  | 'barraSonido' | 'parlante' | 'subwoofer' | 'campana' | 'baliza';
 
 /** Open walk-in dressing modules (model 'vestier'): what each one holds. */
 export type Dressing = 'colgar' | 'repisas' | 'zapatos' | 'cajones';
@@ -132,6 +132,7 @@ export const CATALOG: CatalogItem[] = [
   item('lavaplatos', 'Lavaplatos (mesón con poceta)', 'Cocina', 'lavaplatos', [0.8, 0.6, 0.9], BLANCO),
   item('estufa', 'Estufa', 'Cocina', 'estufa', [0.6, 0.6, 0.9], ACERO),
   item('nevera', 'Nevera', 'Cocina', 'nevera', [0.7, 0.7, 1.8], ACERO),
+  item('campana', 'Campana extractora (con ducto al techo)', 'Cocina', 'campana', [0.9, 0.5, 1.2], ACERO, { elevation: 1.65, light: 0.02 }),
   item('alacena', 'Alacena alta', 'Cocina', 'alacena', [1.2, 0.35, 0.7], BLANCO, { elevation: 1.5 }),
   // Baño
   item('sanitario', 'Sanitario', 'Baño', 'sanitario', [0.4, 0.7, 0.78], LOZA),
@@ -184,6 +185,11 @@ export const CATALOG: CatalogItem[] = [
   item('arbol-guayacan', 'Árbol guayacán amarillo', 'Exterior', 'arbol', [3.0, 3.0, 6.0], '#6a8c42', { flowers: '#e0c552' }),
   item('arbol-pequeno', 'Árbol pequeño', 'Exterior', 'arbol', [2.0, 2.0, 3.5], '#5d8642'),
   item('arbusto', 'Arbusto', 'Exterior', 'arbol', [1.0, 1.0, 1.0], '#557e3c'),
+  // A clipped hedge segment (a shrub much wider than deep is drawn as a hedge); stretch it or line several up.
+  item('seto', 'Seto (cerca viva)', 'Exterior', 'arbol', [2.0, 0.6, 1.3], '#4f7a38'),
+  item('baliza', 'Baliza de jardín (luz baja)', 'Exterior', 'baliza', [0.14, 0.14, 0.6], '#2b2f36', { light: 0.9 }),
+  item('luz-piso', 'Luz de piso hacia arriba (árboles, fachada)', 'Exterior', 'baliza', [0.18, 0.18, 0.12], '#2b2f36', { light: 1.5 }),
+  item('aplique-exterior', 'Aplique de fachada', 'Exterior', 'aplique', [0.14, 0.14, 0.32], '#2b2f36', { elevation: 2.2, light: 0.5 }),
   item('poste-alumbrado', 'Poste de alumbrado', 'Exterior', 'poste', [0.3, 1.2, 6.0], '#3b3f45'),
   // Two leaves on parallel tracks; open, they stack beside the opening (see gate.ts). Same celosía as the front fence.
   item('porton-telescopico', 'Portón corredizo telescópico', 'Parqueadero', 'porton', [3.3, 0.12, 2.0], '#1e1e1e'),

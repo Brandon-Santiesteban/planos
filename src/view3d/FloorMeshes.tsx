@@ -211,7 +211,11 @@ function RoomSlab({ room, walls, selected, floorHeight, ground }: { room: Room; 
     const depth = room.kind !== 'roof' ? 0.02 : room.floorMaterial ? SOLID_ROOF : 0.06;
     return new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false });
   }, [room.points, room.kind, room.floorMaterial]);
-  if (room.kind === 'stairs') return <StairsMesh room={room} rise={floorHeight} selected={selected} />;
+  if (room.kind === 'stairs') return (
+    <group position={[0, room.stairBase ?? 0, 0]}>
+      <StairsMesh room={room} rise={room.stairRise ?? floorHeight} selected={selected} />
+    </group>
+  );
   const outline = selected ? <SelectionOutline room={room} y={room.kind === 'roof' ? (room.height ?? floorHeight) + 0.07 : 0.02} /> : null;
   if (room.kind === 'roof' && room.floorMaterial) {
     // A solid roof: an opaque slab with its finish on top and a fascia of its own colour, hanging down from the

@@ -111,11 +111,12 @@ export function levelAt(project: Project, pos: Vec2, prevFeet: number): Level {
       if (r.kind !== 'stairs') continue;
       const t = stairProgress(r, pos);
       if (t === null) continue;
-      const feet = elev[i] + t * rise;
+      const up = (r.stairBase ?? 0) + t * (r.stairRise ?? rise);
+      const feet = elev[i] + up;
       const gap = Math.abs(feet - prevFeet);
       if (gap > bestGap) continue;
       bestGap = gap;
-      best = { floorIndex: t < 0.5 ? i : Math.min(i + 1, top), feet };
+      best = { floorIndex: up < rise / 2 ? i : Math.min(i + 1, top), feet };
     }
   }
   if (best) return best;

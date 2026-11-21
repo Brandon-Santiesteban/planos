@@ -290,6 +290,24 @@ const sconce: Builder = ({ w, d, h, c, off }) => (
   </>
 );
 
+/** Kitchen range hood: a slim canopy over the stove with its chimney up to the ceiling (the extractor's duct). */
+const rangeHood: Builder = ({ w, d, h, c, off }) => (
+  <>
+    <B p={[0, 0.06, 0]} s={[w, 0.12, d]} c={c} m={0.8} r={0.3} />
+    <B p={[0, 0.0, 0]} s={[w * 0.8, 0.01, d * 0.6]} c="#2a2a2a" m={0.6} e={off ? undefined : '#ffe2b0'} />
+    <B p={[0, 0.12 + (h - 0.12) / 2, -d / 2 + 0.16]} s={[0.32, h - 0.12, 0.28]} c={c} m={0.8} r={0.3} />
+  </>
+);
+
+/** Garden bollard (or a low ground uplight when it is short): a dark post with a glowing head. */
+const bollard: Builder = ({ w, h, c, off }) => (
+  <>
+    <C p={[0, (h * 0.75) / 2, 0]} r={w / 2} h={h * 0.75} c={c} />
+    <C p={[0, h * 0.75 + (h * 0.2) / 2, 0]} r={w / 2 - 0.01} h={h * 0.2} c="#fff4dc" e={off ? undefined : '#ffcf8a'} />
+    <C p={[0, h * 0.975, 0]} r={w / 2 + 0.01} h={h * 0.05} c={c} />
+  </>
+);
+
 const doorsBox: Builder = ({ w, d, h, c }) => {
   const n = Math.max(1, Math.round(w / 0.55));
   const dw = w / n;
@@ -2164,6 +2182,36 @@ const tree: Builder = ({ w, d, h, c, item, seed = 1 }) => {
     const target = t < 0.35 ? shade(base, 0.78) : t < 0.7 ? base : shade(vary(base, rand), 1.1);
     return k % 5 === 0 ? shade(base, 0.68) : target;
   };
+  if (shrub && w > d * 1.5) {
+    // A clipped hedge: a dark woody core hidden behind three layers of small leafy masses on both faces and a
+    // softly uneven top, so it reads as foliage and not as a green box. Few blob shapes are reused (geometry cache).
+    const r = Math.max(d * 0.62, 0.13);
+    const n = Math.max(2, Math.ceil(w / (r * 1.25)));
+    const step = w / n;
+    const layers = [h * 0.28, h * 0.58, h - r * 0.7];
+    const blobs: ReactElement[] = [];
+    layers.forEach((ly, li) => {
+      for (let k = 0; k < n; k++) {
+        for (const side of li === 2 ? [0] : [-1, 1]) {
+          const i = blobs.length;
+          const x = -w / 2 + step * (k + 0.5 * (li % 2) + 0.25) + (rand() - 0.5) * step * 0.4;
+          const y = ly + (rand() - 0.5) * r * (li === 2 ? 0.35 : 0.6);
+          const z = side * d * 0.18 + (rand() - 0.5) * d * 0.12;
+          const sy = li === 2 ? 0.7 + rand() * 0.25 : 1.1 + rand() * 0.3;
+          blobs.push(<Blob key={i} p={[Math.max(-w / 2 + r * 0.6, Math.min(w / 2 - r * 0.6, x)), y, z]} r={r * (0.85 + rand() * 0.3)} sc={[1.25, sy, 0.95]} c={leaf(i)} v={(i % 9) + 1} />);
+        }
+      }
+    });
+    return (
+      <>
+        <mesh position={[0, h * 0.45, 0]} castShadow receiveShadow>
+          <boxGeometry args={[w * 0.98, h * 0.86, d * 0.55]} />
+          <meshStandardMaterial color={shade(base, 0.5)} roughness={1} />
+        </mesh>
+        {blobs}
+      </>
+    );
+  }
   if (shrub) {
     const n = 6 + Math.floor(rand() * 3);
     return (
@@ -2250,7 +2298,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
   centroEntretenimiento: entertainment, centroEscritorio: deskEntertainment, closetTablero: whiteboardCloset, tableroCorredizo: pullOutBoard, consola: console_, cortina: curtain, tiraLed: ledStrip, cuadro: picture,
   repisa: collectiblesShelf, jacuzzi, toallero: towelRail, brasero: firePit, puf: pouf, jardinVertical: verticalGarden,
   vestier: dressing, luzEmpotrada: recessed, colgante: pendant, aplique: sconce, aire: airConditioner, barraSonido: soundbar, parlante: speaker, subwoofer, cornisaLed: cornice,
-  canasta: basket, impresora: printer,
+  canasta: basket, impresora: printer, campana: rangeHood, baliza: bollard,
   matita: pottedSmall, monstera, plantaColgante: hangingPlant, pampas, adornos: tabletopDecor, repisaDeco: decorShelf,
 };
 

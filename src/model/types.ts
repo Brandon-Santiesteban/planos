@@ -75,6 +75,12 @@ export interface Room {
   stairShape?: StairShape;
   /** stairs only: floating wooden treads with a glass railing (e.g. a stair rising in a patio). */
   glass?: boolean;
+  /** straight stairs only: balustrade on the other long side (the north or west one), e.g. when the far side runs along a wall. */
+  railAtStart?: boolean;
+  /** stairs only: how much this flight climbs (default: the floor height), e.g. one flight up to a half landing. */
+  stairRise?: number;
+  /** stairs only: height its first step starts from above the floor (default 0), e.g. the flight after a half landing. */
+  stairBase?: number;
   /** floor finish (rooms and balconies); on a roof it makes a solid, opaque slab with that finish on top. */
   floorMaterial?: FloorMaterial;
   /** hex colour the floor finish should look (e.g. a sand porcelain); absent = the finish's own colour. */

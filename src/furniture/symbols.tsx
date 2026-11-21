@@ -346,7 +346,7 @@ const BUILDERS: Record<FurnitureModel, Builder> = {
     return <>{rect(-w / 2, -d / 2, tw, td, 0, 'l')}{rect(w / 2 - tw, -d / 2, tw, td, 0, 'r')}{line(-w / 2 + tw, -d / 2 + 0.05, w / 2 - tw, -d / 2 + 0.05)}</>;
   }, cortina: curtain, tiraLed: flat, cuadro: flat, repisa: shelfDots, consola: box(0.03),
   jacuzzi, toallero: flat, brasero: firePit, puf: pouf, jardinVertical: shelfDots, vestier: shelfDots,
-  luzEmpotrada: lightPoint, colgante: lightPoint, aplique: lightPoint, aire: flat,
+  luzEmpotrada: lightPoint, colgante: lightPoint, aplique: lightPoint, baliza: lightPoint, campana: flat, aire: flat,
   closetTablero: closet,
   cornisaLed: flat,
   tableroCorredizo: ({ w, d, open }) => <>{line(-w / 2, 0, w / 2, 0)}{rect(open ? 0 : -w / 2, -d / 2, w / 2, d * 0.6)}</>,
