@@ -6,6 +6,7 @@ import { openProjectsDialog } from './ProjectsDialog';
 import { notify } from './toasts';
 import { renameProject } from '../persistence/rename';
 import Icon from './Icon';
+import { openHelp } from './HelpDialog';
 import { useTheme } from './theme';
 import { useProjectFile } from './useProjectFile';
 
@@ -66,6 +67,7 @@ export default function TopBar() {
         <Icon name="magnet" size={16} />Ajustar a cuadrícula
       </button>
       <div className="derecha">
+        <button className="btn btn-sec" onClick={openHelp} title="Cómo usar la página"><Icon name="info" size={16} />Ayuda</button>
         <SaveStatusChip status={status} />
         <button className="btn btn-icono project-name" style={{ width: 'auto', padding: '0 8px', color: 'var(--tinta)' }} onClick={rename} title="Cambiar nombre">
           {name}

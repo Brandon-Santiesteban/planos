@@ -557,3 +557,16 @@ input[type='range'] { accent-color: var(--acento); width: 100%; }
 .btn-texto { background: none; border: 0; padding: 0; color: var(--tinta); cursor: pointer; font: inherit; text-align: left; }
 .btn-texto:hover { color: var(--acento); }
 .panel-luces-cabeza .btn-texto { color: var(--acento); font-size: 12px; }
+
+/* «Cómo usar la página» — controls, colour-coded by group */
+.ventana-ayuda { max-width: 760px; max-height: calc(100vh - 32px); overflow-y: auto; }
+.ayuda-grupos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+.ayuda-grupo { border: 1px solid var(--linea); border-top: 4px solid var(--color-grupo); border-radius: 10px; padding: 12px 14px; }
+.ayuda-grupo h3 { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; margin: 0 0 8px; }
+.ayuda-icono { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 7px; color: #fff; background: var(--color-grupo); }
+.ayuda-grupo dl { margin: 0; display: grid; gap: 6px; }
+.ayuda-grupo dl > div { display: grid; grid-template-columns: 46% 1fr; gap: 8px; font-size: 13px; }
+.ayuda-grupo dt { font-weight: 500; color: var(--color-grupo); }
+[data-tema="oscuro"] .ayuda-grupo dt { filter: brightness(1.6); }
+.ayuda-grupo dd { margin: 0; color: var(--tenue); }
+@media (max-width: 640px) { .ayuda-grupos { grid-template-columns: 1fr; } }

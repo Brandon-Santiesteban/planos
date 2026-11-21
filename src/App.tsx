@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { HelpDialog } from './ui/HelpDialog';
 import GridControls from './editor2d/GridControls';
 import { duplicateSelectedFurniture } from './furniture/actions';
 import { startClipboard } from './store/clipboard';
@@ -129,6 +130,7 @@ export default function App() {
       <ToastHost />
       <ProjectsDialog onOpenFile={open} />
       <DialogHost />
+      <HelpDialog />
     </div>
   );
 }
